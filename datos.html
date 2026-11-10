@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chaos · Datos de Dota</title>
+  <link rel="stylesheet" href="datos.css">
+</head>
+<body>
+  <header>
+    <h1>Datos de Dota</h1>
+    <nav id="tabs">
+      <button data-tab="heroes" class="active">Héroes</button>
+      <button data-tab="items">Ítems</button>
+    </nav>
+    <input id="search" type="search" placeholder="Buscar…" autocomplete="off">
+    <span id="count"></span>
+  </header>
+  <main>
+    <ul id="list"></ul>
+    <section id="detail"><p class="muted">Cargando datos…</p></section>
+  </main>
+
+  <script src="js/datos.js"></script>
+</body>
+</html>
