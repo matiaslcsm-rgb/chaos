@@ -25,29 +25,41 @@ function attackTiming(baseAttackTime, attackPoint, attackSpeed) {
   return { attackInterval: baseAttackTime / speed, attackPoint: attackPoint / speed };
 }
 
+// What a hero gets from its attribute points. Shared by the base stats and by item bonuses.
+function attributeStats(primaryAttr, str, agi, int) {
+  return {
+    maxHp: str * HP_PER_STR,
+    hpRegen: str * HP_REGEN_PER_STR,
+    maxMana: int * MANA_PER_INT,
+    manaRegen: int * MANA_REGEN_PER_INT,
+    magicResist: int * MAGIC_RESIST_PER_INT,
+    armor: agi * ARMOR_PER_AGI,
+    attackSpeed: agi * ATTACK_SPEED_PER_AGI,
+    damage: primaryAttr === 'all' ? (str + agi + int) * UNIVERSAL_DAMAGE_PER_ATTR : { str, agi, int }[primaryAttr],
+  };
+}
+
 function heroStats(hero, level) {
   const ups = level - 1;
   const str = hero.base_str + hero.str_gain * ups;
   const agi = hero.base_agi + hero.agi_gain * ups;
   const int = hero.base_int + hero.int_gain * ups;
-  const attrDamage = hero.primary_attr === 'all'
-    ? (str + agi + int) * UNIVERSAL_DAMAGE_PER_ATTR
-    : { str, agi, int }[hero.primary_attr];
+  const fromAttrs = attributeStats(hero.primary_attr, str, agi, int);
   // In the data, base_attack_time is the base attack speed (100) and attack_rate is the BAT in seconds.
-  const attackSpeed = hero.base_attack_time + agi * ATTACK_SPEED_PER_AGI;
+  const attackSpeed = hero.base_attack_time + fromAttrs.attackSpeed;
 
   return Object.assign({
     str,
     agi,
     int,
-    maxHp: hero.base_health + str * HP_PER_STR,
-    hpRegen: hero.base_health_regen + str * HP_REGEN_PER_STR,
-    maxMana: hero.base_mana + int * MANA_PER_INT,
-    manaRegen: hero.base_mana_regen + int * MANA_REGEN_PER_INT,
-    armor: hero.base_armor + agi * ARMOR_PER_AGI,
-    magicResist: hero.base_mr + int * MAGIC_RESIST_PER_INT,
-    damageMin: hero.base_attack_min + attrDamage,
-    damageMax: hero.base_attack_max + attrDamage,
+    maxHp: hero.base_health + fromAttrs.maxHp,
+    hpRegen: hero.base_health_regen + fromAttrs.hpRegen,
+    maxMana: hero.base_mana + fromAttrs.maxMana,
+    manaRegen: hero.base_mana_regen + fromAttrs.manaRegen,
+    armor: hero.base_armor + fromAttrs.armor,
+    magicResist: hero.base_mr + fromAttrs.magicResist,
+    damageMin: hero.base_attack_min + fromAttrs.damage,
+    damageMax: hero.base_attack_max + fromAttrs.damage,
     attackSpeed,
     attackRange: hero.attack_range,
     projectileSpeed: hero.attack_type === 'Ranged' ? hero.projectile_speed : 0,

@@ -112,9 +112,13 @@ function canLevelAbility(hero, ability) {
   return levelProblem(hero, ability) === null;
 }
 
-// Passive stat bonuses are statuses that never expire, rebuilt whenever a level or toggle changes.
+// Passive stat bonuses (abilities and items) are statuses that never expire, rebuilt whenever
+// a level, a toggle or the inventory changes.
 function refreshPassives(unit) {
   unit.mods = unit.mods.filter((mod) => !mod.passive);
+  unit.items.forEach((item, slot) => {
+    unit.mods.push({ id: `item:${slot}`, passive: true, sourceId: unit.id, duration: Infinity, stacks: 1, tickTimer: 0, stats: itemStats(unit, item) });
+  });
   for (const ability of unit.abilities) {
     if (ability.level > 0 && ability.def.stats) {
       unit.mods.push({
@@ -254,7 +258,7 @@ function stepCastOrder(sim, unit, dt) {
 const neg = (value) => -Math.abs(value);
 
 function spellDamage(c, target, amount, type) {
-  return applyDamage(c.sim, c.caster, target, amount, type || 'magical');
+  return applyDamage(c.sim, c.caster, target, amount * (1 + c.caster.stats.spellAmp / 100), type || 'magical');
 }
 
 // Applies a status named after the ability, so each ability's effects refresh instead of piling up.

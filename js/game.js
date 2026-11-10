@@ -2,12 +2,23 @@
 
 // One player's arena: rounds, waves of creeps, levelling. Runs on top of the simulation, no DOM.
 
-const PREP_TIME = 5;
+// The mod leaves about 15 seconds between rounds to shop.
+const PREP_TIME = 15;
 const HERO_TEAM = 0;
 const CREEP_TEAM = 1;
 // The mod's draft: 5 abilities, two before round 1 and one more before rounds 3, 6 and 9.
 const DRAFT_ROUNDS = [1, 1, 3, 6, 9];
 const DRAFT_OPTIONS = 16;
+// Placeholder income until the mod's real numbers are researched (docs/PLAN.md, open decisions).
+// What is known: clearing the wave faster pays more. Starting gold is Dota's.
+const GOLD = {
+  start: 600,
+  perCreep: { melee: 30, ranged: 40 },
+  round: 150,
+  roundGrowth: 25,
+  // Clearing instantly doubles the round's gold; taking this many seconds or more adds nothing.
+  parTime: 45,
+};
 
 // Placeholder creeps until the mod's real waves are researched (docs/PLAN.md, stage 1).
 const CREEP_TYPES = {
@@ -68,7 +79,33 @@ function waveForRound(round) {
 function createGame(heroData, seed) {
   const sim = createSim(seed);
   const hero = addHero(sim, heroData, 1, HERO_TEAM, ARENA.width / 2, ARENA.height * 0.6);
-  return { sim, hero, round: 0, phase: 'prep', timer: PREP_TIME, picks: 0, draft: null };
+  hero.gold = GOLD.start;
+  return { sim, hero, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, picks: 0, draft: null };
+}
+
+// ---- Gold and the shop ----
+
+function roundGold(round, seconds) {
+  const base = GOLD.round + GOLD.roundGrowth * round;
+  return Math.round(base * (1 + Math.max(0, 1 - seconds / GOLD.parTime)));
+}
+
+// Gold still walking around: what the creeps alive are worth.
+function bountyAlive(game) {
+  return game.sim.units.reduce((sum, unit) => sum + (unit.kind === 'creep' && !unit.dead ? GOLD.perCreep[unit.creepKind] || 0 : 0), 0);
+}
+
+// The shop opens between rounds, like in the mod.
+function shopOpen(game) {
+  return game.phase === 'prep' && !game.draft;
+}
+
+function buyFromShop(game, key) {
+  return shopOpen(game) ? buyItem(game.hero, key) : 'closed';
+}
+
+function sellFromInventory(game, slot) {
+  return shopOpen(game) && sellItem(game.hero, slot);
 }
 
 // ---- Draft ----
@@ -138,12 +175,16 @@ function spawnWave(game) {
 
 function startRound(game) {
   game.round++;
+  game.roundTime = 0;
   game.phase = 'fight';
   spawnWave(game);
 }
 
 // The mod gives one level per round; the hero comes back at full health for the next one.
 function endRound(game) {
+  const gold = roundGold(game.round, game.roundTime);
+  game.hero.gold += gold;
+  pushEvent(game.sim, { type: 'text', x: game.hero.x, y: game.hero.y, text: `+${gold} de oro` });
   setHeroLevel(game.hero, game.hero.level + 1);
   game.hero.hp = game.hero.stats.maxHp;
   game.hero.mana = game.hero.stats.maxMana;
@@ -156,11 +197,16 @@ function stepGame(game, dt) {
   // The match waits while the player is choosing an ability.
   if (game.phase === 'prep' && !game.draft && draftsDue(game) > 0) openDraft(game);
   if (game.draft) return;
+  const bounty = bountyAlive(game);
   stepSim(game.sim, dt);
+  game.hero.gold += bounty - bountyAlive(game);
   if (game.phase === 'prep') {
     game.timer -= dt;
     if (game.timer <= 0) startRound(game);
-  } else if (game.hero.dead) {
+    return;
+  }
+  game.roundTime += dt;
+  if (game.hero.dead) {
     game.phase = 'lost';
   } else if (creepsAlive(game) === 0) {
     endRound(game);

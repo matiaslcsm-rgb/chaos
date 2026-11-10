@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.3.0 · Etapa 3: draft de habilidades';
+const GAME_VERSION = '0.4.0 · Etapa 3: oro, tienda e inventario';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -20,6 +20,11 @@ const CAST_MESSAGES = {
   cooldown: 'Todavía se está recargando',
   mana: 'No alcanza el maná',
 };
+const SHOP_MESSAGES = {
+  gold: 'No te alcanza el oro',
+  full: 'El inventario está lleno',
+  closed: 'La tienda abre entre rondas',
+};
 
 let heroes = [];
 let game = null;
@@ -30,6 +35,7 @@ const view = {
   message: null,
   attackMoveArmed: false,
   targeting: null,
+  shop: false,
   hoverEnemy: null,
   mouse: { x: 0, y: 0 },
 };
@@ -58,7 +64,7 @@ function say(text) {
 
 function startGame(heroData) {
   game = createGame(heroData, Date.now());
-  Object.assign(view, { floaters: [], effects: [], marker: null, message: null, attackMoveArmed: false, targeting: null, hoverEnemy: null });
+  Object.assign(view, { floaters: [], effects: [], marker: null, message: null, attackMoveArmed: false, targeting: null, shop: false, hoverEnemy: null });
 }
 
 function onSelectClick(point) {
@@ -145,6 +151,47 @@ function onBarClick(point) {
   return false;
 }
 
+// ---- Items and the shop ----
+
+function toggleShop() {
+  if (shopOpen(game)) view.shop = !view.shop;
+  else say(SHOP_MESSAGES.closed);
+}
+
+function tryUseItem(slot) {
+  const problem = useItem(game.sim, game.hero, slot);
+  if (problem && CAST_MESSAGES[problem]) say(CAST_MESSAGES[problem]);
+}
+
+function trySellItem(slot) {
+  const item = game.hero.items[slot];
+  if (!item) return;
+  if (sellFromInventory(game, slot)) say(`Vendiste ${DB.items[item.key].dname} por ${sellPrice(item.key)} de oro`);
+  else say('Los ítems se venden entre rondas');
+}
+
+// Returns true if the click was on the shop, its button or the inventory.
+function onShopClick(point, button) {
+  const shopping = view.shop && shopOpen(game);
+  if (shopping && inRect(point, shopPanelRect(canvas))) {
+    const card = shopCards(canvas).find((c) => inRect(point, c));
+    if (card && button === 0) {
+      const problem = buyFromShop(game, card.key);
+      if (problem) say(SHOP_MESSAGES[problem]);
+    }
+    return true;
+  }
+  if (inRect(point, shopButton(canvas))) {
+    if (button === 0) toggleShop();
+    return true;
+  }
+  const slot = inventorySlots(canvas).find((s) => inRect(point, s));
+  if (!slot) return false;
+  if (button === 0) tryUseItem(slot.slot);
+  else if (button === 2) trySellItem(slot.slot);
+  return true;
+}
+
 // ---- Input ----
 
 canvas.addEventListener('mousemove', (event) => {
@@ -168,6 +215,7 @@ canvas.addEventListener('mousedown', (event) => {
     if (event.button === 0) onDraftClick(point);
     return;
   }
+  if (onShopClick(point, event.button)) return;
   const world = worldPoint(point);
   if (event.button === 2) {
     if (view.targeting) {
@@ -209,6 +257,8 @@ window.addEventListener('keydown', (event) => {
     return;
   }
   if (levelling) return;
+  if (ITEM_HOTKEYS.includes(key) && !event.repeat) tryUseItem(ITEM_HOTKEYS.indexOf(key));
+  if (key === 't' && !event.repeat) toggleShop();
   if (key === 'a') {
     view.attackMoveArmed = true;
     view.targeting = null;
@@ -219,6 +269,7 @@ window.addEventListener('keydown', (event) => {
     view.targeting = null;
   }
   if (key === 'escape') {
+    view.shop = false;
     view.attackMoveArmed = false;
     view.targeting = null;
   }

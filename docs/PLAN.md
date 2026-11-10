@@ -37,6 +37,14 @@ cierra con algo que se puede comprobar.
 - **Draft: habilidades repetidas entre jugadores** (decisión, para cuando estén los rivales): (a) **cada habilidad
   la puede tener un solo jugador (recomendada si el mod lo hace así; hay que confirmarlo)**; (b) se pueden repetir.
 
+- **Oro por ronda y por creep** (decisión): las fuentes solo dicen que limpiar más rápido da más oro, no cuánto.
+  Hoy hay números provisorios (600 de arranque, 30-40 por creep, 150 + 25 por ronda, hasta el doble si limpiás
+  rápido). (a) **investigar los valores del mod y reemplazarlos (recomendada)**; (b) dejar los provisorios y
+  ajustarlos con el banco de partidas.
+- **Precios de los ítems** (decisión): el mod los tiene más caros que Dota, pero no sabemos cuánto. (a) **precios
+  de Dota por ahora (así está hoy)**; (b) multiplicarlos por un factor cuando se investigue.
+- **Vender ítems** (decisión): (a) **a mitad de precio, como en Dota (así está hoy)**; (b) sin venta.
+
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
 - [x] Repositorio en GitHub: `matiaslcsm-rgb/chaos` (2026-11-10).
@@ -89,7 +97,15 @@ Una partida completa, pero chica.
       al azar de las 43 del lote (nunca una que ya tenés); la partida espera mientras elegís y, si cerrás la
       ventana, te toca una al azar. El héroe ya no trae habilidades propias: pone solo los atributos, como en el
       mod (`js/game.js`, `js/render.js`) (2026-11-10). Quedan reglas por confirmar en "Decisiones abiertas".
-- [ ] Oro, tienda e inventario de 6.
+- [ ] Oro, tienda e inventario de 6. **A medias (2026-11-10):** programado pero SIN pruebas propias y SIN probar
+      en el navegador (la sesión se cortó ahí). Hecho: oro inicial, oro por creep y por ronda (más si limpiás
+      rápido), tienda entre rondas (tecla T, 15 segundos), inventario de 6 con teclas Z X C V B N, recetas que usan
+      las partes que ya tenés, venta a mitad de precio con clic derecho, y los 25 ítems del lote
+      (`js/items.js`, `js/game.js`, `js/render.js`, `js/main.js`). **Falta:** pruebas en `js/tests.js` (comprar,
+      armar recetas, vender, inventario lleno, robo de vida, crítico, aturdir del Basher, BKB, oro por ronda),
+      jugar una ronda comprando en el navegador y revisar que la tienda no tape nada.
+      Simplificaciones: BKB dura siempre 9 s, Power Treads da siempre el atributo principal, Moon Shard no se
+      consume, un solo crítico por golpe.
 - [ ] 7 rivales de la IA jugando sus arenas.
 - [ ] Duelos y apuestas.
 - [ ] Final de partida: eliminados y ganador.

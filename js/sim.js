@@ -9,6 +9,8 @@ const HERO_RADIUS = 28;
 const HERO_ACQUIRE_RANGE = 800;
 const MAX_EVENTS = 500;
 const MIN_MOVE_SPEED = 100;
+// Stats that only statuses and items give; every unit starts without them.
+const NO_EXTRAS = { evasion: 0, lifesteal: 0, spellAmp: 0 };
 
 // mulberry32: small seeded generator so a match can be replayed exactly.
 function makeRng(seed) {
@@ -30,7 +32,9 @@ function createSim(seed) {
 
 // A status (modifier) is { id, sourceId, duration, stacks, stats, flags, tick, passive }.
 // stats: armor, magicResist, attackSpeed, attackRange, damage, damagePct, moveSpeedPct, evasion,
-//        hpRegen, manaRegen, manaRegenPct.  flags: stunned, rooted, disarmed, silenced, taunted.
+//        hpRegen, manaRegen, manaRegenPct, lifesteal, spellAmp, str, agi, int, moveSpeed (flat),
+//        boots (flat move speed that does not stack: only the best pair counts).
+// flags: stunned, rooted, disarmed, silenced, taunted, immune (enemies cannot put statuses on it).
 function recomputeStats(unit) {
   const stats = Object.assign({}, unit.baseStats);
   const flags = {};
@@ -38,6 +42,9 @@ function recomputeStats(unit) {
   let damagePct = 0;
   let manaRegenPct = 0;
   let dodge = 1;
+  let moveFlat = 0;
+  let boots = 0;
+  const attrs = { str: 0, agi: 0, int: 0 };
   for (const mod of unit.mods) {
     const n = mod.stacks || 1;
     const s = mod.stats || {};
@@ -52,8 +59,20 @@ function recomputeStats(unit) {
     damagePct += (s.damagePct || 0) * n;
     movePct += (s.moveSpeedPct || 0) * n;
     manaRegenPct += (s.manaRegenPct || 0) * n;
+    stats.lifesteal += (s.lifesteal || 0) * n;
+    stats.spellAmp += (s.spellAmp || 0) * n;
+    moveFlat += (s.moveSpeed || 0) * n;
+    boots = Math.max(boots, s.boots || 0);
+    for (const attr of Object.keys(attrs)) attrs[attr] += (s[attr] || 0) * n;
     if (s.evasion) dodge *= 1 - s.evasion;
     for (const flag of mod.flags || []) flags[flag] = mod;
+  }
+  if (unit.data && (attrs.str || attrs.agi || attrs.int)) {
+    const bonus = attributeStats(unit.data.primary_attr, attrs.str, attrs.agi, attrs.int);
+    for (const attr of Object.keys(attrs)) stats[attr] += attrs[attr];
+    for (const key of ['maxHp', 'hpRegen', 'maxMana', 'manaRegen', 'magicResist', 'armor', 'attackSpeed']) stats[key] += bonus[key];
+    stats.damageMin += bonus.damage;
+    stats.damageMax += bonus.damage;
   }
   // Percentage damage is based on the unit's own damage, like in Dota.
   stats.damageMin += unit.baseStats.damageMin * damagePct / 100;
@@ -61,7 +80,7 @@ function recomputeStats(unit) {
   stats.manaRegen *= 1 + manaRegenPct / 100;
   stats.evasion = 1 - dodge;
   if (unit.baseStats.moveSpeed > 0) {
-    stats.moveSpeed = Math.max(MIN_MOVE_SPEED, unit.baseStats.moveSpeed * (1 + movePct / 100));
+    stats.moveSpeed = Math.max(MIN_MOVE_SPEED, (unit.baseStats.moveSpeed + moveFlat + boots) * (1 + movePct / 100));
   }
   Object.assign(stats, attackTiming(stats.baseAttackTime, stats.baseAttackPoint, stats.attackSpeed));
   unit.stats = stats;
@@ -75,6 +94,7 @@ function findMod(unit, id) {
 // Adds a status, or refreshes it (and adds a stack) if the same source already applied it.
 function addMod(sim, target, spec) {
   if (target.dead) return null;
+  if (target.flags.immune && spec.sourceId !== target.id) return null;
   let mod = target.mods.find((m) => m.id === spec.id && m.sourceId === spec.sourceId);
   if (mod) {
     Object.assign(mod, spec, { stacks: spec.maxStacks ? Math.min(spec.maxStacks, mod.stacks + 1) : 1 });
@@ -129,9 +149,10 @@ function addUnit(sim, props) {
     attackCooldown: 0,
     mods: [],
     abilities: [],
+    items: [],
     dead: false,
   }, props);
-  unit.baseStats = Object.assign({ evasion: 0 }, props.stats);
+  unit.baseStats = Object.assign({}, NO_EXTRAS, props.stats);
   recomputeStats(unit);
   unit.hp = unit.stats.maxHp;
   unit.mana = unit.stats.maxMana;
@@ -146,6 +167,7 @@ function addHero(sim, heroData, level, team, x, y) {
     data: heroData,
     level,
     skillPoints: level,
+    gold: 0,
     team,
     x,
     y,
@@ -158,7 +180,7 @@ function addHero(sim, heroData, level, team, x, y) {
 function setHeroLevel(hero, level) {
   hero.skillPoints += level - hero.level;
   hero.level = level;
-  hero.baseStats = Object.assign({ evasion: 0 }, heroStats(hero.data, level));
+  hero.baseStats = Object.assign({}, NO_EXTRAS, heroStats(hero.data, level));
   recomputeStats(hero);
 }
 
@@ -277,10 +299,13 @@ function stepTimers(sim) {
 
 // ---- Damage and attacks ----
 
-// Runs a hook on every learned ability of a unit. Defined by abilities.js; creeps have none.
+// Runs a hook on every learned ability and every item of a unit (see abilities.js and items.js).
 function runHooks(sim, unit, hook, ...args) {
   for (const ability of unit.abilities) {
     if (ability.level > 0 && ability.def[hook]) ability.def[hook](abilityContext(sim, unit, ability), ...args);
+  }
+  for (const item of unit.items) {
+    if (item.def[hook]) item.def[hook](itemContext(sim, unit, item), ...args);
   }
 }
 
@@ -311,6 +336,9 @@ function landAttack(sim, attacker, target, attack) {
   }
   const dealt = applyDamage(sim, attacker, target, attack.damage, 'physical');
   if (attack.crit) pushEvent(sim, { type: 'crit', x: target.x, y: target.y, amount: dealt });
+  if (attacker.stats.lifesteal > 0 && !attacker.dead) {
+    attacker.hp = Math.min(attacker.stats.maxHp, attacker.hp + dealt * attacker.stats.lifesteal / 100);
+  }
   if (!attacker.dead) runHooks(sim, attacker, 'onAttackLanded', target, attack, dealt);
   if (!target.dead) runHooks(sim, target, 'onAttacked', attacker);
 }
@@ -408,6 +436,7 @@ function stepUnit(sim, unit, dt) {
   unit.mana = Math.min(unit.stats.maxMana, unit.mana + unit.stats.manaRegen * dt);
   unit.attackCooldown = Math.max(0, unit.attackCooldown - dt);
   stepAbilityTimers(unit, dt);
+  for (const item of unit.items) item.cooldown = Math.max(0, item.cooldown - dt);
   stepMods(sim, unit, dt);
   if (unit.dead) return;
 

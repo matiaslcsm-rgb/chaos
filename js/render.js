@@ -13,6 +13,8 @@ const ZONE_FADE_TIME = 0.5;
 const CARD = { width: 220, height: 220, gap: 20, columns: 5, top: 150 };
 const DRAFT = { columns: 4, width: 296, height: 126, gap: 12, top: 88 };
 const BAR = { size: 72, gap: 6, bottom: 16, plusHeight: 20, plusGap: 4 };
+const INVENTORY = { size: 54, gap: 4, columns: 3, margin: 16 };
+const SHOP = { columns: 5, width: 196, height: 96, gap: 8, left: 60, top: 84 };
 const HOTKEY_ORDER = BASIC_HOTKEYS.concat(ULT_HOTKEY);
 const FONT = 'system-ui, sans-serif';
 
@@ -38,6 +40,18 @@ const SLOT_STATE_TEXT = {
   ready: 'Lista',
 };
 const SLOT_BORDERS = { ready: '#8a93a6', on: '#4cc35a', mana: '#4a8fe0', passive: '#5a6274' };
+const ITEM_STAT_TEXT = {
+  bonus_damage: '+{v} de daño',
+  bonus_armor: '+{v} de armadura',
+  bonus_attack_speed: '+{v} vel. de ataque',
+  bonus_strength: '+{v} Fuerza',
+  bonus_agility: '+{v} Agilidad',
+  bonus_intellect: '+{v} Inteligencia',
+  bonus_movement_speed: '+{v} de movimiento',
+  lifesteal_percent: '{v}% de robo de vida',
+  spell_amp: '+{v}% daño de habilidades',
+  mana_regen_multiplier: '+{v}% regeneración de maná',
+};
 const CAST_LABELS = {
   passive: 'Pasiva',
   none: 'Sin objetivo',
@@ -118,6 +132,59 @@ function abilityBarSlots(canvas, hero) {
   });
 }
 
+// The six inventory slots, bottom right, in hotkey order (Z X C / V B N).
+function inventorySlots(canvas) {
+  const rows = INVENTORY_SIZE / INVENTORY.columns;
+  const step = INVENTORY.size + INVENTORY.gap;
+  const left = canvas.width - INVENTORY.margin - INVENTORY.columns * step + INVENTORY.gap;
+  const top = canvas.height - INVENTORY.margin - rows * step + INVENTORY.gap;
+  return ITEM_HOTKEYS.map((key, slot) => ({
+    slot,
+    key,
+    x: left + (slot % INVENTORY.columns) * step,
+    y: top + Math.floor(slot / INVENTORY.columns) * step,
+    width: INVENTORY.size,
+    height: INVENTORY.size,
+  }));
+}
+
+function shopButton(canvas) {
+  const first = inventorySlots(canvas)[0];
+  return { x: first.x, y: first.y - 34, width: canvas.width - INVENTORY.margin - first.x, height: 28 };
+}
+
+function shopCards(canvas) {
+  return DB.batch.items.map((key, index) => ({
+    key,
+    x: SHOP.left + (index % SHOP.columns) * (SHOP.width + SHOP.gap),
+    y: SHOP.top + Math.floor(index / SHOP.columns) * (SHOP.height + SHOP.gap),
+    width: SHOP.width,
+    height: SHOP.height,
+  }));
+}
+
+function shopPanelRect(canvas) {
+  const cards = shopCards(canvas);
+  const last = cards[cards.length - 1];
+  const top = SHOP.top - 36;
+  return {
+    x: SHOP.left - 12,
+    y: top,
+    width: SHOP.columns * (SHOP.width + SHOP.gap) - SHOP.gap + 24,
+    height: last.y + last.height + 12 - top,
+  };
+}
+
+// What an item gives, in words: its plain stats, then what is special about it.
+function itemSummary(key) {
+  const stats = (DB.items[key].attrib || [])
+    .filter((attrib) => ITEM_STAT_TEXT[attrib.key])
+    .map((attrib) => ITEM_STAT_TEXT[attrib.key].replace('{v}', parseFloat(attrib.value)));
+  const special = ITEM_DEFS[key] && ITEM_DEFS[key].text;
+  if (!special) return stats.join(' · ') + '.';
+  return stats.length ? stats.join(' · ') + '. ' + special : special;
+}
+
 // ---- What to say about a unit ----
 
 function unitStatusLabels(unit) {
@@ -133,7 +200,8 @@ function heroEffects(hero) {
   for (const mod of hero.mods) {
     if (mod.passive) continue;
     const key = mod.id.split(':')[0];
-    const name = DB.abilities[key] ? DB.abilities[key].dname : key;
+    const source = DB.abilities[key] || DB.items[key];
+    const name = source ? source.dname : key;
     effects.push({
       text: mod.stacks > 1 ? `${name} x${mod.stacks}` : name,
       time: mod.duration,
@@ -592,6 +660,141 @@ function drawAbilityBar(ctx, canvas, game, view) {
   if (hovered && !view.targeting) drawTooltip(ctx, canvas, hero, hovered);
 }
 
+// Gold, the shop button and the six slots. Returns the slot under the mouse, if it holds an item.
+function drawInventory(ctx, canvas, game, view) {
+  const hero = game.hero;
+  const open = shopOpen(game);
+  const button = shopButton(canvas);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#e8b04a';
+  ctx.font = `bold 17px ${FONT}`;
+  ctx.fillText(`Oro: ${Math.floor(hero.gold)}`, button.x + button.width, button.y - 10);
+  ctx.fillStyle = !open ? '#1b2030' : view.shop || inRect(view.mouse, button) ? '#e8b04a' : '#8a6a2c';
+  ctx.fillRect(button.x, button.y, button.width, button.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = open ? '#151922' : '#5a6274';
+  ctx.font = `bold 13px ${FONT}`;
+  ctx.fillText(open ? (view.shop ? 'Cerrar tienda (T)' : 'Tienda (T)') : 'Tienda cerrada', button.x + button.width / 2, button.y + 19);
+
+  let hovered = null;
+  for (const slot of inventorySlots(canvas)) {
+    const item = hero.items[slot.slot];
+    const { x, y, width, height } = slot;
+    ctx.fillStyle = item ? '#1b2030' : 'rgba(13, 15, 20, 0.7)';
+    ctx.fillRect(x, y, width, height);
+    if (item) {
+      if (inRect(view.mouse, slot)) hovered = slot;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#d8dce6';
+      ctx.font = `10px ${FONT}`;
+      const lines = wrapText(ctx, DB.items[item.key].dname, width - 6).slice(0, 3);
+      lines.forEach((line, row) => {
+        ctx.fillText(line, x + width / 2, y + height / 2 + 8 + (row - (lines.length - 1) / 2) * 11);
+      });
+      if (item.cooldown > 0) {
+        ctx.fillStyle = 'rgba(8, 10, 14, 0.72)';
+        ctx.fillRect(x, y, width, height);
+        ctx.fillStyle = '#f4f6fa';
+        ctx.font = `bold 18px ${FONT}`;
+        ctx.fillText(item.cooldown >= 10 ? String(Math.ceil(item.cooldown)) : item.cooldown.toFixed(1), x + width / 2, y + height / 2 + 7);
+      }
+    }
+    const active = item && item.def.active;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = active ? (itemProblem(hero, item) ? '#5a6274' : '#e8b04a') : '#333a4c';
+    ctx.strokeRect(x, y, width, height);
+    ctx.textAlign = 'left';
+    ctx.font = `bold 11px ${FONT}`;
+    ctx.fillStyle = active ? '#e8b04a' : '#5a6274';
+    ctx.fillText(slot.key.toUpperCase(), x + 4, y + 12);
+  }
+  return hovered;
+}
+
+function drawItemTooltip(ctx, canvas, game, slot) {
+  const item = game.hero.items[slot.slot];
+  const info = DB.items[item.key];
+  const width = 320;
+  ctx.font = `12px ${FONT}`;
+  const lines = wrapText(ctx, itemSummary(item.key), width - 24);
+  const facts = [];
+  if (item.def.active) {
+    facts.push(`Se usa con ${slot.key.toUpperCase()} o con clic`);
+    if (info.mc) facts.push(`Maná ${info.mc}`);
+    if (info.cd) facts.push(`Recarga ${info.cd} s`);
+  }
+  facts.push(shopOpen(game) ? `Clic derecho: vender por ${sellPrice(item.key)}` : 'Se vende entre rondas');
+  const factLines = wrapText(ctx, facts.join(' · '), width - 24);
+  const height = 38 + (lines.length + factLines.length) * 16 + 6;
+  const x = canvas.width - INVENTORY.margin - width;
+  const y = shopButton(canvas).y - 34 - height;
+  ctx.fillStyle = 'rgba(13, 15, 20, 0.94)';
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = '#333a4c';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, width, height);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#e8ecf4';
+  ctx.font = `bold 16px ${FONT}`;
+  ctx.fillText(info.dname, x + 12, y + 24);
+  ctx.font = `12px ${FONT}`;
+  let row = y + 44;
+  for (const [group, color] of [[lines, '#b8c0d0'], [factLines, '#e8b04a']]) {
+    ctx.fillStyle = color;
+    for (const line of group) {
+      ctx.fillText(line, x + 12, row);
+      row += 16;
+    }
+  }
+}
+
+function drawShop(ctx, canvas, game, view) {
+  const hero = game.hero;
+  const panel = shopPanelRect(canvas);
+  ctx.fillStyle = 'rgba(13, 15, 20, 0.95)';
+  ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
+  ctx.strokeStyle = '#8a6a2c';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(panel.x, panel.y, panel.width, panel.height);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#e8b04a';
+  ctx.font = `bold 18px ${FONT}`;
+  ctx.fillText('Tienda', panel.x + 12, panel.y + 25);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#8a93a6';
+  ctx.font = `13px ${FONT}`;
+  ctx.fillText('Clic para comprar. Si ya tenés las partes de un ítem, se usan y pagás solo lo que falta.', panel.x + panel.width - 12, panel.y + 24);
+
+  for (const card of shopCards(canvas)) {
+    const info = DB.items[card.key];
+    const plan = purchasePlan(hero, card.key);
+    const problem = buyProblem(hero, card.key);
+    const hover = inRect(view.mouse, card);
+    ctx.fillStyle = hover ? '#2a3142' : '#1b2030';
+    ctx.fillRect(card.x, card.y, card.width, card.height);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = hover && !problem ? '#e8b04a' : '#333a4c';
+    ctx.strokeRect(card.x, card.y, card.width, card.height);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = problem ? '#8a93a6' : '#e8ecf4';
+    ctx.font = `bold 13px ${FONT}`;
+    ctx.fillText(info.dname, card.x + 8, card.y + 18);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = problem === 'gold' ? '#e65a46' : '#e8b04a';
+    ctx.fillText(String(plan.cost), card.x + card.width - 8, card.y + 18);
+    ctx.textAlign = 'left';
+    ctx.font = `11px ${FONT}`;
+    let text = itemSummary(card.key);
+    const parts = info.components || [];
+    if (plan.used.length) text += ` Usa tu ${plan.used.map((part) => DB.items[part].dname).join(' y tu ')}.`;
+    else if (parts.length) text += ` Se arma con ${parts.map((part) => DB.items[part].dname).join(' + ')}.`;
+    ctx.fillStyle = '#b8c0d0';
+    wrapText(ctx, text, card.width - 16).slice(0, 5).forEach((line, row) => {
+      ctx.fillText(line, card.x + 8, card.y + 34 + row * 13);
+    });
+  }
+}
+
 function drawHeroPanel(ctx, canvas, game) {
   const hero = game.hero;
   const stats = hero.stats;
@@ -649,20 +852,25 @@ function drawHud(ctx, canvas, game, view) {
 
   drawHeroPanel(ctx, canvas, game);
 
+  // Controls reminder, top right, out of the way of the inventory.
   ctx.textAlign = 'right';
   ctx.fillStyle = '#8a93a6';
-  ctx.font = `13px ${FONT}`;
+  ctx.font = `12px ${FONT}`;
   const help = [
     'Clic derecho: mover o atacar',
     'A + clic: avanzar atacando · S: frenar',
     'Q W E D F R: habilidades · Esc: cancelar',
     'Shift + tecla o clic en +: subir de nivel',
+    'Z X C V B N: ítems · T: tienda (entre rondas)',
   ];
   help.forEach((line, row) => {
-    ctx.fillText(line, canvas.width - 16, canvas.height - 28 - (help.length - 1 - row) * 18);
+    ctx.fillText(line, canvas.width - 16, 22 + row * 16);
   });
 
+  const hoveredItem = drawInventory(ctx, canvas, game, view);
   drawAbilityBar(ctx, canvas, game, view);
+  if (view.shop && shopOpen(game)) drawShop(ctx, canvas, game, view);
+  if (hoveredItem) drawItemTooltip(ctx, canvas, game, hoveredItem);
 
   let hint = null;
   if (view.targeting) {
