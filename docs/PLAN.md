@@ -50,6 +50,12 @@ Una partida completa, pero chica.
 - [x] Motor de combate, primera parte: stats con las fórmulas de Dota, moverse, atacar (con el tiempo de preparación
       que se cancela al moverse), proyectiles, armadura, regeneración (`js/stats.js`, `js/sim.js`) (2026-11-10).
 - [ ] Motor de combate, segunda parte: las habilidades del lote armadas con piezas, maná, enfriamientos y estados.
+      **A medias (2026-11-10):** hecho el motor (`js/abilities.js`: niveles, maná, enfriamientos, cargas, estados,
+      zonas, proyectiles, empujones) y las 43 habilidades (`js/abilityDefs.js`), probadas todas a nivel 1 y al máximo
+      sin errores. **Falta:** la barra de habilidades y las teclas para usarlas (`js/render.js`, `js/main.js`: Q W E
+      D F R, Ctrl + tecla para subir de nivel, apuntar con clic), dibujar zonas, efectos y estados, y las pruebas de
+      cada pieza en `js/tests.js`. Simplificaciones a revisar: Battle Hunger siempre ralentiza, Viper Strike no
+      decae, Lunar Orbit es un área alrededor de Luna, Great Cleave es un cono de 120°.
 - [x] Una arena con oleadas de creeps y el héroe controlado al estilo Dota: elegís entre los 10 héroes, clic derecho
       para mover o atacar, A + clic para avanzar atacando, S para frenar; un nivel por ronda (`js/game.js`,
       `js/render.js`, `js/main.js`). Los creeps son provisorios hasta investigar las oleadas del mod (2026-11-10).

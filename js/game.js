@@ -52,6 +52,8 @@ function creepStats(type, round) {
     attackRange: type.attackRange,
     projectileSpeed: type.projectileSpeed,
     moveSpeed: type.moveSpeed,
+    baseAttackTime: type.baseAttackTime,
+    baseAttackPoint: type.attackPoint,
   }, attackTiming(type.baseAttackTime, type.attackPoint, 100));
 }
 
@@ -62,6 +64,7 @@ function waveForRound(round) {
 function createGame(heroData, seed) {
   const sim = createSim(seed);
   const hero = addHero(sim, heroData, 1, HERO_TEAM, ARENA.width / 2, ARENA.height * 0.6);
+  giveAbilities(hero, DB.batch.heroes.find((entry) => entry.key === heroData.name).abilities);
   return { sim, hero, round: 0, phase: 'prep', timer: PREP_TIME };
 }
 

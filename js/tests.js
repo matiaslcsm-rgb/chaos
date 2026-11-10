@@ -136,7 +136,7 @@ test('clearing a wave starts the next round one level higher', () => {
 
 test('the match ends when the hero dies', () => {
   const game = createGame(heroByName('Crystal Maiden'), 7);
-  game.hero.stats = Object.assign({}, game.hero.stats, { maxHp: 1, hpRegen: 0 });
+  game.hero.baseStats = Object.assign({}, game.hero.baseStats, { maxHp: 1, hpRegen: 0 });
   game.hero.hp = 1;
   for (let t = 0; t < 60 && game.phase !== 'lost'; t += TEST_STEP) stepGame(game, TEST_STEP);
   assert(game.phase === 'lost', `phase ${game.phase}`);

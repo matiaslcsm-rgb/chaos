@@ -52,5 +52,7 @@ function heroStats(hero, level) {
     attackRange: hero.attack_range,
     projectileSpeed: hero.attack_type === 'Ranged' ? hero.projectile_speed : 0,
     moveSpeed: hero.move_speed,
+    baseAttackTime: hero.attack_rate,
+    baseAttackPoint: hero.attack_point,
   }, attackTiming(hero.attack_rate, hero.attack_point, attackSpeed));
 }
