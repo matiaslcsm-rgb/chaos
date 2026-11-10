@@ -763,7 +763,7 @@ function drawShop(ctx, canvas, game, view) {
   ctx.textAlign = 'right';
   ctx.fillStyle = '#8a93a6';
   ctx.font = `13px ${FONT}`;
-  ctx.fillText('Clic para comprar. Si ya tenés las partes de un ítem, se usan y pagás solo lo que falta.', panel.x + panel.width - 12, panel.y + 24);
+  ctx.fillText('Clic para comprar. Las partes que ya tenés se usan y pagás lo que falta.', panel.x + panel.width - 12, panel.y + 24);
 
   for (const card of shopCards(canvas)) {
     const info = DB.items[card.key];
@@ -852,7 +852,8 @@ function drawHud(ctx, canvas, game, view) {
 
   drawHeroPanel(ctx, canvas, game);
 
-  // Controls reminder, top right, out of the way of the inventory.
+  const shopping = view.shop && shopOpen(game);
+  // Controls reminder, top right, out of the way of the inventory (the shop covers that corner).
   ctx.textAlign = 'right';
   ctx.fillStyle = '#8a93a6';
   ctx.font = `12px ${FONT}`;
@@ -863,13 +864,15 @@ function drawHud(ctx, canvas, game, view) {
     'Shift + tecla o clic en +: subir de nivel',
     'Z X C V B N: ítems · T: tienda (entre rondas)',
   ];
-  help.forEach((line, row) => {
-    ctx.fillText(line, canvas.width - 16, 22 + row * 16);
-  });
+  if (!shopping) {
+    help.forEach((line, row) => {
+      ctx.fillText(line, canvas.width - 16, 22 + row * 16);
+    });
+  }
 
   const hoveredItem = drawInventory(ctx, canvas, game, view);
   drawAbilityBar(ctx, canvas, game, view);
-  if (view.shop && shopOpen(game)) drawShop(ctx, canvas, game, view);
+  if (shopping) drawShop(ctx, canvas, game, view);
   if (hoveredItem) drawItemTooltip(ctx, canvas, game, hoveredItem);
 
   let hint = null;
@@ -891,11 +894,13 @@ function drawHud(ctx, canvas, game, view) {
     const alpha = Math.min(1, (MESSAGE_TIME - view.message.age) / 0.4);
     ctx.textAlign = 'center';
     ctx.font = `bold 18px ${FONT}`;
-    ctx.fillStyle = `rgba(13, 15, 20, ${0.75 * alpha})`;
+    ctx.fillStyle = `rgba(13, 15, 20, ${(shopping ? 1 : 0.75) * alpha})`;
     const width = ctx.measureText(view.message.text).width + 28;
-    ctx.fillRect(canvas.width / 2 - width / 2, 74, width, 30);
+    // Over the shop's title strip while shopping, so it does not cover the cards.
+    const top = shopping ? shopPanelRect(canvas).y + 3 : 74;
+    ctx.fillRect(canvas.width / 2 - width / 2, top, width, 30);
     ctx.fillStyle = `rgba(240, 110, 100, ${alpha})`;
-    ctx.fillText(view.message.text, canvas.width / 2, 95);
+    ctx.fillText(view.message.text, canvas.width / 2, top + 21);
   }
 }
 

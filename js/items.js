@@ -152,7 +152,7 @@ function critOnAttack(c, target, attack) {
 // text: what the shop says about the item, besides its plain stats.
 const ITEM_DEFS = {
   phase_boots: {
-    text: 'Más daño (18 cuerpo a cuerpo, 12 a distancia). Activa: te movés más rápido por 3 segundos.',
+    text: 'Más daño (18 cuerpo a cuerpo, 12 a distancia). Activa: 3 s de más velocidad.',
     stats: (c) => ({ damage: c.v(isRanged(c.caster) ? 'bonus_damage_range' : 'bonus_damage_melee') }),
     active(c) {
       const speed = c.v(isRanged(c.caster) ? 'phase_movement_speed_range' : 'phase_movement_speed');
@@ -160,7 +160,7 @@ const ITEM_DEFS = {
     },
   },
   power_treads: {
-    text: '+10 a tu atributo principal y más movimiento (55 cuerpo a cuerpo, 45 a distancia).',
+    text: '+10 a tu atributo principal y más movimiento (55, o 45 a distancia).',
     stats: (c) => {
       const primary = c.caster.data.primary_attr;
       return {
@@ -178,13 +178,13 @@ const ITEM_DEFS = {
     onAttackStart: critOnAttack,
   },
   black_king_bar: {
-    text: 'Activa: por 9 segundos los enemigos no te pueden poner estados y recibís 60% menos de daño mágico.',
+    text: 'Activa: 9 s sin que te pongan estados y con 60% menos de daño mágico.',
     active(c) {
       status(c, c.caster, 'immune', c.v('duration'), { flags: ['immune'], stats: { magicResist: c.v('spell_reduce') } });
     },
   },
   basher: {
-    text: 'Tus golpes pueden aturdir 1,2 segundos y hacer 100 de daño extra (25% cuerpo a cuerpo, 10% a distancia).',
+    text: 'Tus golpes pueden aturdir 1,2 s y hacer 100 de daño extra.',
     onAttackLanded(c, target) {
       if (c.item.cooldown > 0 || target.dead) return;
       if (c.sim.rng() * 100 >= c.v(isRanged(c.caster) ? 'bash_chance_ranged' : 'bash_chance_melee')) return;
@@ -194,13 +194,13 @@ const ITEM_DEFS = {
     },
   },
   satanic: {
-    text: 'Activa: por 6 segundos tu robo de vida sube a 175%.',
+    text: 'Activa: 6 s con 145% más de robo de vida.',
     active(c) {
       status(c, c.caster, 'unholy', c.v('unholy_duration'), { stats: { lifesteal: c.v('unholy_lifesteal_percent') } });
     },
   },
   mask_of_madness: {
-    text: 'Activa: por 6 segundos atacás y te movés mucho más rápido, pero quedás silenciado y con 7 menos de armadura.',
+    text: 'Activa: 6 s de mucha más velocidad, pero silenciado y con 7 menos de armadura.',
     active(c) {
       const speed = c.v(isRanged(c.caster) ? 'berserk_bonus_movement_speed' : 'berserk_bonus_movement_speed_melee');
       status(c, c.caster, 'berserk', c.v('berserk_duration'), {

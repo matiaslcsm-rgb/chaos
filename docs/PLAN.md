@@ -97,15 +97,20 @@ Una partida completa, pero chica.
       al azar de las 43 del lote (nunca una que ya tenés); la partida espera mientras elegís y, si cerrás la
       ventana, te toca una al azar. El héroe ya no trae habilidades propias: pone solo los atributos, como en el
       mod (`js/game.js`, `js/render.js`) (2026-11-10). Quedan reglas por confirmar en "Decisiones abiertas".
-- [ ] Oro, tienda e inventario de 6. **A medias (2026-11-10):** programado pero SIN pruebas propias y SIN probar
-      en el navegador (la sesión se cortó ahí). Hecho: oro inicial, oro por creep y por ronda (más si limpiás
-      rápido), tienda entre rondas (tecla T, 15 segundos), inventario de 6 con teclas Z X C V B N, recetas que usan
-      las partes que ya tenés, venta a mitad de precio con clic derecho, y los 25 ítems del lote
-      (`js/items.js`, `js/game.js`, `js/render.js`, `js/main.js`). **Falta:** pruebas en `js/tests.js` (comprar,
-      armar recetas, vender, inventario lleno, robo de vida, crítico, aturdir del Basher, BKB, oro por ronda),
-      jugar una ronda comprando en el navegador y revisar que la tienda no tape nada.
-      Simplificaciones: BKB dura siempre 9 s, Power Treads da siempre el atributo principal, Moon Shard no se
-      consume, un solo crítico por golpe.
+- [x] Oro, tienda e inventario de 6 (`js/items.js`, `js/game.js`, `js/render.js`, `js/main.js`) (2026-11-10):
+      - Oro: 600 de arranque, oro por cada creep y un premio al terminar la ronda, mayor si la limpiás rápido. Los
+        números son provisorios (ver "Decisiones abiertas").
+      - Tienda: abre solo entre rondas, que ahora duran 15 segundos como en el mod (tecla T o el botón). Muestra los
+        25 ítems del lote con lo que da cada uno, en castellano. Si ya tenés partes de un ítem, se usan y pagás
+        solo lo que falta.
+      - Inventario de 6 abajo a la derecha, teclas Z X C V B N o clic para usar los que se activan; clic derecho
+        entre rondas vende a mitad de precio.
+      - Los 25 ítems funcionan: atributos, daño, armadura, velocidad, robo de vida, crítico (Crystalys, Daedalus),
+        aturdir (Skull Basher), daño de habilidades (Kaya) y los cuatro que se activan (Phase Boots, Black King
+        Bar, Mask of Madness, Satanic).
+      - 13 pruebas nuevas (57 en total).
+      Simplificaciones a revisar: BKB dura siempre 9 s, Power Treads da siempre el atributo principal, Moon Shard
+      no se puede consumir, un solo crítico por golpe, la resistencia mágica se suma en vez de multiplicarse.
 - [ ] 7 rivales de la IA jugando sus arenas.
 - [ ] Duelos y apuestas.
 - [ ] Final de partida: eliminados y ganador.
