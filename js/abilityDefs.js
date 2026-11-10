@@ -2,6 +2,7 @@
 
 // What each ability of the batch does, written with the parts from abilities.js.
 // cast: passive | none (no target) | unit (an enemy) | ally (yourself for now) | point | toggle (attack modifier).
+// aoe (optional): the value that holds the radius, drawn while aiming.
 // c.v('key') reads the ability's number for its current level from the Dota data.
 
 const FX = { fire: '#f28c38', ice: '#8fd3f4', bolt: '#f2e08a', poison: '#8bc34a', arcane: '#c792ea', steel: '#d8dce6' };
@@ -44,6 +45,7 @@ const ABILITY_DEFS = {
   // ---- Sven ----
   sven_storm_bolt: {
     cast: 'unit',
+    aoe: 'bolt_aoe',
     projectile: 'bolt_speed',
     hit(c) {
       fxRing(c, c.target, c.v('bolt_aoe'), FX.steel);
@@ -66,6 +68,7 @@ const ABILITY_DEFS = {
   },
   sven_warcry: {
     cast: 'none',
+    aoe: 'radius',
     hit(c) {
       fxRing(c, c.caster, c.v('radius'), FX.steel);
       status(c, c.caster, 'buff', c.v('duration'), { stats: { armor: c.v('bonus_armor'), moveSpeedPct: c.v('movespeed') } });
@@ -128,6 +131,7 @@ const ABILITY_DEFS = {
   // ---- Axe ----
   axe_berserkers_call: {
     cast: 'none',
+    aoe: 'radius',
     hit(c) {
       fxRing(c, c.caster, c.v('radius'), FX.fire);
       for (const enemy of enemiesOf(c, c.caster, c.v('radius'))) {
@@ -147,6 +151,7 @@ const ABILITY_DEFS = {
   },
   axe_counter_helix: {
     cast: 'passive',
+    aoe: 'radius',
     onAttacked(c) {
       c.ability.counter = (c.ability.counter || 0) + 1;
       if (c.ability.counter < c.v('trigger_attacks')) return;
@@ -169,6 +174,7 @@ const ABILITY_DEFS = {
   // ---- Sniper ----
   sniper_shrapnel: {
     cast: 'point',
+    aoe: 'radius',
     charges: { count: 'abilitycharges', restore: 'abilitychargerestoretime' },
     hit(c) {
       const point = c.point;
@@ -213,6 +219,7 @@ const ABILITY_DEFS = {
   },
   sniper_concussive_grenade: {
     cast: 'point',
+    aoe: 'radius',
     maxLevel: 1,
     hit(c) {
       const point = c.point;
@@ -259,6 +266,7 @@ const ABILITY_DEFS = {
   },
   viper_nethertoxin: {
     cast: 'point',
+    aoe: 'radius',
     projectile: 'projectile_speed',
     hit(c) {
       netherPool(c, c.point);
@@ -273,6 +281,7 @@ const ABILITY_DEFS = {
   },
   viper_nose_dive: {
     cast: 'point',
+    aoe: 'corrosive_radius',
     maxLevel: 1,
     hit(c) {
       const time = Math.max(0.1, distance(c.caster, c.point) / c.v('dive_speed'));
@@ -337,6 +346,7 @@ const ABILITY_DEFS = {
   },
   luna_eclipse: {
     cast: 'none',
+    aoe: 'radius',
     ult: true,
     hit(c) {
       const beam = borrowAbility(c, 'luna_lucent_beam');
@@ -395,6 +405,7 @@ const ABILITY_DEFS = {
   // ---- Crystal Maiden ----
   crystal_maiden_crystal_nova: {
     cast: 'point',
+    aoe: 'radius',
     hit(c) {
       fxRing(c, c.point, c.v('radius'), FX.ice);
       for (const enemy of enemiesOf(c, c.point, c.v('radius'))) {
@@ -419,6 +430,7 @@ const ABILITY_DEFS = {
   },
   crystal_maiden_freezing_field: {
     cast: 'none',
+    aoe: 'radius',
     ult: true,
     hit(c) {
       // Channeled: the zone ends as soon as she gets a new order or is stunned.
@@ -464,6 +476,7 @@ const ABILITY_DEFS = {
   },
   zuus_heavenly_jump: {
     cast: 'none',
+    aoe: 'range',
     hit(c) {
       const enemy = nearestEnemy(c.sim, c.caster, c.v('range'));
       if (enemy) {
@@ -511,6 +524,7 @@ const ABILITY_DEFS = {
   },
   skywrath_mage_concussive_shot: {
     cast: 'none',
+    aoe: 'launch_radius',
     hit(c) {
       // Flies to the closest enemy, heroes first.
       const pool = enemiesOf(c, c.caster, c.v('launch_radius')).sort((a, b) => distance(c.caster, a) - distance(c.caster, b));
@@ -539,6 +553,7 @@ const ABILITY_DEFS = {
   },
   skywrath_mage_mystic_flare: {
     cast: 'point',
+    aoe: 'radius',
     ult: true,
     hit(c) {
       const point = c.point;

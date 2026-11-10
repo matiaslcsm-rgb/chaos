@@ -7,6 +7,8 @@ const BASIC_MAX_LEVEL = 4;
 const ULT_MAX_LEVEL = 3;
 const ULT_HERO_LEVELS = [6, 12, 18];
 const MULTICAST_DELAY = 0.6;
+const BASIC_HOTKEYS = ['q', 'w', 'e', 'd', 'f'];
+const ULT_HOTKEY = 'r';
 
 // ---- Reading numbers from the Dota data ----
 
@@ -41,6 +43,25 @@ function abilityCastRange(ability) {
   return abilityOptional(ability, 'abilitycastrange');
 }
 
+// Radius of the area an ability affects, for the targeting preview. 0 if it has none.
+function abilityAoe(ability) {
+  return ability.def.aoe ? abilityValue(ability, ability.def.aoe) : 0;
+}
+
+// Dota's layout: basic abilities on Q W E D F in order, the ultimate on R.
+// A second ultimate (possible once abilities are drafted) takes the next free basic key.
+function abilityHotkeys(abilities) {
+  const free = BASIC_HOTKEYS.slice();
+  let ultFree = true;
+  return abilities.map((ability) => {
+    if (ability.def.ult && ultFree) {
+      ultFree = false;
+      return ULT_HOTKEY;
+    }
+    return free.shift() || null;
+  });
+}
+
 // What an ability's code receives: who casts, on what, and `v` to read its numbers.
 function abilityContext(sim, caster, ability, target, point) {
   return {
@@ -68,10 +89,20 @@ function maxAbilityLevel(ability) {
 }
 
 // Dota's rule: ultimates at hero level 6/12/18, the rest at most one level every two hero levels.
+function heroLevelForNextLevel(ability) {
+  return ability.def.ult ? ULT_HERO_LEVELS[ability.level] : ability.level * 2 + 1;
+}
+
+// Why an ability cannot be levelled right now ('max' | 'points' | 'heroLevel'), or null if it can.
+function levelProblem(hero, ability) {
+  if (ability.level >= maxAbilityLevel(ability)) return 'max';
+  if (hero.skillPoints <= 0) return 'points';
+  if (hero.level < heroLevelForNextLevel(ability)) return 'heroLevel';
+  return null;
+}
+
 function canLevelAbility(hero, ability) {
-  if (hero.skillPoints <= 0 || ability.level >= maxAbilityLevel(ability)) return false;
-  if (ability.def.ult) return hero.level >= ULT_HERO_LEVELS[ability.level];
-  return hero.level >= ability.level * 2 + 1;
+  return levelProblem(hero, ability) === null;
 }
 
 // Passive stat bonuses are statuses that never expire, rebuilt whenever a level or toggle changes.
