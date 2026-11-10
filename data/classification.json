@@ -1,0 +1,7721 @@
+{
+ "heroes": {
+  "Anti-Mage": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "antimage_mana_break",
+     "name": "Mana Break",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "mana",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "antimage_blink",
+     "name": "Blink",
+     "cast": "point",
+     "parts": [
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "antimage_counterspell",
+     "name": "Counterspell",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "magic_resist",
+      "reflect",
+      "summon",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "antimage_mana_void",
+     "name": "Mana Void",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Axe": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "axe_berserkers_call",
+     "name": "Berserker's Call",
+     "cast": "no_target",
+     "parts": [
+      "armor",
+      "attack_speed",
+      "area",
+      "fear_taunt"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "axe_battle_hunger",
+     "name": "Battle Hunger",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "axe_counter_helix",
+     "name": "Counter Helix",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "lifesteal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "axe_culling_blade",
+     "name": "Culling Blade",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "armor",
+      "move_speed",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Bane": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "bane_enfeeble",
+     "name": "Enfeeble",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "bane_brain_sap",
+     "name": "Brain Sap",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "bane_nightmare",
+     "name": "Nightmare",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "bane_fiends_grip",
+     "name": "Fiend's Grip",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "mana"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Bloodseeker": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "bloodseeker_bloodrage",
+     "name": "Bloodrage",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "attack_speed"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "bloodseeker_blood_bath",
+     "name": "Blood Rite",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "silence",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "bloodseeker_thirst",
+     "name": "Thirst",
+     "cast": "passive",
+     "parts": [
+      "heal",
+      "move_speed",
+      "execute",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "bloodseeker_rupture",
+     "name": "Rupture",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Crystal Maiden": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "crystal_maiden_crystal_nova",
+     "name": "Crystal Nova",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "shield",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "crystal_maiden_frostbite",
+     "name": "Frostbite",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "crystal_maiden_brilliance_aura",
+     "name": "Arcane Aura",
+     "cast": "passive",
+     "parts": [
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "crystal_maiden_freezing_field",
+     "name": "Freezing Field",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Drow Ranger": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "drow_ranger_frost_arrows",
+     "name": "Frost Arrows",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "drow_ranger_wave_of_silence",
+     "name": "Gust",
+     "cast": "point",
+     "parts": [
+      "silence",
+      "move_speed",
+      "evasion",
+      "on_hit_chance",
+      "knockback",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "drow_ranger_multishot",
+     "name": "Multishot",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "drow_ranger_glacier",
+     "name": "Glacier",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "knockback",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "drow_ranger_marksmanship",
+     "name": "Marksmanship",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_damage",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Earthshaker": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "earthshaker_fissure",
+     "name": "Fissure",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "earthshaker_enchant_totem",
+     "name": "Enchant Totem",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "earthshaker_aftershock",
+     "name": "Aftershock",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "earthshaker_echo_slam",
+     "name": "Echo Slam",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Juggernaut": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "juggernaut_blade_fury",
+     "name": "Blade Fury",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "magic_resist",
+      "attack_speed",
+      "move_speed",
+      "crit",
+      "area",
+      "dispel",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "juggernaut_healing_ward",
+     "name": "Healing Ward",
+     "cast": "point",
+     "parts": [
+      "damage_over_time",
+      "heal",
+      "move_speed",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "juggernaut_blade_dance",
+     "name": "Blade Dance",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "crit",
+      "lifesteal",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "juggernaut_swift_slash",
+     "name": "Swiftslash",
+     "cast": "unit",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "juggernaut_omni_slash",
+     "name": "Omnislash",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "attack_damage",
+      "area",
+      "bounce",
+      "blink",
+      "dispel",
+      "immunity"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Mirana": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "mirana_starfall",
+     "name": "Starstorm",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "evasion",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "mirana_arrow",
+     "name": "Sacred Arrow",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "execute"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "mirana_leap",
+     "name": "Leap",
+     "cast": "no_target",
+     "parts": [
+      "attack_speed",
+      "move_speed",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "mirana_invis",
+     "name": "Moonlight Shadow",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "evasion",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Morphling": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "morphling_waveform",
+     "name": "Waveform",
+     "cast": "point",
+     "parts": [
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "morphling_adaptive_strike_agi",
+     "name": "Adaptive Strike",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "stat_bonus",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "morphling_morph_agi",
+     "name": "Attribute Shift (Agility Gain)",
+     "cast": "no_target",
+     "parts": [
+      "damage_over_time",
+      "stun",
+      "stat_bonus",
+      "knockback",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "morphling_morph_str",
+     "name": "Attribute Shift (Strength Gain)",
+     "cast": "no_target",
+     "parts": [
+      "damage_over_time",
+      "stun",
+      "stat_bonus",
+      "knockback",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "morphling_replicate",
+     "name": "Morph",
+     "cast": "unit",
+     "parts": [
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Shadow Fiend": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "nevermore_shadowraze1",
+     "name": "Shadowraze",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "nevermore_shadowraze2",
+     "name": "Shadowraze",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "nevermore_shadowraze3",
+     "name": "Shadowraze",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "nevermore_frenzy",
+     "name": "Feast of Souls",
+     "cast": "no_target",
+     "parts": [
+      "attack_speed",
+      "move_speed",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "nevermore_dark_lord",
+     "name": "Presence of the Dark Lord",
+     "cast": "passive",
+     "parts": [
+      "armor",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "nevermore_requiem",
+     "name": "Requiem of Souls",
+     "cast": "no_target",
+     "parts": [
+      "magic_resist",
+      "move_speed",
+      "area",
+      "fear_taunt"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Phantom Lancer": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "phantom_lancer_spirit_lance",
+     "name": "Spirit Lance",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "summon",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "phantom_lancer_doppelwalk",
+     "name": "Doppelganger",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "area",
+      "dispel",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "phantom_lancer_phantom_edge",
+     "name": "Phantom Rush",
+     "cast": "no_target",
+     "parts": [
+      "move_speed",
+      "stat_bonus",
+      "evasion",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "phantom_lancer_juxtapose",
+     "name": "Juxtapose",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "on_hit_chance",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Puck": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "puck_illusory_orb",
+     "name": "Illusory Orb",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stat_bonus",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "puck_waning_rift",
+     "name": "Waning Rift",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "silence",
+      "area",
+      "knockback",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "puck_phase_shift",
+     "name": "Phase Shift",
+     "cast": "channel",
+     "parts": [
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "puck_ethereal_jaunt",
+     "name": "Ethereal Jaunt",
+     "cast": "no_target",
+     "parts": [
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "puck_dream_coil",
+     "name": "Dream Coil",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "summon",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Pudge": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "pudge_meat_hook",
+     "name": "Meat Hook",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "pudge_rot",
+     "name": "Rot",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "pudge_flesh_heap",
+     "name": "Meat Shield",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "shield"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "pudge_dismember",
+     "name": "Dismember",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "stat_bonus",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Razor": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "razor_plasma_field",
+     "name": "Plasma Field",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "razor_static_link",
+     "name": "Static Link",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "knockback",
+      "summon",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "razor_storm_surge",
+     "name": "Storm Surge",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "on_hit_chance",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "razor_eye_of_the_storm",
+     "name": "Eye of the Storm",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "armor",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Sand King": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "sandking_burrowstrike",
+     "name": "Burrowstrike",
+     "cast": "point",
+     "parts": [
+      "stun"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "sandking_sand_storm",
+     "name": "Sand Storm",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area",
+      "invisibility",
+      "fear_taunt",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "sandking_scorpion_strike",
+     "name": "Stinger",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "sandking_epicenter",
+     "name": "Epicenter",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Storm Spirit": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "storm_spirit_static_remnant",
+     "name": "Static Remnant",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area",
+      "summon",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "storm_spirit_electric_vortex",
+     "name": "Electric Vortex",
+     "cast": "unit",
+     "parts": [
+      "slow",
+      "knockback",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "storm_spirit_overload",
+     "name": "Overload",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "storm_spirit_ball_lightning",
+     "name": "Ball Lightning",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "move_speed",
+      "mana",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Sven": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "sven_storm_bolt",
+     "name": "Storm Hammer",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "sven_great_cleave",
+     "name": "Great Cleave",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "stat_bonus",
+      "splash",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "sven_warcry",
+     "name": "Warcry",
+     "cast": "no_target",
+     "parts": [
+      "armor",
+      "move_speed",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "sven_gods_strength",
+     "name": "God's Strength",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "stat_bonus",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Tiny": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "tiny_avalanche",
+     "name": "Avalanche",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "tiny_toss",
+     "name": "Toss",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "tiny_tree_grab",
+     "name": "Tree Grab",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "splash",
+      "knockback",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "tiny_grow",
+     "name": "Grow",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow",
+      "armor",
+      "attack_speed",
+      "move_speed",
+      "attack_damage",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Vengeful Spirit": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "vengefulspirit_magic_missile",
+     "name": "Magic Missile",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "bounce"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "vengefulspirit_wave_of_terror",
+     "name": "Wave of Terror",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "vengefulspirit_command_aura",
+     "name": "Vengeance Aura",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "vengefulspirit_nether_swap",
+     "name": "Nether Swap",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "shield"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Windranger": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "windrunner_shackleshot",
+     "name": "Shackleshot",
+     "cast": "unit",
+     "parts": [
+      "stun",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "windrunner_powershot",
+     "name": "Powershot",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "windrunner_windrun",
+     "name": "Windrun",
+     "cast": "no_target",
+     "parts": [
+      "move_speed",
+      "evasion",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "windrunner_focusfire",
+     "name": "Focus Fire",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Zeus": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "zuus_arc_lightning",
+     "name": "Arc Lightning",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area",
+      "bounce",
+      "knockback",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "zuus_lightning_bolt",
+     "name": "Lightning Bolt",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "zuus_heavenly_jump",
+     "name": "Heavenly Jump",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "bounce",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "zuus_lightning_hands",
+     "name": "Lightning Hands",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "zuus_thundergods_wrath",
+     "name": "Thundergod's Wrath",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Kunkka": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "kunkka_torrent",
+     "name": "Torrent",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "slow",
+      "move_speed",
+      "area",
+      "knockback",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "kunkka_tidebringer",
+     "name": "Tidebringer",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "slow",
+      "armor",
+      "move_speed",
+      "attack_damage",
+      "splash",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "kunkka_x_marks_the_spot",
+     "name": "X Marks the Spot",
+     "cast": "unit",
+     "parts": [
+      "armor",
+      "move_speed",
+      "splash",
+      "shield",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "kunkka_ghostship",
+     "name": "Ghostship",
+     "cast": "point",
+     "parts": [
+      "stun",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Lina": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "lina_dragon_slave",
+     "name": "Dragon Slave",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lina_light_strike_array",
+     "name": "Light Strike Array",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lina_fiery_soul",
+     "name": "Fiery Soul",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "move_speed",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lina_flame_cloak",
+     "name": "Flame Cloak",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "magic_resist",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lina_laguna_blade",
+     "name": "Laguna Blade",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "shield",
+      "immunity",
+      "stacks"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Lion": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "lion_impale",
+     "name": "Earth Spike",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "knockback",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lion_voodoo",
+     "name": "Hex",
+     "cast": "unit",
+     "parts": [
+      "move_speed",
+      "area",
+      "hex"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lion_mana_drain",
+     "name": "Mana Drain",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "move_speed"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lion_finger_of_death",
+     "name": "Finger of Death",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "move_speed",
+      "attack_damage",
+      "splash"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Shadow Shaman": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "shadow_shaman_ether_shock",
+     "name": "Ether Shock",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shadow_shaman_voodoo",
+     "name": "Hex",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "move_speed",
+      "hex"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shadow_shaman_shackles",
+     "name": "Shackles",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "shield",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shadow_shaman_urnaconda",
+     "name": "Urnaconda",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "knockback",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shadow_shaman_mass_serpent_ward",
+     "name": "Mass Serpent Ward",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "attack_damage",
+      "area",
+      "immunity",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Slardar": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "slardar_sprint",
+     "name": "Guardian Sprint",
+     "cast": "no_target",
+     "parts": [
+      "slow",
+      "move_speed"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "slardar_slithereen_crush",
+     "name": "Slithereen Crush",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stun",
+      "slow",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "slardar_bash",
+     "name": "Bash of the Deep",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "slardar_amplify_damage",
+     "name": "Corrosive Haze",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "armor",
+      "area",
+      "invisibility",
+      "dispel"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Tidehunter": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "tidehunter_gush",
+     "name": "Gush",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "armor",
+      "move_speed",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "tidehunter_kraken_shell",
+     "name": "Kraken Shell",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "attack_damage",
+      "shield",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "tidehunter_anchor_smash",
+     "name": "Anchor Smash",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "tidehunter_dead_in_the_water",
+     "name": "Dead in the Water",
+     "cast": "unit",
+     "parts": [
+      "move_speed",
+      "bounce",
+      "knockback",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "tidehunter_ravage",
+     "name": "Ravage",
+     "cast": "no_target",
+     "parts": [
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Witch Doctor": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "witch_doctor_paralyzing_cask",
+     "name": "Paralyzing Cask",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "bounce"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "witch_doctor_voodoo_restoration",
+     "name": "Voodoo Restoration",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "witch_doctor_maledict",
+     "name": "Maledict",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "witch_doctor_death_ward",
+     "name": "Death Ward",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Lich": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "lich_frost_nova",
+     "name": "Frost Blast",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "lich_frost_shield",
+     "name": "Frost Shield",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "shield",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "lich_sinister_gaze",
+     "name": "Sinister Gaze",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_damage",
+      "mana"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lich_chain_frost",
+     "name": "Chain Frost",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "bounce"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Riki": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "riki_smoke_screen",
+     "name": "Smoke Screen",
+     "cast": "point",
+     "parts": [
+      "silence",
+      "armor",
+      "evasion",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "riki_blink_strike",
+     "name": "Blink Strike",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_damage",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "riki_tricks_of_the_trade",
+     "name": "Tricks of the Trade",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "stat_bonus",
+      "attack_damage",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "riki_backstab",
+     "name": "Cloak and Dagger",
+     "cast": "passive",
+     "parts": [
+      "invisibility"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Enigma": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "enigma_malefice",
+     "name": "Malefice",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "enigma_demonic_conversion",
+     "name": "Demonic Summoning",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "magic_resist",
+      "attack_speed",
+      "move_speed",
+      "attack_damage",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "enigma_midnight_pulse",
+     "name": "Midnight Pulse",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "enigma_black_hole",
+     "name": "Black Hole",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area",
+      "knockback",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Tinker": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "tinker_laser",
+     "name": "Laser",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "evasion",
+      "splash",
+      "area",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "tinker_march_of_the_machines",
+     "name": "March of the Machines",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "splash",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "tinker_deploy_turrets",
+     "name": "Deploy Turrets",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "splash",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "tinker_keen_teleport",
+     "name": "Keen Conveyance",
+     "cast": "channel",
+     "parts": [
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "tinker_rearm",
+     "name": "Rearm",
+     "cast": "channel",
+     "parts": [
+      "armor",
+      "magic_resist"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Sniper": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "sniper_shrapnel",
+     "name": "Shrapnel",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "sniper_headshot",
+     "name": "Headshot",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "on_hit_chance",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "sniper_take_aim",
+     "name": "Take Aim",
+     "cast": "no_target",
+     "parts": [
+      "slow",
+      "root",
+      "attack_speed",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "sniper_concussive_grenade",
+     "name": "Concussive Grenade",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "disarm",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "sniper_assassinate",
+     "name": "Assassinate",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Necrophos": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "necrolyte_death_pulse",
+     "name": "Death Pulse",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "necrolyte_ghost_shroud",
+     "name": "Ghost Shroud",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "aura",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "necrolyte_heartstopper_aura",
+     "name": "Heartstopper Aura",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "necrolyte_reapers_scythe",
+     "name": "Reaper's Scythe",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "stun"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Warlock": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "warlock_fatal_bonds",
+     "name": "Fatal Bonds",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "warlock_shadow_word",
+     "name": "Shadow Word",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "warlock_upheaval",
+     "name": "Upheaval",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "warlock_rain_of_chaos",
+     "name": "Chaotic Offering",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "slow",
+      "armor",
+      "move_speed",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Beastmaster": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "beastmaster_wild_axes",
+     "name": "Wild Axes",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "knockback",
+      "stacks",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "beastmaster_summon_razorback",
+     "name": "Summon Razorback",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "beastmaster_summon_raptor",
+     "name": "Summon Raptors",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "root",
+      "magic_resist",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "beastmaster_drums_of_slom",
+     "name": "Drums of Slom",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "aura",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "beastmaster_primal_roar",
+     "name": "Primal Roar",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Queen of Pain": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "queenofpain_shadow_strike",
+     "name": "Shadow Strike",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "move_speed",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "queenofpain_blink",
+     "name": "Blink",
+     "cast": "point",
+     "parts": [
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "queenofpain_scream_of_pain",
+     "name": "Scream Of Pain",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "queenofpain_sonic_wave",
+     "name": "Sonic Wave",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area",
+      "knockback",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Venomancer": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "venomancer_venomous_gale",
+     "name": "Venomous Gale",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "slow",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "venomancer_snakebite",
+     "name": "Snakebite",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "dispel",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "venomancer_plague_ward",
+     "name": "Plague Ward",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "immunity",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "venomancer_noxious_plague",
+     "name": "Noxious Plague",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Faceless Void": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "faceless_void_time_walk",
+     "name": "Time Walk",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "on_hit_chance",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "faceless_void_time_dilation",
+     "name": "Time Dilation",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "stacks",
+      "time"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "faceless_void_time_lock",
+     "name": "Time Lock",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "faceless_void_chronosphere",
+     "name": "Chronosphere",
+     "cast": "point",
+     "parts": [
+      "attack_speed",
+      "area",
+      "invisibility",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Wraith King": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "skeleton_king_hellfire_blast",
+     "name": "Wraithfire Blast",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "slow"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "skeleton_king_bone_guard",
+     "name": "Bone Guard",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "lifesteal",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "skeleton_king_mortal_strike",
+     "name": "Mortal Strike",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "crit"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "skeleton_king_reincarnation",
+     "name": "Reincarnation",
+     "cast": "unit",
+     "parts": [
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Death Prophet": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "death_prophet_carrion_swarm",
+     "name": "Crypt Swarm",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "death_prophet_silence",
+     "name": "Silence",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "death_prophet_spirit_siphon",
+     "name": "Spirit Siphon",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "summon",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "death_prophet_exorcism",
+     "name": "Exorcism",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "reflect",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Phantom Assassin": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "phantom_assassin_stifling_dagger",
+     "name": "Stifling Dagger",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "phantom_assassin_phantom_strike",
+     "name": "Phantom Strike",
+     "cast": "unit",
+     "parts": [
+      "attack_speed",
+      "lifesteal",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "phantom_assassin_immaterial",
+     "name": "Immaterial",
+     "cast": "passive",
+     "parts": [
+      "evasion",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "phantom_assassin_coup_de_grace",
+     "name": "Coup de Grace",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "crit",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Pugna": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "pugna_nether_blast",
+     "name": "Nether Blast",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "pugna_decrepify",
+     "name": "Decrepify",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "move_speed"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "pugna_nether_ward",
+     "name": "Nether Ward",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "mana",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "pugna_life_drain",
+     "name": "Life Drain",
+     "cast": "channel",
+     "parts": [
+      "damage_over_time",
+      "heal"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Templar Assassin": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "templar_assassin_refraction",
+     "name": "Refraction",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "shield"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "templar_assassin_meld",
+     "name": "Meld",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_damage",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "templar_assassin_psi_blades",
+     "name": "Psi Blades",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "templar_assassin_trap",
+     "name": "Trap",
+     "cast": "no_target",
+     "parts": [
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "templar_assassin_psionic_trap",
+     "name": "Psionic Trap",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Viper": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 4,
+   "abilities": [
+    {
+     "key": "viper_poison_attack",
+     "name": "Poison Attack",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "magic_resist",
+      "move_speed",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "viper_nethertoxin",
+     "name": "Nethertoxin",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "viper_corrosive_skin",
+     "name": "Corrosive Skin",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "magic_resist",
+      "attack_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "viper_nose_dive",
+     "name": "Nosedive",
+     "cast": "point",
+     "parts": [
+      "slow",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "viper_viper_strike",
+     "name": "Viper Strike",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_speed",
+      "move_speed"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Luna": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "luna_lucent_beam",
+     "name": "Lucent Beam",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "luna_lunar_orbit",
+     "name": "Lunar Orbit",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "luna_moon_glaive",
+     "name": "Moon Glaives",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "area",
+      "bounce"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "luna_eclipse",
+     "name": "Eclipse",
+     "cast": "no_target",
+     "parts": [
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Dragon Knight": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "dragon_knight_breathe_fire",
+     "name": "Breathe Fire",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "knockback",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "dragon_knight_dragon_tail",
+     "name": "Dragon Tail",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "shield",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "dragon_knight_wyrms_wrath",
+     "name": "Wyrm's Wrath",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "dragon_knight_elder_dragon_form",
+     "name": "Elder Dragon Form",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "magic_resist",
+      "attack_speed",
+      "move_speed",
+      "attack_damage",
+      "splash",
+      "area",
+      "knockback",
+      "immunity",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Dazzle": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "dazzle_poison_touch",
+     "name": "Poison Touch",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dazzle_shallow_grave",
+     "name": "Shallow Grave",
+     "cast": "unit",
+     "parts": [
+      "heal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dazzle_shadow_wave",
+     "name": "Shadow Wave",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "bounce"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "dazzle_nothl_projection",
+     "name": "Nothl Projection",
+     "cast": "point",
+     "parts": [
+      "heal",
+      "knockback",
+      "immunity",
+      "hex",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Clockwerk": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "rattletrap_battery_assault",
+     "name": "Battery Assault",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "rattletrap_power_cogs",
+     "name": "Power Cogs",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "armor",
+      "mana",
+      "shield",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "rattletrap_rocket_flare",
+     "name": "Rocket Flare",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area",
+      "global"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "rattletrap_hookshot",
+     "name": "Hookshot",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "armor",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Leshrac": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 4,
+   "abilities": [
+    {
+     "key": "leshrac_split_earth",
+     "name": "Split Earth",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "leshrac_diabolic_edict",
+     "name": "Diabolic Edict",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "leshrac_lightning_storm",
+     "name": "Lightning Storm",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area",
+      "bounce",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "leshrac_greater_lightning_storm",
+     "name": "Nihilism",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "leshrac_pulse_nova",
+     "name": "Pulse Nova",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Nature's Prophet": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "furion_sprout",
+     "name": "Sprout",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "furion_teleportation",
+     "name": "Teleportation",
+     "cast": "point",
+     "parts": [
+      "shield",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "furion_force_of_nature",
+     "name": "Nature's Call",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "move_speed",
+      "area",
+      "summon",
+      "terrain",
+      "control"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "furion_curse_of_the_forest",
+     "name": "Curse of the Oldgrowth",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area",
+      "summon",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "furion_wrath_of_nature",
+     "name": "Wrath of Nature",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "bounce"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Lifestealer": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "life_stealer_rage",
+     "name": "Rage",
+     "cast": "no_target",
+     "parts": [
+      "armor",
+      "magic_resist",
+      "move_speed",
+      "dispel",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "life_stealer_open_wounds",
+     "name": "Open Wounds",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "lifesteal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "life_stealer_feast",
+     "name": "Feast",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "heal",
+      "lifesteal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "life_stealer_infest",
+     "name": "Infest",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "move_speed",
+      "lifesteal",
+      "area",
+      "dispel",
+      "control"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Dark Seer": {
+   "attr": "int",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "dark_seer_vacuum",
+     "name": "Vacuum",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "summon",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "dark_seer_ion_shell",
+     "name": "Ion Shell",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "shield",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dark_seer_surge",
+     "name": "Surge",
+     "cast": "unit",
+     "parts": [
+      "slow",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dark_seer_wall_of_replica",
+     "name": "Wall of Replica",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "summon",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Clinkz": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "clinkz_strafe",
+     "name": "Strafe",
+     "cast": "no_target",
+     "parts": [
+      "attack_speed",
+      "evasion",
+      "area",
+      "invisibility",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "clinkz_searing_arrows",
+     "name": "Searing Arrows",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "clinkz_death_pact",
+     "name": "Death Pact",
+     "cast": "unit",
+     "parts": [
+      "heal",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "clinkz_burning_barrage",
+     "name": "Burning Barrage",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "attack_damage"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "clinkz_burning_army",
+     "name": "Burning Army",
+     "cast": "point",
+     "parts": [
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "clinkz_wind_walk",
+     "name": "Skeleton Walk",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "move_speed",
+      "invisibility",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Omniknight": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "omniknight_purification",
+     "name": "Purification",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "omniknight_martyr",
+     "name": "Repel",
+     "cast": "unit",
+     "parts": [
+      "magic_resist",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "omniknight_hammer_of_purity",
+     "name": "Hammer of Purity",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "omniknight_guardian_angel",
+     "name": "Guardian Angel",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "immunity",
+      "global"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Enchantress": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "enchantress_impetus",
+     "name": "Impetus",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "illusion",
+      "control"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "enchantress_enchant",
+     "name": "Enchant",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "armor",
+      "attack_speed",
+      "move_speed",
+      "attack_damage",
+      "dispel",
+      "control"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "enchantress_natures_attendants",
+     "name": "Nature's Attendants",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "move_speed",
+      "area",
+      "control"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "enchantress_little_friends",
+     "name": "Little Friends",
+     "cast": "unit",
+     "parts": [
+      "root",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "control"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "enchantress_untouchable",
+     "name": "Untouchable",
+     "cast": "passive",
+     "parts": [
+      "slow",
+      "attack_speed",
+      "control"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Huskar": {
+   "attr": "str",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "huskar_inner_fire",
+     "name": "Inner Fire",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "silence",
+      "disarm",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "huskar_burning_spear",
+     "name": "Burning Spear",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "huskar_berserkers_blood",
+     "name": "Berserker's Blood",
+     "cast": "passive",
+     "parts": [
+      "heal",
+      "magic_resist",
+      "attack_speed",
+      "stat_bonus",
+      "area",
+      "aura"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "huskar_life_break",
+     "name": "Life Break",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "magic_resist",
+      "attack_speed",
+      "move_speed",
+      "splash",
+      "area",
+      "blink",
+      "dispel",
+      "immunity",
+      "fear_taunt"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Night Stalker": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "night_stalker_void",
+     "name": "Void",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "invisibility",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "night_stalker_crippling_fear",
+     "name": "Crippling Fear",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "silence",
+      "area",
+      "aura"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "night_stalker_midnight_feast",
+     "name": "Midnight Feast",
+     "cast": "passive",
+     "parts": [
+      "heal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "night_stalker_darkness",
+     "name": "Dark Ascension",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Broodmother": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "broodmother_insatiable_hunger",
+     "name": "Insatiable Hunger",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "attack_damage",
+      "lifesteal",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "broodmother_spin_web",
+     "name": "Spin Web",
+     "cast": "point",
+     "parts": [
+      "heal",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "broodmother_incapacitating_bite",
+     "name": "Incapacitating Bite",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "evasion",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "broodmother_spawn_spiderlings",
+     "name": "Spawn Spiderlings",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Bounty Hunter": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "bounty_hunter_shuriken_toss",
+     "name": "Shuriken Toss",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "bounce",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "bounty_hunter_jinada",
+     "name": "Jinada",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "bounty_hunter_wind_walk",
+     "name": "Shadow Walk",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stun",
+      "move_speed",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "bounty_hunter_wind_walk_ally",
+     "name": "Friendly Shadow",
+     "cast": "unit",
+     "parts": [
+      "invisibility"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "bounty_hunter_track",
+     "name": "Track",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Weaver": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "weaver_the_swarm",
+     "name": "The Swarm",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_damage",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "weaver_shukuchi",
+     "name": "Shukuchi",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "weaver_geminate_attack",
+     "name": "Geminate Attack",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "weaver_time_lapse",
+     "name": "Time Lapse",
+     "cast": "no_target",
+     "parts": [
+      "dispel"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Jakiro": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "jakiro_dual_breath",
+     "name": "Dual Breath",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "jakiro_ice_path",
+     "name": "Ice Path",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "jakiro_liquid_fire",
+     "name": "Liquid Fire",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "attack_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "jakiro_liquid_ice",
+     "name": "Liquid Frost",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "jakiro_macropyre",
+     "name": "Macropyre",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area",
+      "immunity"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Batrider": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "batrider_sticky_napalm",
+     "name": "Sticky Napalm",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "move_speed",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "batrider_flamebreak",
+     "name": "Flamebreak",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "slow",
+      "area",
+      "knockback",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "batrider_firefly",
+     "name": "Firefly",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "move_speed",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "batrider_flaming_lasso",
+     "name": "Flaming Lasso",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "knockback",
+      "blink"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Chen": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "chen_penitence",
+     "name": "Penitence",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "move_speed"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "chen_holy_persuasion",
+     "name": "Holy Persuasion",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "move_speed",
+      "attack_damage",
+      "summon",
+      "control",
+      "global"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "chen_divine_favor",
+     "name": "Divine Favor",
+     "cast": "unit",
+     "parts": [
+      "heal",
+      "armor",
+      "area",
+      "aura"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "chen_hand_of_god",
+     "name": "Hand of God",
+     "cast": "no_target",
+     "parts": [
+      "damage_over_time",
+      "heal",
+      "slow"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Spectre": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "spectre_spectral_dagger",
+     "name": "Spectral Dagger",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "spectre_shadow_step",
+     "name": "Shadow Step",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "move_speed",
+      "blink",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "spectre_dispersion",
+     "name": "Dispersion",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "area",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "spectre_reality",
+     "name": "Reality",
+     "cast": "point",
+     "parts": [
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "spectre_haunt",
+     "name": "Haunt",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area",
+      "blink",
+      "fear_taunt",
+      "summon",
+      "illusion",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Ancient Apparition": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "ancient_apparition_cold_feet",
+     "name": "Cold Feet",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ancient_apparition_ice_vortex",
+     "name": "Ice Vortex",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "move_speed",
+      "area",
+      "knockback",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "ancient_apparition_chilling_touch",
+     "name": "Chilling Touch",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "slow"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ancient_apparition_ice_blast",
+     "name": "Ice Blast",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "stun",
+      "area",
+      "execute"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Doom": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "doom_bringer_devour",
+     "name": "Devour",
+     "cast": "unit",
+     "parts": [
+      "magic_resist",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "doom_bringer_scorched_earth",
+     "name": "Scorched Earth",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "doom_bringer_infernal_blade",
+     "name": "Infernal Blade",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "doom_bringer_empty1",
+     "name": "Devoured Ability",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "doom_bringer_empty2",
+     "name": "Devoured Ability",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "doom_bringer_doom",
+     "name": "Doom",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "area",
+      "aura",
+      "dispel"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Ursa": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "ursa_earthshock",
+     "name": "Earthshock",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "ursa_overpower",
+     "name": "Overpower",
+     "cast": "no_target",
+     "parts": [
+      "slow",
+      "attack_speed"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ursa_fury_swipes",
+     "name": "Fury Swipes",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "ursa_enrage",
+     "name": "Enrage",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "shield",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Spirit Breaker": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "spirit_breaker_charge_of_darkness",
+     "name": "Charge of Darkness",
+     "cast": "unit",
+     "parts": [
+      "stun",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "spirit_breaker_bulldoze",
+     "name": "Bulldoze",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "shield"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "spirit_breaker_greater_bash",
+     "name": "Greater Bash",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "stun",
+      "move_speed",
+      "on_hit_chance",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "spirit_breaker_planar_pocket",
+     "name": "Planar Pocket",
+     "cast": "unit",
+     "parts": [
+      "magic_resist",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "spirit_breaker_nether_strike",
+     "name": "Nether Strike",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Gyrocopter": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 4,
+   "abilities": [
+    {
+     "key": "gyrocopter_rocket_barrage",
+     "name": "Rocket Barrage",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "gyrocopter_homing_missile",
+     "name": "Homing Missile",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_speed"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "gyrocopter_flak_cannon",
+     "name": "Flak Cannon",
+     "cast": "no_target",
+     "parts": [
+      "crit",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "gyrocopter_side_gunner_spawn_ability",
+     "name": "Side Gunner",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "gyrocopter_call_down",
+     "name": "Call Down",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Alchemist": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "alchemist_acid_spray",
+     "name": "Acid Spray",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "armor",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "alchemist_unstable_concoction",
+     "name": "Unstable Concoction",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stun",
+      "move_speed",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "alchemist_corrosive_weaponry",
+     "name": "Corrosive Weaponry",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_damage",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "alchemist_chemical_rage",
+     "name": "Chemical Rage",
+     "cast": "no_target",
+     "parts": [
+      "heal",
+      "move_speed",
+      "dispel"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Invoker": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "invoker_quas",
+     "name": "Quas",
+     "cast": "no_target",
+     "parts": [
+      "heal",
+      "stat_bonus"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "invoker_wex",
+     "name": "Wex",
+     "cast": "no_target",
+     "parts": [
+      "attack_speed",
+      "move_speed",
+      "stat_bonus"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "invoker_exort",
+     "name": "Exort",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stat_bonus",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "invoker_empty1",
+     "name": "Invoked Spell",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "invoker_empty2",
+     "name": "Invoked Spell",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    }
+   ]
+  },
+  "Silencer": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "silencer_curse_of_the_silent",
+     "name": "Arcane Curse",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "silence",
+      "move_speed",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "silencer_glaives_of_wisdom",
+     "name": "Glaives of Wisdom",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "silence",
+      "stat_bonus",
+      "stacks",
+      "control"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "silencer_last_word",
+     "name": "Last Word",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "silence",
+      "stat_bonus",
+      "area",
+      "control"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "silencer_global_silence",
+     "name": "Global Silence",
+     "cast": "no_target",
+     "parts": [
+      "silence"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Outworld Devourer": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "obsidian_destroyer_arcane_orb",
+     "name": "Arcane Orb",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "obsidian_destroyer_astral_imprisonment",
+     "name": "Astral Imprisonment",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "move_speed",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "obsidian_destroyer_objurgation",
+     "name": "Objurgation",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "shield"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "obsidian_destroyer_sanity_eclipse",
+     "name": "Sanity's Eclipse",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "attack_damage",
+      "area",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Lycan": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "lycan_summon_wolves",
+     "name": "Summon Wolves",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "armor",
+      "attack_speed",
+      "attack_damage",
+      "on_hit_chance",
+      "invisibility",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lycan_howl",
+     "name": "Howl",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_damage",
+      "area",
+      "fear_taunt",
+      "summon",
+      "global"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "lycan_feral_impulse",
+     "name": "Feral Impulse",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "heal",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "lycan_shapeshift",
+     "name": "Shapeshift",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "move_speed",
+      "crit",
+      "on_hit_chance",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Brewmaster": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "brewmaster_thunder_clap",
+     "name": "Thunder Clap",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "brewmaster_cinder_brew",
+     "name": "Cinder Brew",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "brewmaster_drunken_brawler",
+     "name": "Drunken Brawler",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "armor",
+      "magic_resist",
+      "attack_speed",
+      "move_speed",
+      "crit",
+      "evasion",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "brewmaster_primal_split",
+     "name": "Primal Split",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Shadow Demon": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "shadow_demon_disruption",
+     "name": "Disruption",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "shadow_demon_disseminate",
+     "name": "Disseminate",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shadow_demon_shadow_poison",
+     "name": "Shadow Poison",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shadow_demon_shadow_poison_release",
+     "name": "Shadow Poison Release",
+     "cast": "no_target",
+     "parts": [
+      "damage"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "shadow_demon_demonic_cleanse",
+     "name": "Demonic Cleanse",
+     "cast": "unit",
+     "parts": [
+      "heal",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shadow_demon_demonic_purge",
+     "name": "Demonic Purge",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "dispel",
+      "stacks"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Lone Druid": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "lone_druid_entangle",
+     "name": "Entangle",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "root",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "lone_druid_spirit_link",
+     "name": "Spirit Link",
+     "cast": "passive",
+     "parts": [
+      "move_speed",
+      "lifesteal",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "lone_druid_savage_roar",
+     "name": "Savage Roar",
+     "cast": "no_target",
+     "parts": [
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "lone_druid_true_form",
+     "name": "True Form",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "armor",
+      "attack_damage"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Chaos Knight": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "chaos_knight_chaos_bolt",
+     "name": "Chaos Bolt",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "bounce",
+      "knockback",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "chaos_knight_reality_rift",
+     "name": "Reality Rift",
+     "cast": "unit",
+     "parts": [
+      "armor",
+      "knockback",
+      "blink",
+      "immunity",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "chaos_knight_chaos_strike",
+     "name": "Chaos Strike",
+     "cast": "passive",
+     "parts": [
+      "stat_bonus",
+      "crit",
+      "lifesteal",
+      "on_hit_chance",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "chaos_knight_phantasm",
+     "name": "Phantasm",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "magic_resist",
+      "on_hit_chance",
+      "area",
+      "dispel",
+      "summon",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Meepo": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "meepo_earthbind",
+     "name": "Earthbind",
+     "cast": "point",
+     "parts": [
+      "root",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "meepo_poof",
+     "name": "Poof",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "meepo_ransack",
+     "name": "Ransack",
+     "cast": "passive",
+     "parts": [
+      "heal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "meepo_megameepo",
+     "name": "MegaMeepo",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "knockback",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "meepo_divided_we_stand",
+     "name": "Divided We Stand",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "attack_speed",
+      "mana",
+      "blink",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Treant Protector": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "treant_natures_grasp",
+     "name": "Nature's Grasp",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "treant_leech_seed",
+     "name": "Leech Seed",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "heal",
+      "slow",
+      "root",
+      "disarm",
+      "attack_damage",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "treant_living_armor",
+     "name": "Living Armor",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "shield"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "treant_overgrowth",
+     "name": "Overgrowth",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area",
+      "blink",
+      "invisibility",
+      "dispel",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Ogre Magi": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 4,
+   "abilities": [
+    {
+     "key": "ogre_magi_fireblast",
+     "name": "Fireblast",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ogre_magi_ignite",
+     "name": "Ignite",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ogre_magi_bloodlust",
+     "name": "Bloodlust",
+     "cast": "attack_modifier",
+     "parts": [
+      "attack_speed",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ogre_magi_multicast",
+     "name": "Multicast",
+     "cast": "passive",
+     "parts": [
+      "stat_bonus"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Undying": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "undying_decay",
+     "name": "Decay",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stat_bonus",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "undying_soul_rip",
+     "name": "Soul Rip",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "stat_bonus",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "undying_tombstone",
+     "name": "Tombstone",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "execute",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "undying_flesh_golem",
+     "name": "Flesh Golem",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "stat_bonus",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Rubick": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "rubick_telekinesis",
+     "name": "Telekinesis",
+     "cast": "unit",
+     "parts": [
+      "stun",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "rubick_fade_bolt",
+     "name": "Fade Bolt",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area",
+      "bounce",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "rubick_arcane_supremacy",
+     "name": "Arcane Supremacy",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "rubick_empty1",
+     "name": "Stolen Spell",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "rubick_empty2",
+     "name": "Stolen Spell",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "rubick_spell_steal",
+     "name": "Spell Steal",
+     "cast": "unit",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    }
+   ]
+  },
+  "Disruptor": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "disruptor_thunder_strike",
+     "name": "Thunder Strike",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "disruptor_glimpse",
+     "name": "Glimpse",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "silence",
+      "blink",
+      "execute",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "disruptor_kinetic_field",
+     "name": "Kinetic Field",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "shield",
+      "area",
+      "summon",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "disruptor_static_storm",
+     "name": "Static Storm",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "silence",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Nyx Assassin": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "nyx_assassin_impale",
+     "name": "Impale",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "nyx_assassin_jolt",
+     "name": "Mind Flare",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "mana",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "nyx_assassin_spiked_carapace",
+     "name": "Spiked Carapace",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "invisibility",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "nyx_assassin_vendetta",
+     "name": "Vendetta",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "move_speed",
+      "attack_damage",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Naga Siren": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "naga_siren_mirror_image",
+     "name": "Mirror Image",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "dispel",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "naga_siren_ensnare",
+     "name": "Ensnare",
+     "cast": "unit",
+     "parts": [
+      "root",
+      "blink",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "naga_siren_rip_tide",
+     "name": "Rip Tide",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_damage",
+      "area",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "naga_siren_reel_in",
+     "name": "Reel In",
+     "cast": "channel",
+     "parts": [
+      "root",
+      "stat_bonus",
+      "area",
+      "knockback",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "naga_siren_song_of_the_siren",
+     "name": "Song of the Siren",
+     "cast": "no_target",
+     "parts": [
+      "damage_over_time",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Keeper of the Light": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "keeper_of_the_light_illuminate",
+     "name": "Illuminate",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "keeper_of_the_light_blinding_light",
+     "name": "Blinding Light",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "evasion",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "keeper_of_the_light_chakra_magic",
+     "name": "Chakra Magic",
+     "cast": "unit",
+     "parts": [
+      "mana"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "keeper_of_the_light_spirit_form",
+     "name": "Spirit Form",
+     "cast": "no_target",
+     "parts": [
+      "heal",
+      "move_speed"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Io": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "wisp_tether",
+     "name": "Tether",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "move_speed",
+      "area",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "wisp_spirits",
+     "name": "Spirits",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "wisp_overcharge",
+     "name": "Overcharge",
+     "cast": "no_target",
+     "parts": [
+      "heal",
+      "armor",
+      "magic_resist",
+      "attack_speed",
+      "lifesteal",
+      "spell_steal",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "wisp_relocate",
+     "name": "Relocate",
+     "cast": "point",
+     "parts": [
+      "blink",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Visage": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "visage_grave_chill",
+     "name": "Grave Chill",
+     "cast": "unit",
+     "parts": [
+      "attack_speed",
+      "move_speed",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "visage_soul_assumption",
+     "name": "Soul Assumption",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "visage_gravekeepers_cloak",
+     "name": "Gravekeeper's Cloak",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "shield",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "visage_stone_form_self_cast",
+     "name": "Stone Form",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "area",
+      "immunity",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "visage_summon_familiars",
+     "name": "Summon Familiars",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "armor",
+      "move_speed",
+      "attack_damage",
+      "evasion",
+      "area",
+      "immunity",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "visage_summon_familiars_stone_form",
+     "name": "Stone Form",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "area",
+      "immunity",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Slark": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "slark_dark_pact",
+     "name": "Dark Pact",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "slark_pounce",
+     "name": "Pounce",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area",
+      "blink",
+      "stacks",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "slark_saltwater_shiv",
+     "name": "Saltwater Shiv",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "heal",
+      "move_speed",
+      "attack_damage",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "slark_shadow_dance",
+     "name": "Shadow Dance",
+     "cast": "no_target",
+     "parts": [
+      "damage_over_time",
+      "heal",
+      "move_speed",
+      "immunity"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Medusa": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "medusa_split_shot",
+     "name": "Split Shot",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "crit"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "medusa_mystic_snake",
+     "name": "Mystic Snake",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "bounce",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "medusa_gorgon_grasp",
+     "name": "Gorgon's Grasp",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "root",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "medusa_stone_gaze",
+     "name": "Stone Gaze",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stun",
+      "slow",
+      "attack_speed",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Troll Warlord": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "troll_warlord_whirling_axes_ranged",
+     "name": "Whirling Axes (Ranged)",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "troll_warlord_whirling_axes_melee",
+     "name": "Whirling Axes (Melee)",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "move_speed",
+      "evasion",
+      "area",
+      "knockback",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "troll_warlord_fervor",
+     "name": "Fervor",
+     "cast": "passive",
+     "parts": [
+      "attack_speed",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "troll_warlord_berserkers_rage",
+     "name": "Berserker's Rage",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow",
+      "root",
+      "armor",
+      "attack_speed",
+      "move_speed",
+      "attack_damage",
+      "on_hit_chance",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Centaur Warrunner": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "centaur_hoof_stomp",
+     "name": "Hoof Stomp",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stun",
+      "disarm",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "centaur_double_edge",
+     "name": "Double Edge",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stat_bonus",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "centaur_return",
+     "name": "Retaliate",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "stat_bonus",
+      "area",
+      "aura",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "centaur_work_horse",
+     "name": "Work Horse",
+     "cast": "no_target",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "centaur_stampede",
+     "name": "Stampede",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "stat_bonus",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Magnus": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "magnataur_shockwave",
+     "name": "Shockwave",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "knockback",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "magnataur_empower",
+     "name": "Empower",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "splash",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "magnataur_skewer",
+     "name": "Skewer",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area",
+      "knockback",
+      "blink",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "magnataur_reverse_polarity",
+     "name": "Reverse Polarity",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "knockback",
+      "stacks"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Timbersaw": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "shredder_whirling_death",
+     "name": "Whirling Death",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "attack_damage",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "shredder_timber_chain",
+     "name": "Timber Chain",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "bounce",
+      "knockback",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "shredder_reactive_armor",
+     "name": "Reactive Armor",
+     "cast": "passive",
+     "parts": [
+      "heal",
+      "armor",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "shredder_chakram",
+     "name": "Chakram",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Bristleback": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "bristleback_viscous_nasal_goo",
+     "name": "Viscous Nasal Goo",
+     "cast": "unit",
+     "parts": [
+      "slow",
+      "armor",
+      "move_speed",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "bristleback_quill_spray",
+     "name": "Quill Spray",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "bristleback_bristleback",
+     "name": "Bristleback",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "bristleback_warpath",
+     "name": "Warpath",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "move_speed",
+      "stacks"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Tusk": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "tusk_ice_shards",
+     "name": "Ice Shards",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "shield",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "tusk_snowball",
+     "name": "Snowball",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "tusk_tag_team",
+     "name": "Tag Team",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "aura"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "tusk_drinking_buddies",
+     "name": "Drinking Buddies",
+     "cast": "unit",
+     "parts": [
+      "armor",
+      "move_speed",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "tusk_walrus_punch",
+     "name": "Walrus PUNCH!",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "crit",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Skywrath Mage": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 4,
+   "abilities": [
+    {
+     "key": "skywrath_mage_arcane_bolt",
+     "name": "Arcane Bolt",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "stat_bonus",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "skywrath_mage_concussive_shot",
+     "name": "Concussive Shot",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "skywrath_mage_ancient_seal",
+     "name": "Ancient Seal",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "silence"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "skywrath_mage_mystic_flare",
+     "name": "Mystic Flare",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Abaddon": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "abaddon_death_coil",
+     "name": "Mist Coil",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "abaddon_aphotic_shield",
+     "name": "Aphotic Shield",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "shield",
+      "area",
+      "dispel",
+      "reflect",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "abaddon_frostmourne",
+     "name": "Curse of Avernus",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_speed"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "abaddon_borrowed_time",
+     "name": "Borrowed Time",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "dispel",
+      "execute"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Elder Titan": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "elder_titan_echo_stomp",
+     "name": "Echo Stomp",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "elder_titan_ancestral_spirit",
+     "name": "Astral Spirit",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "armor",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "immunity",
+      "reflect"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "elder_titan_natural_order",
+     "name": "Natural Order",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "armor",
+      "magic_resist",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "elder_titan_earth_splitter",
+     "name": "Earth Splitter",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Legion Commander": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "legion_commander_overwhelming_odds",
+     "name": "Overwhelming Odds",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "armor",
+      "attack_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "legion_commander_press_the_attack",
+     "name": "Press The Attack",
+     "cast": "unit",
+     "parts": [
+      "heal",
+      "move_speed",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "legion_commander_moment_of_courage",
+     "name": "Moment of Courage",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "lifesteal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "legion_commander_duel",
+     "name": "Duel",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "area",
+      "fear_taunt"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Techies": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "techies_sticky_bomb",
+     "name": "Sticky Bomb",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "techies_reactive_tazer",
+     "name": "Reactive Tazer",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "disarm",
+      "move_speed",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "techies_suicide",
+     "name": "Blast Off!",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "techies_land_mines",
+     "name": "Proximity Mines",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "magic_resist",
+      "area",
+      "invisibility"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Ember Spirit": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "ember_spirit_searing_chains",
+     "name": "Searing Chains",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area",
+      "bounce"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "ember_spirit_sleight_of_fist",
+     "name": "Sleight of Fist",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "ember_spirit_flame_guard",
+     "name": "Flame Guard",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "shield",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ember_spirit_activate_fire_remnant",
+     "name": "Activate Fire Remnant",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "ember_spirit_fire_remnant",
+     "name": "Fire Remnant",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Earth Spirit": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "earth_spirit_boulder_smash",
+     "name": "Boulder Smash",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "earth_spirit_rolling_boulder",
+     "name": "Rolling Boulder",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "earth_spirit_geomagnetic_grip",
+     "name": "Geomagnetic Grip",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "silence",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "earth_spirit_magnetize",
+     "name": "Magnetize",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "silence",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Underlord": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "abyssal_underlord_firestorm",
+     "name": "Firestorm",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "abyssal_underlord_pit_of_malice",
+     "name": "Pit of Malice",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "root",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "abyssal_underlord_atrophy_aura",
+     "name": "Atrophy Aura",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "splash",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "abyssal_underlord_dark_portal",
+     "name": "Fiend's Gate",
+     "cast": "point",
+     "parts": [
+      "damage_over_time",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Terrorblade": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "terrorblade_reflection",
+     "name": "Reflection",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "area",
+      "immunity",
+      "reflect",
+      "illusion",
+      "global"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "terrorblade_conjure_image",
+     "name": "Conjure Image",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "summon",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "terrorblade_metamorphosis",
+     "name": "Metamorphosis",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "area",
+      "aura",
+      "illusion",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "terrorblade_terror_wave",
+     "name": "Terror Wave",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area",
+      "fear_taunt",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "terrorblade_sunder",
+     "name": "Sunder",
+     "cast": "unit",
+     "parts": [
+      "heal"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Phoenix": {
+   "attr": "str",
+   "attack": "Ranged",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "phoenix_icarus_dive",
+     "name": "Icarus Dive",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "move_speed",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "phoenix_fire_spirits",
+     "name": "Fire Spirits",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "attack_speed",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "phoenix_sun_ray",
+     "name": "Sun Ray",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "phoenix_sun_ray_toggle_move",
+     "name": "Toggle Movement",
+     "cast": "no_target",
+     "parts": [
+      "slow"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "phoenix_supernova",
+     "name": "Supernova",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "stun",
+      "on_hit_chance",
+      "area",
+      "dispel",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Oracle": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 4,
+   "abilities": [
+    {
+     "key": "oracle_fortunes_end",
+     "name": "Fortune's End",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "heal",
+      "root",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "oracle_fates_edict",
+     "name": "Fate's Edict",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "disarm"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "oracle_purifying_flames",
+     "name": "Purifying Flames",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "oracle_rain_of_destiny",
+     "name": "Rain of Destiny",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "oracle_diviners_deck",
+     "name": "Diviner's Deck",
+     "cast": "passive",
+     "parts": [
+      "heal",
+      "shield"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "oracle_false_promise",
+     "name": "False Promise",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "dispel"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Winter Wyvern": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "winter_wyvern_arctic_burn",
+     "name": "Arctic Burn",
+     "cast": "no_target",
+     "parts": [
+      "damage_over_time",
+      "heal",
+      "slow",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "winter_wyvern_splinter_blast",
+     "name": "Splinter Blast",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "slow",
+      "move_speed",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "winter_wyvern_cold_embrace",
+     "name": "Cold Embrace",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "winter_wyvern_winters_curse",
+     "name": "Winter's Curse",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "attack_speed",
+      "area",
+      "dispel",
+      "immunity"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Arc Warden": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "arc_warden_flux",
+     "name": "Flux",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "silence",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "arc_warden_magnetic_field",
+     "name": "Magnetic Field",
+     "cast": "point",
+     "parts": [
+      "attack_speed",
+      "stat_bonus",
+      "evasion",
+      "on_hit_chance",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "arc_warden_spark_wraith",
+     "name": "Spark Wraith",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "move_speed",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "arc_warden_tempest_double",
+     "name": "Tempest Double",
+     "cast": "point",
+     "parts": [
+      "slow",
+      "evasion",
+      "on_hit_chance",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Monkey King": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "monkey_king_boundless_strike",
+     "name": "Boundless Strike",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "crit",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "monkey_king_tree_dance",
+     "name": "Tree Dance",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "slow",
+      "bounce",
+      "blink",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "monkey_king_primal_spring",
+     "name": "Primal Spring",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "monkey_king_jingu_mastery",
+     "name": "Jingu Mastery",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "lifesteal",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "monkey_king_wukongs_command",
+     "name": "Wukong's Command",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "summon",
+      "transform"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Dark Willow": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "dark_willow_bramble_maze",
+     "name": "Bramble Maze",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "root",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "dark_willow_shadow_realm",
+     "name": "Shadow Realm",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area",
+      "aura"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dark_willow_cursed_crown",
+     "name": "Cursed Crown",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dark_willow_bedlam",
+     "name": "Bedlam",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dark_willow_terrorize",
+     "name": "Terrorize",
+     "cast": "point",
+     "parts": [
+      "area",
+      "fear_taunt"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Pangolier": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "pangolier_swashbuckle",
+     "name": "Swashbuckle",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_damage",
+      "on_hit_chance",
+      "area",
+      "blink"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "pangolier_shield_crash",
+     "name": "Shield Crash",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "shield",
+      "area",
+      "bounce",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "pangolier_lucky_shot",
+     "name": "Lucky Shot",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "slow",
+      "armor",
+      "attack_speed",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "pangolier_gyroshell",
+     "name": "Rolling Thunder",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "magic_resist",
+      "move_speed",
+      "attack_damage",
+      "area",
+      "bounce",
+      "knockback",
+      "dispel",
+      "immunity",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Grimstroke": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "grimstroke_dark_artistry",
+     "name": "Stroke of Fate",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "stat_bonus",
+      "attack_damage",
+      "area",
+      "blink",
+      "reflect",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "grimstroke_ink_creature",
+     "name": "Phantom's Embrace",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "silence",
+      "area",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "grimstroke_spirit_walk",
+     "name": "Ink Swell",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "move_speed",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "grimstroke_soul_chain",
+     "name": "Soulbind",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "area",
+      "bounce",
+      "reflect",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Hoodwink": {
+   "attr": "agi",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "hoodwink_acorn_shot",
+     "name": "Acorn Shot",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_damage",
+      "bounce",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "hoodwink_bushwhack",
+     "name": "Bushwhack",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "area",
+      "knockback",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "hoodwink_scurry",
+     "name": "Scurry",
+     "cast": "no_target",
+     "parts": [
+      "move_speed",
+      "evasion",
+      "on_hit_chance",
+      "area",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "hoodwink_sharpshooter",
+     "name": "Sharpshooter",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Void Spirit": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "void_spirit_aether_remnant",
+     "name": "Aether Remnant",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "void_spirit_dissimilate",
+     "name": "Dissimilate",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "void_spirit_resonant_pulse",
+     "name": "Resonant Pulse",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "shield",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "void_spirit_astral_step",
+     "name": "Astral Step",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "on_hit_chance",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Snapfire": {
+   "attr": "all",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "snapfire_scatterblast",
+     "name": "Scatterblast",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "snapfire_firesnap_cookie",
+     "name": "Firesnap Cookie",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "area",
+      "bounce"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "snapfire_lil_shredder",
+     "name": "Lil' Shredder",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "armor",
+      "attack_speed",
+      "attack_damage",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "snapfire_spit_creep",
+     "name": "Spit Out",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "snapfire_mortimer_kisses",
+     "name": "Mortimer Kisses",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Mars": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "mars_spear",
+     "name": "Spear of Mars",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "knockback",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "mars_gods_rebuke",
+     "name": "God's Rebuke",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_damage",
+      "crit",
+      "shield",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "mars_bulwark",
+     "name": "Bulwark",
+     "cast": "point",
+     "parts": [
+      "move_speed",
+      "on_hit_chance",
+      "shield",
+      "immunity"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "mars_arena_of_blood",
+     "name": "Arena Of Blood",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "heal",
+      "area",
+      "knockback",
+      "immunity",
+      "summon",
+      "terrain",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Ring Master": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "ringmaster_tame_the_beasts",
+     "name": "Tame the Beasts",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "magic_resist",
+      "area",
+      "immunity",
+      "fear_taunt"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "ringmaster_the_box",
+     "name": "Escape Act",
+     "cast": "unit",
+     "parts": [
+      "heal",
+      "slow",
+      "silence",
+      "disarm",
+      "magic_resist",
+      "move_speed",
+      "area",
+      "blink",
+      "immunity",
+      "tether"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "ringmaster_impalement",
+     "name": "Impalement Arts",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "heal",
+      "slow",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "ringmaster_empty_souvenir",
+     "name": "Souvenir Slot",
+     "cast": "passive",
+     "parts": [],
+     "difficulty": "sin clasificar"
+    },
+    {
+     "key": "ringmaster_spotlight",
+     "name": "Spotlight",
+     "cast": "point",
+     "parts": [
+      "heal",
+      "evasion",
+      "on_hit_chance",
+      "area",
+      "invisibility",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "ringmaster_wheel",
+     "name": "Wheel of Wonder",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area",
+      "aura",
+      "knockback"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Dawnbreaker": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 2,
+   "abilities": [
+    {
+     "key": "dawnbreaker_fire_wreath",
+     "name": "Starbreaker",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "slow",
+      "move_speed",
+      "stat_bonus",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dawnbreaker_celestial_hammer",
+     "name": "Celestial Hammer",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "dawnbreaker_luminosity",
+     "name": "Luminosity",
+     "cast": "passive",
+     "parts": [
+      "damage",
+      "heal",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "dawnbreaker_solar_guardian",
+     "name": "Solar Guardian",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "heal",
+      "stun",
+      "move_speed",
+      "area",
+      "summon",
+      "global"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Marci": {
+   "attr": "all",
+   "attack": "Melee",
+   "simple": 0,
+   "abilities": [
+    {
+     "key": "marci_grapple",
+     "name": "Dispose",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "marci_companion_run",
+     "name": "Rebound",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "stun",
+      "move_speed",
+      "area",
+      "bounce"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "marci_bodyguard",
+     "name": "Bodyguard",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "attack_damage",
+      "lifesteal",
+      "shield",
+      "dispel",
+      "summon"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "marci_unleash",
+     "name": "Unleash",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_speed",
+      "move_speed",
+      "area",
+      "knockback",
+      "summon"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Primal Beast": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "primal_beast_onslaught",
+     "name": "Onslaught",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "stun",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "primal_beast_trample",
+     "name": "Trample",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "disarm",
+      "magic_resist",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "primal_beast_uproar",
+     "name": "Uproar",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "armor",
+      "attack_speed",
+      "attack_damage",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "primal_beast_pulverize",
+     "name": "Pulverize",
+     "cast": "channel",
+     "parts": [
+      "damage",
+      "stun",
+      "attack_damage",
+      "splash",
+      "area",
+      "immunity"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  },
+  "Muerta": {
+   "attr": "int",
+   "attack": "Ranged",
+   "simple": 3,
+   "abilities": [
+    {
+     "key": "muerta_dead_shot",
+     "name": "Dead Shot",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "area",
+      "fear_taunt"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "muerta_the_calling",
+     "name": "The Calling",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "slow",
+      "silence",
+      "move_speed",
+      "area",
+      "aura"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "muerta_gunslinger",
+     "name": "Gunslinger",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "attack_damage",
+      "on_hit_chance"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "muerta_spectral_slug",
+     "name": "Spectral Slug",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "slow",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "muerta_pierce_the_veil",
+     "name": "Pierce the Veil",
+     "cast": "no_target",
+     "parts": [
+      "damage"
+     ],
+     "difficulty": "simple"
+    }
+   ]
+  },
+  "Kez": {
+   "attr": "agi",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "kez_echo_slash",
+     "name": "Echo Slash",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "slow",
+      "attack_damage",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "kez_grappling_claw",
+     "name": "Grappling Claw",
+     "cast": "unit",
+     "parts": [
+      "slow",
+      "move_speed",
+      "lifesteal",
+      "terrain"
+     ],
+     "difficulty": "difícil"
+    },
+    {
+     "key": "kez_kazurai_katana",
+     "name": "Kazurai Katana",
+     "cast": "attack_modifier",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "lifesteal",
+      "stacks"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "kez_raptor_dance",
+     "name": "Raptor Dance",
+     "cast": "no_target",
+     "parts": [
+      "damage",
+      "heal",
+      "magic_resist",
+      "lifesteal",
+      "area",
+      "dispel",
+      "immunity",
+      "illusion"
+     ],
+     "difficulty": "difícil"
+    }
+   ]
+  },
+  "Largo": {
+   "attr": "str",
+   "attack": "Melee",
+   "simple": 1,
+   "abilities": [
+    {
+     "key": "largo_catchy_lick",
+     "name": "Catchy Lick",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "heal",
+      "knockback",
+      "dispel"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "largo_frogstomp",
+     "name": "Frogstomp",
+     "cast": "point",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "stun",
+      "slow",
+      "move_speed",
+      "area",
+      "knockback"
+     ],
+     "difficulty": "media"
+    },
+    {
+     "key": "largo_croak_of_genius",
+     "name": "Croak of Genius",
+     "cast": "unit",
+     "parts": [
+      "damage",
+      "damage_over_time",
+      "slow",
+      "area"
+     ],
+     "difficulty": "simple"
+    },
+    {
+     "key": "largo_amphibian_rhapsody",
+     "name": "Amphibian Rhapsody",
+     "cast": "no_target",
+     "parts": [
+      "disarm",
+      "armor",
+      "area",
+      "stacks"
+     ],
+     "difficulty": "media"
+    }
+   ]
+  }
+ },
+ "totals": {
+  "difícil": 99,
+  "media": 247,
+  "simple": 199,
+  "sin clasificar": 12
+ },
+ "partCounts": {
+  "damage": 437,
+  "mana": 9,
+  "illusion": 26,
+  "blink": 40,
+  "heal": 115,
+  "magic_resist": 26,
+  "reflect": 14,
+  "summon": 86,
+  "stun": 80,
+  "attack_damage": 105,
+  "area": 331,
+  "armor": 43,
+  "attack_speed": 66,
+  "fear_taunt": 11,
+  "damage_over_time": 116,
+  "slow": 162,
+  "lifesteal": 17,
+  "move_speed": 144,
+  "stacks": 38,
+  "silence": 19,
+  "dispel": 38,
+  "execute": 6,
+  "knockback": 80,
+  "shield": 28,
+  "evasion": 18,
+  "on_hit_chance": 28,
+  "invisibility": 20,
+  "terrain": 30,
+  "crit": 12,
+  "immunity": 35,
+  "bounce": 24,
+  "stat_bonus": 28,
+  "transform": 19,
+  "tether": 14,
+  "splash": 13,
+  "hex": 3,
+  "root": 13,
+  "disarm": 9,
+  "aura": 12,
+  "time": 1,
+  "global": 6,
+  "control": 10,
+  "spell_steal": 1
+ }
+}

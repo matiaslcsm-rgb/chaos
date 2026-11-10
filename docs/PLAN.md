@@ -37,11 +37,11 @@ Sin programar nada del juego todavía.
 **Lista cuando:** hay una tabla consultable con todo.
 
 ## Etapa 2 · Piezas
-- [ ] Definir las piezas con las que se arman las habilidades (daño, aturdir, ralentizar, proyectil, área, invocación,
-      pasiva al golpear, aura, etc.).
-- [ ] Clasificar todas las habilidades: las que salen solo con piezas, las que piden una pieza nueva y las que
-      necesitan código a mano.
-- [ ] Elegir el primer lote: 10 héroes, unas 40 habilidades y 20 ítems, empezando por los más simples.
+- [x] Definir las piezas con las que se arman las habilidades: 6 formas de lanzar y 43 efectos en 3 niveles, en
+      `PIEZAS.md` (2026-11-10).
+- [x] Clasificar todas las habilidades: de 557 elegibles, 199 simples, 247 medias, 99 difíciles y 12 sin clasificar
+      (`tools/classify.js`; es una estimación, cada una se revisa a mano al entrar a un lote) (2026-11-10).
+- [x] Elegir el primer lote: 10 héroes, 43 habilidades y 25 ítems, en `data/batch1.json` (2026-11-10).
 
 **Lista cuando:** hay una lista de habilidades ordenada por dificultad y el primer lote elegido.
 

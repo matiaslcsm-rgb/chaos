@@ -1,0 +1,125 @@
+{
+ "note": "First playable batch (stage 3). Keys point into data/dota/.",
+ "heroes": [
+  {
+   "key": "npc_dota_hero_sven",
+   "abilities": [
+    "sven_storm_bolt",
+    "sven_great_cleave",
+    "sven_warcry",
+    "sven_gods_strength"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_ogre_magi",
+   "abilities": [
+    "ogre_magi_fireblast",
+    "ogre_magi_ignite",
+    "ogre_magi_bloodlust",
+    "ogre_magi_multicast"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_axe",
+   "abilities": [
+    "axe_berserkers_call",
+    "axe_battle_hunger",
+    "axe_counter_helix",
+    "axe_culling_blade"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_sniper",
+   "abilities": [
+    "sniper_shrapnel",
+    "sniper_headshot",
+    "sniper_take_aim",
+    "sniper_concussive_grenade",
+    "sniper_assassinate"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_viper",
+   "abilities": [
+    "viper_poison_attack",
+    "viper_nethertoxin",
+    "viper_corrosive_skin",
+    "viper_nose_dive",
+    "viper_viper_strike"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_luna",
+   "abilities": [
+    "luna_lucent_beam",
+    "luna_lunar_orbit",
+    "luna_moon_glaive",
+    "luna_eclipse"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_phantom_assassin",
+   "abilities": [
+    "phantom_assassin_stifling_dagger",
+    "phantom_assassin_phantom_strike",
+    "phantom_assassin_immaterial",
+    "phantom_assassin_coup_de_grace"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_crystal_maiden",
+   "abilities": [
+    "crystal_maiden_crystal_nova",
+    "crystal_maiden_frostbite",
+    "crystal_maiden_brilliance_aura",
+    "crystal_maiden_freezing_field"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_zuus",
+   "abilities": [
+    "zuus_arc_lightning",
+    "zuus_lightning_bolt",
+    "zuus_heavenly_jump",
+    "zuus_lightning_hands",
+    "zuus_thundergods_wrath"
+   ]
+  },
+  {
+   "key": "npc_dota_hero_skywrath_mage",
+   "abilities": [
+    "skywrath_mage_arcane_bolt",
+    "skywrath_mage_concussive_shot",
+    "skywrath_mage_ancient_seal",
+    "skywrath_mage_mystic_flare"
+   ]
+  }
+ ],
+ "items": [
+  "boots",
+  "blades_of_attack",
+  "chainmail",
+  "gloves",
+  "belt_of_strength",
+  "robe",
+  "staff_of_wizardry",
+  "broadsword",
+  "claymore",
+  "mithril_hammer",
+  "ogre_axe",
+  "demon_edge",
+  "reaver",
+  "lifesteal",
+  "hyperstone",
+  "phase_boots",
+  "power_treads",
+  "lesser_crit",
+  "greater_crit",
+  "black_king_bar",
+  "basher",
+  "satanic",
+  "mask_of_madness",
+  "moon_shard",
+  "kaya"
+ ]
+}
