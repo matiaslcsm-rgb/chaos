@@ -11,4 +11,8 @@ Para abrirlo, serví la carpeta y entrá a `http://localhost:8768`:
 py -m http.server 8768
 ```
 
+- Juego: `http://localhost:8768/`
+- Pruebas: `http://localhost:8768/tests.html`
+- Consulta de los datos de Dota: `http://localhost:8768/datos.html`
+
 Proyecto de fans, sin relación con Valve ni con los creadores del mod.

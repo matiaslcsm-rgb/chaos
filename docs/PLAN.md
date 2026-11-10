@@ -22,7 +22,7 @@ cierra con algo que se puede comprobar.
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
 - [ ] Repositorio en GitHub y publicación.
-- [ ] Página de pruebas.
+- [x] Página de pruebas: `tests.html`, tiene que decir "✅ N/N pruebas" (2026-11-10).
 
 ## Etapa 1 · Copiar la información
 Sin programar nada del juego todavía.
@@ -47,8 +47,12 @@ Sin programar nada del juego todavía.
 
 ## Etapa 3 · Primera versión jugable
 Una partida completa, pero chica.
-- [ ] Motor de combate: moverse, atacar, vida, maná, armadura, enfriamientos, estados.
-- [ ] Una arena con oleadas de creeps y el héroe controlado al estilo Dota.
+- [x] Motor de combate, primera parte: stats con las fórmulas de Dota, moverse, atacar (con el tiempo de preparación
+      que se cancela al moverse), proyectiles, armadura, regeneración (`js/stats.js`, `js/sim.js`) (2026-11-10).
+- [ ] Motor de combate, segunda parte: las habilidades del lote armadas con piezas, maná, enfriamientos y estados.
+- [x] Una arena con oleadas de creeps y el héroe controlado al estilo Dota: elegís entre los 10 héroes, clic derecho
+      para mover o atacar, A + clic para avanzar atacando, S para frenar; un nivel por ronda (`js/game.js`,
+      `js/render.js`, `js/main.js`). Los creeps son provisorios hasta investigar las oleadas del mod (2026-11-10).
 - [ ] Draft de 5 habilidades (rondas 1, 1, 3, 6 y 9).
 - [ ] Oro, tienda e inventario de 6.
 - [ ] 7 rivales de la IA jugando sus arenas.
