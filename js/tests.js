@@ -21,6 +21,12 @@ function runFor(sim, seconds) {
   for (let t = 0; t < seconds; t += TEST_STEP) stepSim(sim, TEST_STEP);
 }
 
+// Steps a match, taking a random ability whenever the draft opens.
+function stepPlaying(game) {
+  if (game.draft) skipDraft(game);
+  stepGame(game, TEST_STEP);
+}
+
 function addTestCreep(sim, x, y, overrides) {
   return addUnit(sim, {
     kind: 'creep',
@@ -129,7 +135,7 @@ test('units do not stand on top of each other', () => {
 
 test('clearing a wave starts the next round one level higher', () => {
   const game = createGame(heroByName('Sven'), 7);
-  for (let t = 0; t < 120 && game.round < 2; t += TEST_STEP) stepGame(game, TEST_STEP);
+  for (let t = 0; t < 120 && game.round < 2; t += TEST_STEP) stepPlaying(game);
   assert(game.round === 2, `reached round ${game.round}, phase ${game.phase}`);
   assert(game.hero.level === 2, `hero level ${game.hero.level}`);
 });
@@ -138,15 +144,15 @@ test('the match ends when the hero dies', () => {
   const game = createGame(heroByName('Crystal Maiden'), 7);
   game.hero.baseStats = Object.assign({}, game.hero.baseStats, { maxHp: 1, hpRegen: 0 });
   game.hero.hp = 1;
-  for (let t = 0; t < 60 && game.phase !== 'lost'; t += TEST_STEP) stepGame(game, TEST_STEP);
+  for (let t = 0; t < 60 && game.phase !== 'lost'; t += TEST_STEP) stepPlaying(game);
   assert(game.phase === 'lost', `phase ${game.phase}`);
 });
 
 test('the same seed plays the same match', () => {
   const play = () => {
     const game = createGame(heroByName('Viper'), 42);
-    for (let t = 0; t < 30; t += TEST_STEP) stepGame(game, TEST_STEP);
-    return `${game.round} ${game.hero.hp} ${game.hero.x} ${game.sim.units.length}`;
+    for (let t = 0; t < 30; t += TEST_STEP) stepPlaying(game);
+    return `${game.round} ${game.hero.hp} ${game.hero.x} ${game.sim.units.length} ${game.hero.abilities.map((ability) => ability.key)}`;
   };
   assert(play() === play(), 'two runs with one seed differ');
 });
@@ -685,6 +691,74 @@ test('all 43 abilities of the batch work at level 1', () => {
 
 test('all 43 abilities of the batch work at their maximum level', () => {
   for (const { data } of batchHeroes()) exerciseHero(data.localized_name, true);
+});
+
+// ---- Draft ----
+
+test('the draft: the match waits while 16 different abilities are on offer', () => {
+  const game = createGame(heroByName('Sven'), 5);
+  assert(game.hero.abilities.length === 0, 'the hero starts with no abilities');
+  stepGame(game, TEST_STEP);
+  assert(game.draft && game.draft.number === 1, 'the first pick opens before round 1');
+  const options = game.draft.options;
+  assert(options.length === DRAFT_OPTIONS && new Set(options).size === DRAFT_OPTIONS, 'different options');
+  assert(options.every((key) => ABILITY_DEFS[key] && draftPool().includes(key)), 'all from the batch');
+  for (let t = 0; t < 10; t += TEST_STEP) stepGame(game, TEST_STEP);
+  assert(game.round === 0 && game.timer === PREP_TIME && game.draft.options === options, 'nothing moves until you choose');
+
+  assert(!pickDraft(game, 'not_an_ability') && game.draft, 'only what is on offer can be picked');
+  const first = options.find((key) => !ABILITY_DEFS[key].ult);
+  assert(pickDraft(game, first), 'picked');
+  assert(game.hero.abilities.length === 1 && game.hero.abilities[0].key === first && game.hero.abilities[0].level === 0, 'it arrives unlearned');
+  stepGame(game, TEST_STEP);
+  assert(game.draft && game.draft.number === 2, 'the second pick follows right away');
+  assert(!game.draft.options.includes(first), 'what you already have is not offered again');
+  const offered = game.draft.options;
+  assert(skipDraft(game), 'closing the window');
+  assert(game.hero.abilities.length === 2 && offered.includes(game.hero.abilities[1].key), 'gives a random one of those offered');
+  for (let t = 0; t < PREP_TIME + 1; t += TEST_STEP) stepGame(game, TEST_STEP);
+  assert(game.round === 1 && !game.draft, 'then round 1 starts');
+  assert(levelUpAbility(game.hero, 0) && abilityHotkeys(game.hero.abilities).every(Boolean), 'drafted abilities can be levelled and have keys');
+});
+
+test('the draft: five picks, before rounds 1, 1, 3, 6 and 9', () => {
+  const game = createGame(heroByName('Luna'), 5);
+  const pickedBefore = [];
+  for (let round = 0; round < 15; round++) {
+    Object.assign(game, { round, phase: 'prep', timer: PREP_TIME });
+    stepGame(game, TEST_STEP);
+    while (game.draft) {
+      pickedBefore.push(round + 1);
+      skipDraft(game);
+      stepGame(game, TEST_STEP);
+    }
+  }
+  assert(pickedBefore.join(',') === '1,1,3,6,9', `picked before rounds ${pickedBefore}`);
+  assert(new Set(game.hero.abilities.map((ability) => ability.key)).size === 5, 'five different abilities');
+});
+
+test('the draft: the same seed offers the same abilities', () => {
+  const offer = (seed) => {
+    const game = createGame(heroByName('Axe'), seed);
+    stepGame(game, TEST_STEP);
+    return game.draft.options.join(',');
+  };
+  assert(offer(11) === offer(11), 'same seed, same offer');
+  assert(offer(11) !== offer(12), 'another seed, another offer');
+});
+
+test('the draft screen: one card per option, none overlapping', () => {
+  const canvas = { width: 1280, height: 720 };
+  const game = createGame(heroByName('Sven'), 5);
+  stepGame(game, TEST_STEP);
+  const cards = draftCards(canvas, game);
+  const button = draftSkipButton(canvas);
+  assert(cards.length === DRAFT_OPTIONS, 'one card per option');
+  for (const card of cards) {
+    assert(card.x >= 0 && card.x + card.width <= canvas.width && card.y + card.height <= button.y, 'cards fit above the button');
+    assert(abilityOwnerName(card.key), 'each card can say whose ability it was');
+  }
+  assert(button.y + button.height <= canvas.height, 'the button fits');
 });
 
 async function runTests() {

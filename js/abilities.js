@@ -77,11 +77,18 @@ function abilityContext(sim, caster, ability, target, point) {
 
 // ---- Learning ----
 
+function newAbility(key) {
+  if (!ABILITY_DEFS[key]) throw new Error(`no definition for ability ${key}`);
+  return { key, def: ABILITY_DEFS[key], level: 0, cooldown: 0, charges: 0, chargeTimer: 0, autocast: true };
+}
+
 function giveAbilities(unit, keys) {
-  unit.abilities = keys.map((key) => {
-    if (!ABILITY_DEFS[key]) throw new Error(`no definition for ability ${key}`);
-    return { key, def: ABILITY_DEFS[key], level: 0, cooldown: 0, charges: 0, chargeTimer: 0, autocast: true };
-  });
+  unit.abilities = keys.map(newAbility);
+}
+
+// Adds one more ability (a draft pick). It starts unlearned, like the rest.
+function addAbility(unit, key) {
+  unit.abilities.push(newAbility(key));
 }
 
 function maxAbilityLevel(ability) {

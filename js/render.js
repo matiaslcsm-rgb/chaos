@@ -11,6 +11,7 @@ const FX_TIME = 0.45;
 const MESSAGE_TIME = 1.8;
 const ZONE_FADE_TIME = 0.5;
 const CARD = { width: 220, height: 220, gap: 20, columns: 5, top: 150 };
+const DRAFT = { columns: 4, width: 296, height: 126, gap: 12, top: 88 };
 const BAR = { size: 72, gap: 6, bottom: 16, plusHeight: 20, plusGap: 4 };
 const HOTKEY_ORDER = BASIC_HOTKEYS.concat(ULT_HOTKEY);
 const FONT = 'system-ui, sans-serif';
@@ -160,7 +161,8 @@ function drawSelect(ctx, canvas, heroes, mouse) {
   ctx.fillText('Elegí tu héroe', canvas.width / 2, 90);
 
   for (const card of selectCards(canvas, heroes)) {
-    const { data, abilities } = card.hero;
+    const { data } = card.hero;
+    const stats = heroStats(data, 1);
     ctx.fillStyle = inRect(mouse, card) ? '#262c3a' : '#1b2030';
     ctx.fillRect(card.x, card.y, card.width, card.height);
     ctx.fillStyle = ATTR_COLORS[data.primary_attr];
@@ -175,10 +177,107 @@ function drawSelect(ctx, canvas, heroes, mouse) {
     ctx.fillText(`${ATTR_LABELS[data.primary_attr]} · ${data.attack_type === 'Melee' ? 'cuerpo a cuerpo' : 'a distancia'}`, card.x + 14, card.y + 60);
     ctx.fillStyle = '#b8c0d0';
     ctx.font = `14px ${FONT}`;
-    abilities.forEach((ability, row) => {
-      ctx.fillText(ability.dname, card.x + 14, card.y + 92 + row * 22);
+    // The hero is only a base of attributes; the abilities come from the draft.
+    const lines = [
+      `Fuerza ${data.base_str} (+${data.str_gain} por nivel)`,
+      `Agilidad ${data.base_agi} (+${data.agi_gain})`,
+      `Inteligencia ${data.base_int} (+${data.int_gain})`,
+      `Vida ${Math.round(stats.maxHp)} · Maná ${Math.round(stats.maxMana)}`,
+      `Daño ${Math.round(stats.damageMin)}-${Math.round(stats.damageMax)} · Alcance ${stats.attackRange}`,
+      `Armadura ${stats.armor.toFixed(1)} · Movimiento ${stats.moveSpeed}`,
+    ];
+    lines.forEach((line, row) => {
+      ctx.fillText(line, card.x + 14, card.y + 90 + row * 21);
     });
   }
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#8a93a6';
+  ctx.font = `15px ${FONT}`;
+  ctx.fillText('El héroe pone los atributos. Las habilidades las vas eligiendo durante la partida, de cualquier héroe.', canvas.width / 2, 660);
+}
+
+// ---- Draft ----
+
+function draftCards(canvas, game) {
+  const rowWidth = DRAFT.columns * DRAFT.width + (DRAFT.columns - 1) * DRAFT.gap;
+  const left = (canvas.width - rowWidth) / 2;
+  return game.draft.options.map((key, index) => ({
+    key,
+    x: left + (index % DRAFT.columns) * (DRAFT.width + DRAFT.gap),
+    y: DRAFT.top + Math.floor(index / DRAFT.columns) * (DRAFT.height + DRAFT.gap),
+    width: DRAFT.width,
+    height: DRAFT.height,
+  }));
+}
+
+function draftSkipButton(canvas) {
+  return { x: canvas.width / 2 - 170, y: canvas.height - 62, width: 340, height: 36 };
+}
+
+function abilityOwnerName(key) {
+  const entry = DB.batch.heroes.find((hero) => hero.abilities.includes(key));
+  return entry ? DB.heroes[entry.key].localized_name : '';
+}
+
+function perLevel(value) {
+  return [].concat(value).join('/');
+}
+
+function drawDraft(ctx, canvas, game, mouse) {
+  ctx.fillStyle = 'rgba(13, 15, 20, 0.88)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#e8b04a';
+  ctx.font = `bold 30px ${FONT}`;
+  ctx.fillText(`Elegí una habilidad (${game.draft.number} de ${DRAFT_ROUNDS.length})`, canvas.width / 2, 44);
+  ctx.fillStyle = '#8a93a6';
+  ctx.font = `14px ${FONT}`;
+  const owned = game.hero.abilities.map((ability) => DB.abilities[ability.key].dname).join(', ');
+  ctx.fillText(owned ? `Ya tenés: ${owned}` : 'Todavía no tenés ninguna. La partida espera mientras elegís.', canvas.width / 2, 70);
+
+  for (const card of draftCards(canvas, game)) {
+    const info = DB.abilities[card.key];
+    const def = ABILITY_DEFS[card.key];
+    const hover = inRect(mouse, card);
+    ctx.fillStyle = hover ? '#2a3142' : '#1b2030';
+    ctx.fillRect(card.x, card.y, card.width, card.height);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = hover ? '#e8b04a' : def.ult ? '#6b5a2e' : '#333a4c';
+    ctx.strokeRect(card.x, card.y, card.width, card.height);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#e8ecf4';
+    ctx.font = `bold 15px ${FONT}`;
+    ctx.fillText(info.dname, card.x + 10, card.y + 22);
+    if (def.ult) {
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#e8b04a';
+      ctx.font = `bold 11px ${FONT}`;
+      ctx.fillText('DEFINITIVA', card.x + card.width - 10, card.y + 21);
+      ctx.textAlign = 'left';
+    }
+    ctx.font = `12px ${FONT}`;
+    ctx.fillStyle = '#8a93a6';
+    ctx.fillText(`${CAST_LABELS[def.cast]} · de ${abilityOwnerName(card.key)}`, card.x + 10, card.y + 40);
+    const costs = [];
+    if (info.mc !== undefined && parseFloat(perLevel(info.mc)) > 0) costs.push(`Maná ${perLevel(info.mc)}`);
+    if (info.cd !== undefined && parseFloat(perLevel(info.cd)) > 0) costs.push(`Recarga ${perLevel(info.cd)} s`);
+    ctx.fillStyle = '#6aa8f0';
+    ctx.fillText(costs.join(' · ') || 'Sin costo', card.x + 10, card.y + 57);
+    ctx.fillStyle = '#b8c0d0';
+    ctx.font = `11px ${FONT}`;
+    wrapText(ctx, info.desc || '', card.width - 20).slice(0, 4).forEach((line, row) => {
+      ctx.fillText(line, card.x + 10, card.y + 75 + row * 14);
+    });
+  }
+
+  const button = draftSkipButton(canvas);
+  ctx.fillStyle = inRect(mouse, button) ? '#3a4154' : '#262c3a';
+  ctx.fillRect(button.x, button.y, button.width, button.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#d8dce6';
+  ctx.font = `15px ${FONT}`;
+  ctx.fillText('Cerrar: que me toque una al azar', canvas.width / 2, button.y + 24);
 }
 
 // ---- The arena ----
@@ -622,6 +721,7 @@ function drawGame(ctx, canvas, game, view) {
   drawEffects(ctx, view, scale);
   drawFloaters(ctx, view, scale);
   drawHud(ctx, canvas, game, view);
+  if (game.draft) drawDraft(ctx, canvas, game, view.mouse);
 
   if (game.phase === 'lost') {
     ctx.fillStyle = 'rgba(13, 15, 20, 0.75)';

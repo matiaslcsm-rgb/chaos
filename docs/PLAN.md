@@ -26,6 +26,17 @@ cierra con algo que se puede comprobar.
 - **Clic derecho mientras apuntás** (decisión): (a) **solo cancela (así está hoy)**; (b) cancela y además mueve al
   héroe, como en Dota.
 
+- **Draft: tiempo para elegir** (decisión): las fuentes no dicen cuánto tiempo da el mod. (a) **la partida espera
+  hasta que elijas (así está hoy; recomendada mientras se juega solo)**; (b) un reloj de 20-30 segundos y al
+  terminar te toca una al azar (va a hacer falta cuando jueguen los 7 rivales al mismo tiempo).
+- **Draft: definitivas** (decisión): las fuentes no dicen si el mod limita cuántas definitivas se pueden tener.
+  (a) **sin límite: las 16 opciones mezclan comunes y definitivas (así está hoy)**; (b) como mucho una definitiva;
+  (c) cuatro comunes y una definitiva, con una elección reservada para la definitiva.
+- **Draft: cantidad de opciones** (decisión): (a) **16, como dice un análisis del mod (así está hoy)**; (b) menos
+  (8-10) mientras el lote tenga solo 43 habilidades, para que no se repitan tanto entre elecciones.
+- **Draft: habilidades repetidas entre jugadores** (decisión, para cuando estén los rivales): (a) **cada habilidad
+  la puede tener un solo jugador (recomendada si el mod lo hace así; hay que confirmarlo)**; (b) se pueden repetir.
+
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
 - [x] Repositorio en GitHub: `matiaslcsm-rgb/chaos` (2026-11-10).
@@ -74,7 +85,10 @@ Una partida completa, pero chica.
 - [x] Una arena con oleadas de creeps y el héroe controlado al estilo Dota: elegís entre los 10 héroes, clic derecho
       para mover o atacar, A + clic para avanzar atacando, S para frenar; un nivel por ronda (`js/game.js`,
       `js/render.js`, `js/main.js`). Los creeps son provisorios hasta investigar las oleadas del mod (2026-11-10).
-- [ ] Draft de 5 habilidades (rondas 1, 1, 3, 6 y 9).
+- [x] Draft de 5 habilidades: dos antes de la ronda 1 y una más antes de las rondas 3, 6 y 9. Cada vez se ofrecen 16
+      al azar de las 43 del lote (nunca una que ya tenés); la partida espera mientras elegís y, si cerrás la
+      ventana, te toca una al azar. El héroe ya no trae habilidades propias: pone solo los atributos, como en el
+      mod (`js/game.js`, `js/render.js`) (2026-11-10). Quedan reglas por confirmar en "Decisiones abiertas".
 - [ ] Oro, tienda e inventario de 6.
 - [ ] 7 rivales de la IA jugando sus arenas.
 - [ ] Duelos y apuestas.

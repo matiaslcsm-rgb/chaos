@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.2.0 · Etapa 3: habilidades';
+const GAME_VERSION = '0.3.0 · Etapa 3: draft de habilidades';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -64,6 +64,12 @@ function startGame(heroData) {
 function onSelectClick(point) {
   const card = selectCards(canvas, heroes).find((c) => inRect(point, c));
   if (card) startGame(card.hero.data);
+}
+
+function onDraftClick(point) {
+  const card = draftCards(canvas, game).find((c) => inRect(point, c));
+  if (card) pickDraft(game, card.key);
+  else if (inRect(point, draftSkipButton(canvas))) skipDraft(game);
 }
 
 // ---- Abilities ----
@@ -158,6 +164,10 @@ canvas.addEventListener('mousedown', (event) => {
     game = null;
     return;
   }
+  if (game.draft) {
+    if (event.button === 0) onDraftClick(point);
+    return;
+  }
   const world = worldPoint(point);
   if (event.button === 2) {
     if (view.targeting) {
@@ -185,7 +195,7 @@ canvas.addEventListener('mousedown', (event) => {
 });
 
 window.addEventListener('keydown', (event) => {
-  if (!game || game.phase === 'lost') return;
+  if (!game || game.phase === 'lost' || game.draft) return;
   const key = event.key.toLowerCase();
   const index = abilityHotkeys(game.hero.abilities).indexOf(key);
   const levelling = event.shiftKey || event.ctrlKey;
@@ -275,7 +285,7 @@ function frame(now) {
     }
     ageView(elapsed);
     consumeEvents();
-    if (game.phase === 'lost') view.targeting = null;
+    if (game.phase === 'lost' || game.draft) view.targeting = null;
     view.hoverEnemy = enemyAt(worldPoint(view.mouse));
     drawGame(ctx, canvas, game, view);
   } else {
