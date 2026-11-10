@@ -586,9 +586,9 @@ function drawHud(ctx, canvas, game, view) {
     ctx.font = `bold 18px ${FONT}`;
     ctx.fillStyle = `rgba(13, 15, 20, ${0.75 * alpha})`;
     const width = ctx.measureText(view.message.text).width + 28;
-    ctx.fillRect(canvas.width / 2 - width / 2, canvas.height - 178, width, 30);
+    ctx.fillRect(canvas.width / 2 - width / 2, 74, width, 30);
     ctx.fillStyle = `rgba(240, 110, 100, ${alpha})`;
-    ctx.fillText(view.message.text, canvas.width / 2, canvas.height - 157);
+    ctx.fillText(view.message.text, canvas.width / 2, 95);
   }
 }
 

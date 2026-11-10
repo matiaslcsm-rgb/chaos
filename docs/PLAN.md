@@ -19,9 +19,17 @@ cierra con algo que se puede comprobar.
 - **Largo de la partida** (decisión): (a) **55-65 rondas como el mod (recomendada: es lo fiel)**; (b) una versión corta
   de 20-25 rondas; (c) las dos como modos.
 
+- **Tecla para subir de nivel una habilidad** (decisión): el plan decía Ctrl + tecla como en Dota, pero en el
+  navegador Ctrl + W cierra la pestaña y no se puede evitar. Hoy funciona (a) **Shift + tecla y clic en el "+"
+  (recomendada: no choca con nada)**; Ctrl + tecla también anda en Q, E, D, F y R, pero no en W. Otras opciones:
+  (b) Alt + tecla; (c) solo el "+".
+- **Clic derecho mientras apuntás** (decisión): (a) **solo cancela (así está hoy)**; (b) cancela y además mueve al
+  héroe, como en Dota.
+
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
-- [ ] Repositorio en GitHub y publicación.
+- [x] Repositorio en GitHub: `matiaslcsm-rgb/chaos` (2026-11-10).
+- [ ] Publicación (que se pueda jugar desde un enlace).
 - [x] Página de pruebas: `tests.html`, tiene que decir "✅ N/N pruebas" (2026-11-10).
 
 ## Etapa 1 · Copiar la información
@@ -49,13 +57,20 @@ Sin programar nada del juego todavía.
 Una partida completa, pero chica.
 - [x] Motor de combate, primera parte: stats con las fórmulas de Dota, moverse, atacar (con el tiempo de preparación
       que se cancela al moverse), proyectiles, armadura, regeneración (`js/stats.js`, `js/sim.js`) (2026-11-10).
-- [ ] Motor de combate, segunda parte: las habilidades del lote armadas con piezas, maná, enfriamientos y estados.
-      **A medias (2026-11-10):** hecho el motor (`js/abilities.js`: niveles, maná, enfriamientos, cargas, estados,
-      zonas, proyectiles, empujones) y las 43 habilidades (`js/abilityDefs.js`), probadas todas a nivel 1 y al máximo
-      sin errores. **Falta:** la barra de habilidades y las teclas para usarlas (`js/render.js`, `js/main.js`: Q W E
-      D F R, Ctrl + tecla para subir de nivel, apuntar con clic), dibujar zonas, efectos y estados, y las pruebas de
-      cada pieza en `js/tests.js`. Simplificaciones a revisar: Battle Hunger siempre ralentiza, Viper Strike no
-      decae, Lunar Orbit es un área alrededor de Luna, Great Cleave es un cono de 120°.
+- [x] Motor de combate, segunda parte: las habilidades del lote armadas con piezas, maná, enfriamientos y estados
+      (`js/abilities.js`, `js/abilityDefs.js`) y la interfaz para usarlas (2026-11-10):
+      - Barra de habilidades abajo al centro: tecla, nombre, nivel, recarga, maná, cargas y estado de cada una; al
+        pasar el mouse muestra el detalle, el alcance y el área. Las descripciones salen en inglés porque vienen de
+        los datos de Dota.
+      - Teclas Q W E D F para las comunes y R para la definitiva (o clic en el casillero). Las que piden objetivo
+        entran en modo apuntar: clic izquierdo confirma, clic derecho o Esc cancela.
+      - Subir de nivel: clic en el "+" o Shift + tecla (ver "Decisiones abiertas").
+      - Se dibujan las zonas, los rayos y explosiones, los fallos y críticos, los estados sobre cada unidad
+        (aturdido, provocado, inmóvil, silenciado, desarmado, lento) y los efectos activos del héroe con su tiempo.
+      - 28 pruebas nuevas, una por pieza, más una que lanza las 43 habilidades a nivel 1 y al máximo.
+        `node tools/run-tests.js` corre las mismas pruebas sin abrir el navegador.
+      Simplificaciones a revisar: Battle Hunger siempre ralentiza, Viper Strike no decae, Lunar Orbit es un área
+      alrededor de Luna, Great Cleave es un cono de 120°, Bloodlust solo se lanza sobre uno mismo.
 - [x] Una arena con oleadas de creeps y el héroe controlado al estilo Dota: elegís entre los 10 héroes, clic derecho
       para mover o atacar, A + clic para avanzar atacando, S para frenar; un nivel por ronda (`js/game.js`,
       `js/render.js`, `js/main.js`). Los creeps son provisorios hasta investigar las oleadas del mod (2026-11-10).
