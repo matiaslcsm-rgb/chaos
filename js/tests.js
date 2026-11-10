@@ -761,6 +761,234 @@ test('the draft screen: one card per option, none overlapping', () => {
   assert(button.y + button.height <= canvas.height, 'the button fits');
 });
 
+// ---- Gold, shop and items ----
+
+function richHero(sim, name, x, y) {
+  const hero = addTestHero(sim, name, 10, x, y);
+  hero.gold = 100000;
+  return hero;
+}
+
+test('items: plain stats come straight from the data', () => {
+  const sim = createSim(1);
+  const sven = richHero(sim, 'Sven', 500, 500);
+  const before = Object.assign({}, sven.stats);
+  for (const key of ['blades_of_attack', 'chainmail', 'gloves', 'belt_of_strength', 'robe', 'boots']) {
+    assert(buyItem(sven, key) === null, `bought ${key}`);
+  }
+  // Sven's main attribute is strength, so the belt also adds damage.
+  assertNear(sven.stats.damageMin, before.damageMin + 9 + 6, 1e-6, 'damage');
+  assertNear(sven.stats.armor, before.armor + 4, 1e-6, 'armor');
+  assertNear(sven.stats.attackSpeed, before.attackSpeed + 20, 1e-6, 'attack speed');
+  assertNear(sven.stats.maxHp, before.maxHp + 6 * HP_PER_STR, 1e-6, 'health from strength');
+  assertNear(sven.stats.maxMana, before.maxMana + 6 * MANA_PER_INT, 1e-6, 'mana from intelligence');
+  assertNear(sven.stats.moveSpeed, before.moveSpeed + 45, 1e-6, 'move speed');
+  sellItem(sven, 0);
+  buyItem(sven, 'boots');
+  assertNear(sven.stats.moveSpeed, before.moveSpeed + 45, 1e-6, 'a second pair of boots adds nothing');
+  assertNear(sven.stats.damageMin, before.damageMin + 6, 1e-6, 'selling took the damage away');
+});
+
+test('items: buying keeps health and mana at the same fraction', () => {
+  const sim = createSim(1);
+  const sven = richHero(sim, 'Sven', 500, 500);
+  sven.hp = sven.stats.maxHp / 2;
+  buyItem(sven, 'reaver');
+  assertNear(sven.hp / sven.stats.maxHp, 0.5, 1e-9, 'still at half health');
+});
+
+test('shop: a built item costs only what you are missing', () => {
+  const sim = createSim(1);
+  const sven = richHero(sim, 'Sven', 500, 500);
+  assert(purchasePlan(sven, 'phase_boots').cost === 1450, 'from scratch');
+  buyItem(sven, 'boots');
+  const plan = purchasePlan(sven, 'phase_boots');
+  assert(plan.cost === 950 && plan.used.join() === 'boots', `with boots: ${plan.cost}`);
+  const gold = sven.gold;
+  assert(buyItem(sven, 'phase_boots') === null, 'bought');
+  assert(sven.gold === gold - 950 && sven.items.length === 1 && sven.items[0].key === 'phase_boots', 'the boots were used up');
+
+  buyItem(sven, 'mithril_hammer');
+  buyItem(sven, 'belt_of_strength');
+  const recipe = itemCost('basher') - itemCost('mithril_hammer') - itemCost('belt_of_strength');
+  assert(recipe > 0 && purchasePlan(sven, 'basher').cost === recipe, 'only the recipe is left to pay');
+
+  // Parts of a part count too: Daedalus needs Crystalys, which needs a Claymore and Blades.
+  buyItem(sven, 'claymore');
+  buyItem(sven, 'blades_of_attack');
+  const daedalus = purchasePlan(sven, 'greater_crit');
+  assert(daedalus.cost === itemCost('greater_crit') - itemCost('claymore') - itemCost('blades_of_attack'), `Daedalus: ${daedalus.cost}`);
+  assert(daedalus.used.length === 2, 'uses both parts');
+});
+
+test('shop: no gold or no room stops a purchase, and selling pays half', () => {
+  const sim = createSim(1);
+  const sven = addTestHero(sim, 'Sven', 10, 500, 500);
+  sven.gold = 400;
+  assert(buyItem(sven, 'blades_of_attack') === 'gold' && sven.items.length === 0 && sven.gold === 400, 'not enough gold');
+  sven.gold = 100000;
+  buyItem(sven, 'claymore');
+  for (let i = 0; i < 5; i++) assert(buyItem(sven, 'blades_of_attack') === null, 'filling the inventory');
+  assert(sven.items.length === INVENTORY_SIZE, 'six items');
+  assert(buyItem(sven, 'chainmail') === 'full' && sven.items.length === INVENTORY_SIZE, 'no room for a seventh');
+  assert(buyItem(sven, 'lesser_crit') === null && sven.items.length === 5, 'a recipe that frees slots still fits');
+  const gold = sven.gold;
+  assert(sellItem(sven, 0) && sven.gold === gold + Math.floor(itemCost('blades_of_attack') / 2), 'half price back');
+  assert(!sellItem(sven, 9), 'nothing to sell in an empty slot');
+});
+
+test('items: lifesteal heals with every hit', () => {
+  const sim = createSim(1);
+  const sven = richHero(sim, 'Sven', 500, 500);
+  buyItem(sven, 'lifesteal');
+  sven.baseStats.hpRegen = 0;
+  sven.hp = 100;
+  const creep = addDummy(sim, 560, 500);
+  orderAttack(sven, creep);
+  runFor(sim, 3);
+  const dealt = 5000 - creep.hp;
+  assert(dealt > 0, 'it attacked');
+  assertNear(sven.hp, 100 + dealt * 0.18, 0.01, 'healed 18% of the damage');
+});
+
+test('items: Crystalys crits and Skull Basher stuns', () => {
+  const sim = createSim(1);
+  const sven = richHero(sim, 'Sven', 500, 500);
+  buyItem(sven, 'lesser_crit');
+  buyItem(sven, 'basher');
+  const creep = addDummy(sim, 560, 500, { maxHp: 50000 });
+  sim.rng = () => 0; // every roll succeeds
+  orderAttack(sven, creep);
+  runUntil(sim, 3, () => creep.flags.stunned, 'the bash');
+  const crit = sim.events.find((event) => event.type === 'crit');
+  assert(crit && crit.amount > sven.stats.damageMax, 'a critical hit');
+  assert(hitsOn(sim, creep) === 2, 'the hit and the bash damage');
+  assert(sven.items[1].cooldown > 0, 'the bash has its own cooldown');
+});
+
+test('items: Kaya makes abilities hit harder', () => {
+  const sim = createSim(1);
+  const zeus = richHero(sim, 'Zeus', 500, 500);
+  buyItem(zeus, 'kaya');
+  const index = teach(zeus, 'zuus_lightning_bolt');
+  const creep = addDummy(sim, 800, 500);
+  orderCast(zeus, index, creep);
+  runUntil(sim, 3, () => creep.hp < 5000, 'the bolt');
+  assertNear(5000 - creep.hp, abilityValue(zeus.abilities[index], 'damage') * 1.1, 0.01, '10% more damage');
+});
+
+test('items: actives cost mana, have a cooldown and do their thing', () => {
+  const sim = createSim(1);
+  const sven = richHero(sim, 'Sven', 500, 500);
+  for (const key of ['black_king_bar', 'mask_of_madness', 'phase_boots', 'satanic', 'blades_of_attack']) buyItem(sven, key);
+  const bolt = sven.abilities[teach(sven, 'sven_storm_bolt')];
+  assert(useItem(sim, sven, 4) === 'passive' && useItem(sim, sven, 5) === 'empty', 'nothing to use there');
+
+  const mana = sven.mana;
+  const resist = sven.stats.magicResist;
+  assert(useItem(sim, sven, 0) === null, 'Black King Bar');
+  assert(sven.mana === mana - 50 && sven.items[0].cooldown === 95, 'paid and on cooldown');
+  assert(useItem(sim, sven, 0) === 'cooldown', 'not again yet');
+  assert(sven.flags.immune && sven.stats.magicResist === resist + 60, 'immune and resistant');
+  assert(addMod(sim, sven, { id: 'test:stun', sourceId: 0, duration: 5, flags: ['stunned'] }) === null && !sven.flags.stunned, 'enemy statuses bounce off');
+
+  const speed = sven.stats.attackSpeed;
+  const move = sven.stats.moveSpeed;
+  assert(useItem(sim, sven, 1) === null, 'Mask of Madness');
+  assert(sven.stats.attackSpeed === speed + 100 && castProblem(sven, bolt) === 'silenced', 'faster but silenced');
+  assert(useItem(sim, sven, 2) === null && sven.stats.moveSpeed > move, 'Phase Boots speed up');
+  const lifesteal = sven.stats.lifesteal;
+  assert(lifesteal === 25 + 22, 'lifesteal from two items adds up');
+  assert(useItem(sim, sven, 3) === null && sven.stats.lifesteal === lifesteal + 145, 'Satanic raises lifesteal');
+  assert(heroEffects(sven).some((effect) => effect.text === 'Black King Bar'), 'effects are listed by item name');
+  runFor(sim, 10);
+  assert(!sven.flags.immune && castProblem(sven, bolt) === null && sven.stats.lifesteal === lifesteal, 'everything wears off');
+  sven.mana = 0;
+  sven.items[1].cooldown = 0;
+  assert(useItem(sim, sven, 1) === 'mana', 'no mana, no mask');
+});
+
+test('items: Power Treads feed the main attribute', () => {
+  const sim = createSim(1);
+  const sven = richHero(sim, 'Sven', 500, 500);
+  const sniper = richHero(sim, 'Sniper', 700, 500);
+  const before = [sven.stats.str, sven.stats.moveSpeed, sniper.stats.agi, sniper.stats.moveSpeed];
+  buyItem(sven, 'power_treads');
+  buyItem(sniper, 'power_treads');
+  assertNear(sven.stats.str, before[0] + 10, 1e-9, 'strength for Sven');
+  assertNear(sven.stats.moveSpeed, before[1] + 55, 1e-9, 'melee speed');
+  assertNear(sniper.stats.agi, before[2] + 10, 1e-9, 'agility for Sniper');
+  assertNear(sniper.stats.moveSpeed, before[3] + 45, 1e-9, 'ranged speed');
+});
+
+test('all 25 items of the batch can be bought, used and fought with', () => {
+  assert(DB.batch.items.length === 25, `the batch has ${DB.batch.items.length} items`);
+  for (const name of ['Sven', 'Sniper']) {
+    for (const key of DB.batch.items) {
+      try {
+        const sim = createSim(2);
+        const hero = richHero(sim, name, 500, 500);
+        assert(buyItem(hero, key) === null, 'could not buy');
+        assert(itemSummary(key).length > 3, 'the shop has nothing to say about it');
+        if (hero.items[0].def.active) assert(useItem(sim, hero, 0) === null, 'could not use');
+        hero.acquireRange = HERO_ACQUIRE_RANGE;
+        addTestCreep(sim, 650, 500, { maxHp: 2000 });
+        runFor(sim, 8);
+        assert(Number.isFinite(hero.hp) && Number.isFinite(hero.stats.damageMin) && Number.isFinite(hero.stats.moveSpeed), 'a broken number');
+      } catch (error) {
+        throw new Error(`${key} on ${name}: ${error.message}`);
+      }
+    }
+  }
+});
+
+test('gold: creeps and rounds pay, and a faster clear pays more', () => {
+  assert(roundGold(3, 10) > roundGold(3, 30) && roundGold(3, 30) > roundGold(3, 60), 'faster is better');
+  assert(roundGold(3, 60) === roundGold(3, 500) && roundGold(4, 60) > roundGold(3, 60), 'a floor that grows with the round');
+  const game = createGame(heroByName('Sven'), 7);
+  assert(game.hero.gold === GOLD.start, 'starting gold');
+  for (let t = 0; t < 120 && !(game.round === 1 && game.phase === 'prep'); t += TEST_STEP) stepPlaying(game);
+  assert(game.round === 1 && game.phase === 'prep', 'round 1 cleared');
+  const wave = waveForRound(1);
+  const bounties = wave.melee * GOLD.perCreep.melee + wave.ranged * GOLD.perCreep.ranged;
+  assert(game.hero.gold === GOLD.start + bounties + roundGold(1, game.roundTime), `gold ${game.hero.gold}`);
+});
+
+test('the shop only opens between rounds', () => {
+  const game = createGame(heroByName('Sven'), 7);
+  stepGame(game, TEST_STEP);
+  assert(game.draft && buyFromShop(game, 'blades_of_attack') === 'closed', 'not while drafting');
+  while (game.draft) stepPlaying(game);
+  assert(shopOpen(game) && buyFromShop(game, 'blades_of_attack') === null, 'open before the round');
+  assert(game.hero.gold === GOLD.start - itemCost('blades_of_attack') && game.hero.items.length === 1, 'paid for it');
+  for (let t = 0; t < PREP_TIME + 1 && game.phase === 'prep'; t += TEST_STEP) stepPlaying(game);
+  assert(game.phase === 'fight', 'the round started');
+  assert(buyFromShop(game, 'chainmail') === 'closed' && !sellFromInventory(game, 0), 'closed during the fight');
+  assert(game.hero.items.length === 1, 'nothing changed');
+});
+
+test('the shop and the inventory fit on screen without covering the rest', () => {
+  const canvas = { width: 1280, height: 720 };
+  const overlap = (a, b) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+  const hero = addTestHero(createSim(1), 'Sniper', 1, 500, 500);
+  addAbility(hero, 'sven_warcry');
+  const bar = abilityBarSlots(canvas, hero);
+  assert(bar.length === 6, 'a full bar of six');
+  const slots = inventorySlots(canvas);
+  const button = shopButton(canvas);
+  const panel = shopPanelRect(canvas);
+  const cards = shopCards(canvas);
+  assert(slots.length === INVENTORY_SIZE && cards.length === 25, 'six slots and 25 cards');
+  for (const slot of slots) {
+    assert(slot.x + slot.width <= canvas.width && slot.y + slot.height <= canvas.height, 'inventory on screen');
+    assert(!bar.some((other) => overlap(slot, other) || overlap(slot, other.plus)), 'inventory clear of the ability bar');
+    assert(!overlap(slot, panel), 'the shop leaves the inventory visible');
+  }
+  assert(!overlap(button, panel) && !slots.some((slot) => overlap(slot, button)), 'the shop button stays visible');
+  assert(!overlap(panel, heroPanelRect(canvas)) && !bar.some((slot) => overlap(panel, slot)), 'the shop leaves the hero panel and the bar visible');
+  for (const card of cards) assert(card.x >= panel.x && card.x + card.width <= panel.x + panel.width && card.y + card.height <= panel.y + panel.height, 'cards inside the panel');
+});
+
 async function runTests() {
   const summary = document.getElementById('summary');
   const list = document.getElementById('results');
