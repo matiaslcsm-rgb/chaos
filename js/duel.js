@@ -187,13 +187,14 @@ function duelPrize(round) {
   return DUEL_PRIZE.base + DUEL_PRIZE.perRound * round;
 }
 
-// Final stretch: an Aegis, or a curse mark if none is left (at most CURSE.max). Returns what it cost.
+// Final stretch: an Aegis, or a curse mark if none is left (at most CURSE.max). With no Aegis and every mark,
+// losing knocks you out (user decision, 2026-11-11), so the last two cannot duel forever. Returns what it cost.
 function punishLoser(hero) {
   if (hero.aegis > 0) {
     hero.aegis--;
     return 'aegis';
   }
-  if (hero.curses >= CURSE.max) return null;
+  if (hero.curses >= CURSE.max) return 'out';
   hero.curses++;
   refreshPassives(hero);
   return 'curse';
@@ -216,6 +217,7 @@ function finishDuel(match, winnerSide) {
   const prize = duelPrize(duel.round);
   earn(winner.game, prize, 'duels');
   const penalty = playersAlive(match).length <= FINAL_STRETCH ? punishLoser(loser.game.hero) : null;
+  if (penalty === 'out') loser.game.phase = 'lost';
   winner.duelsWon = (winner.duelsWon || 0) + 1;
   duel.state = 'done';
   duel.result = { winner, loser, prize, time: duel.time, payouts, penalty };

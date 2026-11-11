@@ -26,7 +26,7 @@ const GOLD = {
 
 // Decision D5, provisional. The mod's creeps grow fast until round 10 and slower after 20 (history, 28 Feb 2020);
 // here: three stretches, the last one without a ceiling. From round 60 they also resist magic (history, 21 Feb 2020).
-const CREEP_GROWTH = { early: 0.3, middle: 0.18, lateRate: 1.07, magicResistFrom: 60, magicResist: 30 };
+const CREEP_GROWTH = { early: 0.2, middle: 0.15, lateRate: 1.05, magicResistFrom: 60, magicResist: 30 };
 // Waves: a few kinds of creep per round, more creeps as rounds go by, and a heavy wave every 5 rounds.
 const WAVE = { baseCount: 5, perRounds: 6, maxCount: 12, heavyEvery: 5, seed: 1009 };
 // After this long, the creeps of a wave enrage: faster, harder hitting, and nothing can slow or stop them (mod).

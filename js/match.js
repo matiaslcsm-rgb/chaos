@@ -10,7 +10,7 @@ const ROUND_LIMIT = 120;
 const AI_NAMES = ['Lucía', 'Tomás', 'Valen', 'Martina', 'Joaco', 'Sofi', 'Nico', 'Cami', 'Bauti', 'Juli'];
 // Decision D5, provisional: the round's prize by finishing place, like the example of the analysis (round 1:
 // the fastest about 500, the slowest about 50), growing with the round.
-const ROUND_PRIZE = { ladder: [500, 400, 320, 250, 190, 140, 90, 50], growth: 0.15, duelPlace: 3 };
+const ROUND_PRIZE = { ladder: [500, 400, 320, 250, 190, 140, 90, 50], growth: 0.08, duelPlace: 3 };
 const PLAYER_COLORS = ['#4cc35a', '#e65a46', '#4a8fe0', '#e8b04a', '#c792ea', '#5fd0c8', '#f28cb8', '#a0a8b8'];
 
 function shuffled(rng, list) {

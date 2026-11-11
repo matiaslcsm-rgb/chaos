@@ -890,6 +890,11 @@ function drawHud(ctx, canvas, game, view) {
     ctx.fillStyle = view.targeting ? '#e8b04a' : '#e65a46';
     ctx.font = `bold 16px ${FONT}`;
     ctx.fillText(hint, canvas.width / 2, 62);
+  } else if (nextWaveText(game)) {
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#b8c0d0';
+    ctx.font = `15px ${FONT}`;
+    ctx.fillText(nextWaveText(game), canvas.width / 2, 62);
   }
 
   if (view.message) {
@@ -1299,4 +1304,16 @@ function drawPodium(ctx, canvas, game) {
   ctx.fillStyle = '#e8c45a';
   ctx.font = `16px ${FONT}`;
   ctx.fillText(`De dónde salió tu oro: ${incomeText(game)}`, canvas.width / 2, 213 + lines.length * 30 + 20);
+}
+
+// Between rounds, what is coming (the mod announces the next wave). Null during a round, or if your next round
+// is a duel.
+function nextWaveText(game) {
+  const match = game.match;
+  const prep = match ? match.phase === 'prep' : game.phase === 'prep';
+  if (!prep || game.phase === 'lost') return null;
+  if (match && match.duel && match.duel.state === 'betting' && isDuelist(match.duel, humanPlayer(match))) return null;
+  const round = (match ? match.round : game.round) + 1;
+  const heavy = round % WAVE.heavyEvery === 0 ? ' (oleada pesada)' : '';
+  return `Próxima oleada${heavy}: ${waveText(waveForRound(round))}`;
 }

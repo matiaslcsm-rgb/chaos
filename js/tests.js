@@ -1449,7 +1449,7 @@ test('curse marks (D8): 7% more damage taken, 7% less dealt and less gold, at mo
   assertNear(creepHp - creep.hp, 43, 0.01, 'deals less');
   assertNear(goldFactor(hero), 0.86, 1e-9, 'earns less');
   punishLoser(hero);
-  assert(punishLoser(hero) === null && hero.curses === CURSE.max, 'at most 3');
+  assert(punishLoser(hero) === 'out' && hero.curses === CURSE.max, 'at most 3; one more loss knocks you out');
   refreshPassives(hero);
   moveHero(hero, createSim(43), 99, CREEP_TEAM, 0, 0);
   assert(hero.stats.damageTakenPct === 21, 'the marks survive a trip to the duel arena');
@@ -1494,6 +1494,98 @@ test('the closing screen: everyone in order, and your gold adds up by where it c
   assert(incomeText(human.game).startsWith('creeps '), incomeText(human.game));
   const canvas = { width: 1280, height: 720 };
   assert(213 + lines.length * 30 + 20 < canvas.height - 60, 'the podium fits above the last line');
+});
+
+// ---- Waves (decision D5) ----
+
+test('waves: the same for everyone each round, 1 to 3 kinds, heavy every 5 rounds, each kind from its round on', () => {
+  for (let round = 1; round <= 90; round++) {
+    const wave = waveForRound(round);
+    assert(JSON.stringify(wave) === JSON.stringify(waveForRound(round)), `round ${round} changes`);
+    assert(wave.length >= 1 && wave.length <= 3, `round ${round}: ${wave.length} kinds`);
+    const total = wave.reduce((sum, entry) => sum + entry.count, 0);
+    assert(total >= 4 && total <= WAVE.maxCount, `round ${round}: ${total} creeps`);
+    for (const entry of wave) assert(creepType(entry.key).from <= round, `round ${round}: ${entry.key} too early`);
+    const heavy = wave.some((entry) => creepType(entry.key).heavy);
+    assert(heavy === (round % WAVE.heavyEvery === 0), `round ${round}: heavy ${heavy}`);
+  }
+  assert(waveText([{ key: 'melee', count: 6 }, { key: 'ranged', count: 2 }]) === '6 Kóbold y 2 Arpía', 'the announcement');
+});
+
+test('waves: creeps grow fast until round 10, slower to 20, and without a ceiling after; magic resistance from 60', () => {
+  const step = (round) => creepGrowth(round + 1) - creepGrowth(round);
+  assert(creepGrowth(1) === 1, 'round 1 is the base');
+  assert(step(5) > step(15), 'slower after round 10');
+  assert(creepGrowth(80) > creepGrowth(60) * 2, 'no ceiling');
+  const type = creepType('melee');
+  assert(creepStats(type, 59).magicResist === 0 && creepStats(type, 60).magicResist === CREEP_GROWTH.magicResist, 'resists magic from 60');
+  assert(creepStats(creepType('spider'), 20).magicResist === 50, 'the spider always resists');
+  assert(creepBounty(type, 1) === type.bounty && creepBounty(type, 30) > type.bounty, 'bounties grow');
+});
+
+test('waves: centaurs stun on hit sometimes, and the exploding bug hurts whoever is close when it dies', () => {
+  const game = createGame(heroByName('Axe'), 61);
+  game.round = 12;
+  const hero = game.hero;
+  const centaur = addCreep(game, 'centaur', hero.x + 80, hero.y);
+  let stunned = false;
+  for (let t = 0; t < 30 && !stunned; t += TEST_STEP) {
+    stepSim(game.sim, TEST_STEP);
+    hero.hp = hero.stats.maxHp;
+    stunned = Boolean(hero.flags.stunned);
+  }
+  assert(stunned, 'the centaur stunned');
+  centaur.dead = true;
+  const bug = addCreep(game, 'baneling', hero.x + 100, hero.y);
+  const far = addCreep(game, 'melee', hero.x + 900, hero.y);
+  far.team = HERO_TEAM;
+  const hp = hero.hp;
+  applyDamage(game.sim, hero, bug, 1e9, 'pure');
+  const expected = creepType('baneling').explode.damage * creepGrowth(12) * (1 - hero.stats.magicResist / 100);
+  assertNear(hp - hero.hp, expected, 0.01, 'explosion damage');
+});
+
+test('waves: after 50 seconds the creeps enrage: faster, harder, and no more stuns or slows', () => {
+  const game = createGame(heroByName('Sven'), 62);
+  game.phase = 'fight';
+  game.round = 1;
+  const creep = addCreep(game, 'melee', 200, 200);
+  creep.stats.moveSpeed = 0;
+  const speed = creep.stats.moveSpeed;
+  game.roundTime = ENRAGE.after - TEST_STEP / 2;
+  stepArena(game, TEST_STEP);
+  assert(findMod(creep, 'enrage') && creep.flags.immune, 'enraged');
+  assert(creep.stats.attackSpeed === 100 + ENRAGE.attackSpeed, 'attacks faster');
+  const c = abilityContext(game.sim, game.hero, newAbility('sven_storm_bolt'), creep, null);
+  stun(c, creep, 2);
+  assert(!creep.flags.stunned, 'cannot be stunned');
+});
+
+test('round prize: by finishing place, the duelists as in the middle, a wave ended by time as the last', () => {
+  const match = createMatch(null, 63);
+  runMatchUntil(match, () => match.phase === 'fight', PREP_TIME + 1);
+  const pay = (place) => Math.round(ROUND_PRIZE.ladder[place] * (1 + ROUND_PRIZE.growth * (match.round - 1)));
+  const [a, b, c] = match.players.map((player) => player.game);
+  assert(roundPrize(match, a) === pay(0) && roundPrize(match, b) === pay(1), 'first and second');
+  c.forcedEnd = true;
+  assert(roundPrize(match, c) === pay(ROUND_PRIZE.ladder.length - 1), 'too slow: last');
+  c.forcedEnd = false;
+  c.phase = 'duel';
+  assert(roundPrize(match, c) === pay(ROUND_PRIZE.duelPlace), 'duelist');
+  assert(pay(0) === 500 && pay(7) === 50, 'round 1 goes from 500 to 50');
+});
+
+test('final two (user decision): losing a duel with no Aegis and every mark knocks you out', () => {
+  const match = createMatch(null, 64);
+  const duel = runUntilDuel(match, 'fighting');
+  for (const player of match.players) {
+    if (!isDuelist(duel, player)) player.game.phase = 'lost';
+  }
+  Object.assign(duel.b.game.hero, { aegis: 0, curses: CURSE.max });
+  finishDuel(match, 'a');
+  assert(duel.result.penalty === 'out' && duel.b.game.phase === 'lost', 'out');
+  stepMatch(match, TEST_STEP);
+  assert(match.over && duel.a.place === 1 && duel.b.place > 1, 'the winner of the last duel wins the match');
 });
 
 // ---- The bench ----
