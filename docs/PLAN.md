@@ -28,6 +28,8 @@ cierra con algo que se puede comprobar.
   - D11: los ítems para mandar creeps a los rivales quedan afuera de la 1.0.
   - D12: dos jugadores pueden tener la misma habilidad.
 
+- **2026-11-11 (decisión del usuario):** en la recta final, perder un duelo sin Aegis y con las 3 marcas de
+  maldición te deja afuera. Sin esto, los dos últimos pelearían duelos para siempre (no enfrentan creeps).
 - **2026-11-11 (decisión del usuario):** al revivir con Aegis, durante 5 segundos recibís la mitad de daño y hacés
   50% más. El mod no publica el número; se puede ajustar con el banco.
 
@@ -186,17 +188,30 @@ Una partida completa, pero chica.
         en juego) y de dónde salió tu oro: creeps, rondas, duelos y apuestas (las apuestas, ganado menos apostado).
       - 5 pruebas nuevas (83 en total).
       Simplificaciones a revisar: si quedás afuera, la pantalla final no te deja seguir mirando la partida; el
-      Aegis todavía no se compra (ver "Decisiones abiertas"); con los creeps de relleno de hoy, una partida de 8
-      rivales de la IA sigue sin terminar en la ronda 40: hace falta el banco y las oleadas de D5 para que termine
-      cerca de la ronda 55-65.
-- [ ] Banco de partidas: la IA juega sola cientos de partidas y mide el balance. Avance (2026-11-11):
-      - Ya existe: `node tools/bench.js 20 30` (20 partidas hasta la ronda 30) y la página `banco.html`, que hacen
-        lo mismo (`js/bench.js`). Informan cuántas partidas terminaron y en qué ronda, de dónde sale el oro, cada
-        cuánto gana el favorito del duelo, cuánto gana cada héroe y cada habilidad, y la alarma "gana sola".
-      - Falta para tildarlo: que las partidas terminen solas. Con los creeps de relleno de hoy nadie cae después de
-        las primeras rondas, así que el banco corta en la ronda máxima y da por ganador al primero de la tabla. Eso
-        se arregla con las oleadas y números provisorios de D5 (la tabla de 10 tipos de creep de `DISENO.md`),
-        calibrados con este banco hasta que la partida promedio termine entre las rondas 55 y 65.
+      Aegis todavía no se compra (ver "Decisiones abiertas").
+- [x] Banco de partidas: la IA juega sola partidas completas y mide el balance (2026-11-11):
+      - `node tools/bench.js 24 150` (24 partidas, cortando en la ronda 150 si alguna no termina) y la página
+        `banco.html` hacen lo mismo (`js/bench.js`). Informan en qué ronda terminó cada partida, de dónde sale el
+        oro, cada cuánto gana el favorito del duelo, cuánto gana cada héroe y cada habilidad, y la alarma "gana
+        sola".
+- [x] Oleadas y números de D5, calibrados con el banco (`data/waves.json`, `js/game.js`) (2026-11-11):
+      - 9 tipos de creep con nombres propios, inspirados en los neutrales de Dota: Kóbold, Arpía (a distancia),
+        Lobo (rápido), Centauro (aturde al pegar), Troll (a distancia, pega fuerte), Bicho explosivo (explota al
+        morir), Araña (resiste la magia) y dos pesados, Gólem y Ogro. Cada tipo aparece desde una ronda.
+      - Cada ronda tiene su oleada fija, la misma para los 8 (como en el mod): 1 a 3 tipos, de 5 a 12 creeps, y
+        cada 5 rondas una oleada pesada. En la pausa, debajo del título, se anuncia la próxima.
+      - Crecen en tres tramos: rápido hasta la ronda 10, más lento hasta la 20 y después sin techo. Desde la 60
+        resisten la magia.
+      - A los 50 segundos de ronda los creeps se enfurecen: más rápidos, pegan más fuerte y no se los puede aturdir
+        ni frenar, como en el mod.
+      - Premio de ronda por puesto: el primero en terminar cobra 500 y el último 50 en la ronda 1, y crece con las
+        rondas. Los duelistas cobran como el cuarto; una oleada cortada por tiempo, como el último.
+      - Calibración: en 12 partidas de prueba la partida terminó entre las rondas 49 y 72, con un promedio de 60
+        (la meta era 55-65). El oro a la ronda 20 da unos 15.800 por jugador (las guías hablan de 10.000-15.000).
+      - 6 pruebas nuevas (90 en total).
+      Simplificaciones a revisar: la Araña resiste la magia en vez de "apagar pasivas" como en el mod; todos los
+      creeps se dibujan iguales salvo el tamaño; muchas eliminaciones caen justo en las oleadas pesadas (rondas 10,
+      30, 40, 45...), lo que puede estar bien o ser un salto demasiado grande.
 
 **Lista cuando:** jugás una partida de punta a punta con el primer lote.
 
