@@ -1496,6 +1496,22 @@ test('the closing screen: everyone in order, and your gold adds up by where it c
   assert(213 + lines.length * 30 + 20 < canvas.height - 60, 'the podium fits above the last line');
 });
 
+// ---- The bench ----
+
+test('the bench plays a match alone and counts heroes, abilities, gold and duels', () => {
+  const tally = createBenchTally();
+  const played = playBenchMatch(51, 4);
+  tallyBenchMatch(tally, played);
+  assert(tally.matches === 1 && tally.unfinished + tally.endRounds.length === 1, 'one match');
+  const heroGames = [...tally.heroes.values()].reduce((sum, entry) => sum + entry.seen, 0);
+  const heroWins = [...tally.heroes.values()].reduce((sum, entry) => sum + entry.won, 0);
+  assert(heroGames === 8 && heroWins === 1, `${heroGames} heroes, ${heroWins} winners`);
+  assert(tally.duels === 2 && tally.favouriteWins <= 2, `duels ${tally.duels}`);
+  assert(tally.income.rounds > 0 && tally.income.creeps > 0, 'gold counted');
+  const lines = benchReport(tally, 4);
+  assert(lines[0] === '1 partidas, hasta la ronda 4.' && lines.some((line) => line.startsWith('Sin alarmas')), lines[0]);
+});
+
 async function runTests() {
   const summary = document.getElementById('summary');
   const list = document.getElementById('results');

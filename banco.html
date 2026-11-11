@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chaos · Banco de partidas</title>
+  <style>
+    body { margin: 24px; background: #0d0f14; color: #d8dce6; font-family: system-ui, sans-serif; }
+    h1 { font-size: 22px; }
+    label { margin-right: 16px; }
+    input { width: 64px; background: #1c2230; color: #e8ecf4; border: 1px solid #4a5468; padding: 4px; }
+    button { background: #3a4a6a; color: #e8ecf4; border: 1px solid #8fb4f0; padding: 6px 14px; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    pre { background: #151922; padding: 16px; white-space: pre-wrap; }
+    .note { color: #8a93a6; max-width: 760px; }
+  </style>
+</head>
+<body>
+  <h1>Banco de partidas</h1>
+  <p class="note">La IA juega sola partidas completas de 8, sin dibujar, y se mide el balance. Mientras no estén las
+    oleadas de la decisión D5, casi ninguna partida termina sola: se corta en la ronda máxima y gana el primero de la
+    tabla.</p>
+  <p>
+    <label>Partidas <input id="matches" type="number" min="1" value="10"></label>
+    <label>Ronda máxima <input id="rounds" type="number" min="2" value="20"></label>
+    <button id="run">Correr</button>
+  </p>
+  <p id="progress"></p>
+  <pre id="report"></pre>
+
+  <script src="js/data.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/sim.js"></script>
+  <script src="js/abilities.js"></script>
+  <script src="js/abilityDefs.js"></script>
+  <script src="js/items.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/match.js"></script>
+  <script src="js/duel.js"></script>
+  <script src="js/bench.js"></script>
+  <script>
+    'use strict';
+    // Plays one match at a time so the page keeps responding.
+    const button = document.getElementById('run');
+    const progress = document.getElementById('progress');
+    const report = document.getElementById('report');
+    const ready = loadDB();
+
+    button.addEventListener('click', async () => {
+      await ready;
+      const matches = Math.max(1, Number(document.getElementById('matches').value) || 1);
+      const rounds = Math.max(2, Number(document.getElementById('rounds').value) || 2);
+      const tally = createBenchTally();
+      button.disabled = true;
+      report.textContent = '';
+      for (let i = 0; i < matches; i++) {
+        progress.textContent = `Jugando la partida ${i + 1} de ${matches}…`;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        tallyBenchMatch(tally, playBenchMatch(i + 1, rounds));
+      }
+      progress.textContent = 'Listo.';
+      report.textContent = benchReport(tally, rounds).join('\n');
+      button.disabled = false;
+    });
+  </script>
+</body>
+</html>
