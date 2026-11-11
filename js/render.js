@@ -972,8 +972,9 @@ function playerTableRows(canvas, match) {
   }));
 }
 
+// Next to the table, below the round title, the aiming hint and the messages (they end at y = 104).
 function spyPanelRect(canvas) {
-  return { x: TABLE.x + TABLE.width + 8, y: TABLE.y, width: 280, height: 250 };
+  return { x: TABLE.x + TABLE.width + 8, y: 112, width: 280, height: 250 };
 }
 
 function drawPlayerTable(ctx, canvas, match, view) {

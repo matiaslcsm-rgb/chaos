@@ -1222,8 +1222,8 @@ test('the players table and the rival panel fit on screen without covering the r
   const spy = spyPanelRect(canvas);
   assert(spy.x >= last.x + last.width && spy.x + spy.width < canvas.width / 2 + 200, 'the rival panel sits next to the table');
   assert(spy.y + spy.height < panel.y - 10 - 8 * 22, 'and above the hero panel');
-  const help = 22 + 5 * 16;
-  assert(spy.x + spy.width < canvas.width - 300 || spy.y > help, 'it does not cover the controls reminder');
+  assert(spy.y > 104, 'it does not cover the round title, the aiming hint or the messages');
+  assert(spy.x + spy.width < canvas.width - 300, 'nor the controls reminder');
 });
 
 test('the round title follows the shared clock and says who is still fighting', () => {
