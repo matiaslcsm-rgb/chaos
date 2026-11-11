@@ -8,7 +8,10 @@ const HERO_TEAM = 0;
 const CREEP_TEAM = 1;
 // The mod's draft: 5 abilities, two before round 1 and one more before rounds 3, 6 and 9.
 const DRAFT_ROUNDS = [1, 1, 3, 6, 9];
-const DRAFT_OPTIONS = 16;
+// Decision D2 (docs/PLAN.md): 8 options while there are fewer than 150 abilities, 16 after, as the mod did over time.
+const DRAFT_OPTIONS_FEW = 8;
+const DRAFT_OPTIONS_MANY = 16;
+const DRAFT_MANY_FROM = 150;
 // Placeholder income until the mod's real numbers are researched (docs/PLAN.md, open decisions).
 // What is known: clearing the wave faster pays more. Starting gold is Dota's.
 const GOLD = {
@@ -120,12 +123,18 @@ function draftsDue(game) {
   return DRAFT_ROUNDS.filter((round) => round <= game.round + 1).length - game.picks;
 }
 
+function draftOptionCount(poolSize) {
+  return poolSize < DRAFT_MANY_FROM ? DRAFT_OPTIONS_FEW : DRAFT_OPTIONS_MANY;
+}
+
 // Offers a random handful of the abilities the hero does not have yet.
 function openDraft(game) {
   const owned = new Set(game.hero.abilities.map((ability) => ability.key));
-  const pool = draftPool().filter((key) => !owned.has(key));
+  const all = draftPool();
+  const pool = all.filter((key) => !owned.has(key));
+  const count = draftOptionCount(all.length);
   const options = [];
-  while (options.length < DRAFT_OPTIONS && pool.length) {
+  while (options.length < count && pool.length) {
     options.push(pool.splice(Math.floor(game.sim.rng() * pool.length), 1)[0]);
   }
   game.draft = { options, number: game.picks + 1 };
@@ -192,19 +201,27 @@ function endRound(game) {
   game.timer = PREP_TIME;
 }
 
+// One arena on its own, with its own clock between rounds (a solo game, and the tests).
 function stepGame(game, dt) {
   if (game.phase === 'lost') return;
   // The match waits while the player is choosing an ability.
   if (game.phase === 'prep' && !game.draft && draftsDue(game) > 0) openDraft(game);
   if (game.draft) return;
-  const bounty = bountyAlive(game);
-  stepSim(game.sim, dt);
-  game.hero.gold += bounty - bountyAlive(game);
+  stepArena(game, dt);
   if (game.phase === 'prep') {
     game.timer -= dt;
     if (game.timer <= 0) startRound(game);
-    return;
   }
+}
+
+// Moves one arena forward: the fight, the gold of the creeps that die, and the end of the wave.
+// Whoever owns the clock (stepGame or the match) decides when the next round starts.
+function stepArena(game, dt) {
+  if (game.phase === 'lost') return;
+  const bounty = bountyAlive(game);
+  stepSim(game.sim, dt);
+  game.hero.gold += bounty - bountyAlive(game);
+  if (game.phase !== 'fight') return;
   game.roundTime += dt;
   if (game.hero.dead) {
     game.phase = 'lost';

@@ -695,13 +695,14 @@ test('all 43 abilities of the batch work at their maximum level', () => {
 
 // ---- Draft ----
 
-test('the draft: the match waits while 16 different abilities are on offer', () => {
+test('the draft: the match waits while 8 different abilities are on offer (16 from 150 abilities on)', () => {
+  assert(draftOptionCount(43) === 8 && draftOptionCount(149) === 8 && draftOptionCount(150) === 16, 'decision D2');
   const game = createGame(heroByName('Sven'), 5);
   assert(game.hero.abilities.length === 0, 'the hero starts with no abilities');
   stepGame(game, TEST_STEP);
   assert(game.draft && game.draft.number === 1, 'the first pick opens before round 1');
   const options = game.draft.options;
-  assert(options.length === DRAFT_OPTIONS && new Set(options).size === DRAFT_OPTIONS, 'different options');
+  assert(options.length === DRAFT_OPTIONS_FEW && new Set(options).size === DRAFT_OPTIONS_FEW, 'different options');
   assert(options.every((key) => ABILITY_DEFS[key] && draftPool().includes(key)), 'all from the batch');
   for (let t = 0; t < 10; t += TEST_STEP) stepGame(game, TEST_STEP);
   assert(game.round === 0 && game.timer === PREP_TIME && game.draft.options === options, 'nothing moves until you choose');
@@ -753,7 +754,7 @@ test('the draft screen: one card per option, none overlapping', () => {
   stepGame(game, TEST_STEP);
   const cards = draftCards(canvas, game);
   const button = draftSkipButton(canvas);
-  assert(cards.length === DRAFT_OPTIONS, 'one card per option');
+  assert(cards.length === DRAFT_OPTIONS_FEW, 'one card per option');
   for (const card of cards) {
     assert(card.x >= 0 && card.x + card.width <= canvas.width && card.y + card.height <= button.y, 'cards fit above the button');
     assert(abilityOwnerName(card.key), 'each card can say whose ability it was');
