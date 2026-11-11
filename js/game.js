@@ -54,7 +54,7 @@ const CREEP_TYPES = {
 };
 const CREEP_GROWTH_PER_ROUND = 0.1;
 // Decision D3: 2 Aegis per player, as in the mod. Dying to the wave spends one and you come back on the spot
-// with a short advantage. How big the advantage is, the mod does not say: provisional (docs/PLAN.md).
+// with a short advantage. The mod does not say how big; the size is the user's decision (docs/PLAN.md).
 const AEGIS_START = 2;
 const AEGIS_ADVANTAGE = { duration: 5, damageTakenPct: -50, damageDealtPct: 50 };
 // Decision D8: curse marks of 7% (more damage taken, less damage dealt, less gold), at most 3.

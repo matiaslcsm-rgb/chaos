@@ -28,6 +28,9 @@ cierra con algo que se puede comprobar.
   - D11: los ítems para mandar creeps a los rivales quedan afuera de la 1.0.
   - D12: dos jugadores pueden tener la misma habilidad.
 
+- **2026-11-11 (decisión del usuario):** al revivir con Aegis, durante 5 segundos recibís la mitad de daño y hacés
+  50% más. El mod no publica el número; se puede ajustar con el banco.
+
 ## Decisiones abiertas
 
 - **Nombre del proyecto** (decisión): hoy la carpeta se llama `chaos`.
@@ -56,10 +59,6 @@ cierra con algo que se puede comprobar.
   hoy) y los del mod para los propios**; (b) multiplicar todo por un factor.
 - **Vender ítems** (decisión): (a) **a mitad de precio, como en Dota (así está hoy)**; (b) sin venta.
 
-- **Ventaja al revivir con Aegis** (decisión, 2026-11-11): el mod dice que al revivir "recibís menos daño y hacés
-  más" durante unos segundos, pero no cuánto. (a) **la mitad de daño recibido y 50% más de daño hecho durante 5
-  segundos, ajustable con el banco (así está hoy)**; (b) solo la vida llena, sin ventaja; (c) invulnerable 3
-  segundos y nada más.
 - **Comprar Aegis en la tienda**: el mod lo vende pero no se encontró el precio; entra con los demás números de D5
   cuando esté el banco. Por ahora no se puede comprar.
 
