@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.6.0 · Etapa 3: duelos y apuestas';
+const GAME_VERSION = '0.7.0 · Etapa 3: Aegis y final de partida';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');

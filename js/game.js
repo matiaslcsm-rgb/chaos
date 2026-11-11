@@ -53,6 +53,26 @@ const CREEP_TYPES = {
   },
 };
 const CREEP_GROWTH_PER_ROUND = 0.1;
+// Decision D3: 2 Aegis per player, as in the mod. Dying to the wave spends one and you come back on the spot
+// with a short advantage. How big the advantage is, the mod does not say: provisional (docs/PLAN.md).
+const AEGIS_START = 2;
+const AEGIS_ADVANTAGE = { duration: 5, damageTakenPct: -50, damageDealtPct: 50 };
+// Decision D8: curse marks of 7% (more damage taken, less damage dealt, less gold), at most 3.
+const CURSE = { pct: 7, max: 3 };
+
+function curseStats() {
+  return { damageTakenPct: CURSE.pct, damageDealtPct: -CURSE.pct };
+}
+
+function goldFactor(hero) {
+  return 1 - CURSE.pct * (hero.curses || 0) / 100;
+}
+
+// Gold that comes in, with a note of where it came from for the closing screen.
+function earn(game, amount, source) {
+  game.hero.gold += amount;
+  game.income[source] += amount;
+}
 
 function creepStats(type, round) {
   const growth = 1 + CREEP_GROWTH_PER_ROUND * (round - 1);
@@ -83,7 +103,10 @@ function createGame(heroData, seed) {
   const sim = createSim(seed);
   const hero = addHero(sim, heroData, 1, HERO_TEAM, ARENA.width / 2, ARENA.height * 0.6);
   hero.gold = GOLD.start;
-  return { sim, hero, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, picks: 0, draft: null };
+  hero.aegis = AEGIS_START;
+  hero.curses = 0;
+  const income = { creeps: 0, rounds: 0, duels: 0, bets: 0 };
+  return { sim, hero, income, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, picks: 0, draft: null };
 }
 
 // ---- Gold and the shop ----
@@ -191,14 +214,31 @@ function startRound(game) {
 
 // The mod gives one level per round; the hero comes back at full health for the next one.
 function endRound(game) {
-  const gold = roundGold(game.round, game.roundTime);
-  game.hero.gold += gold;
+  const gold = Math.round(roundGold(game.round, game.roundTime) * goldFactor(game.hero));
+  earn(game, gold, 'rounds');
   pushEvent(game.sim, { type: 'text', x: game.hero.x, y: game.hero.y, text: `+${gold} de oro` });
   setHeroLevel(game.hero, game.hero.level + 1);
   game.hero.hp = game.hero.stats.maxHp;
   game.hero.mana = game.hero.stats.maxMana;
   game.phase = 'prep';
   game.timer = PREP_TIME;
+}
+
+// Back on the spot, full health and mana, with a few seconds of advantage. The wave goes on.
+function reviveWithAegis(game) {
+  const hero = game.hero;
+  hero.aegis--;
+  hero.dead = false;
+  hero.hp = hero.stats.maxHp;
+  hero.mana = hero.stats.maxMana;
+  hero.order = { type: 'idle' };
+  addMod(game.sim, hero, {
+    id: 'aegis',
+    sourceId: hero.id,
+    duration: AEGIS_ADVANTAGE.duration,
+    stats: { damageTakenPct: AEGIS_ADVANTAGE.damageTakenPct, damageDealtPct: AEGIS_ADVANTAGE.damageDealtPct },
+  });
+  pushEvent(game.sim, { type: 'text', x: hero.x, y: hero.y, text: `¡Aegis! Te quedan ${hero.aegis}` });
 }
 
 // One arena on its own, with its own clock between rounds (a solo game, and the tests).
@@ -220,10 +260,13 @@ function stepArena(game, dt) {
   if (game.phase === 'lost') return;
   const bounty = bountyAlive(game);
   stepSim(game.sim, dt);
-  game.hero.gold += bounty - bountyAlive(game);
+  const bountyEarned = Math.round((bounty - bountyAlive(game)) * goldFactor(game.hero));
+  if (bountyEarned) earn(game, bountyEarned, 'creeps');
   if (game.phase !== 'fight') return;
   game.roundTime += dt;
-  if (game.hero.dead) {
+  if (game.hero.dead && game.hero.aegis > 0) {
+    reviveWithAegis(game);
+  } else if (game.hero.dead) {
     game.phase = 'lost';
   } else if (creepsAlive(game) === 0) {
     endRound(game);

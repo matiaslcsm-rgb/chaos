@@ -1109,12 +1109,12 @@ test('match: whoever falls takes the last place free and loses the gold; the las
   const match = createMatch(heroByName('Sniper'), 8);
   runMatchUntil(match, () => match.phase === 'fight', PREP_TIME + 1);
   const first = match.players[3];
-  first.game.hero.dead = true;
+  Object.assign(first.game.hero, { aegis: 0, dead: true });
   stepMatch(match, TEST_STEP);
   assert(first.game.phase === 'lost' && first.place === 8 && first.outRound === 1, `place ${first.place}`);
   assert(first.game.hero.gold === 0, 'the gold is gone, as in the mod');
   assert(playerState(match, first) === 'out' && playerStanding(match)[7] === first, 'last in the table');
-  for (const player of match.players.slice(1)) player.game.hero.dead = true;
+  for (const player of match.players.slice(1)) Object.assign(player.game.hero, { aegis: 0, dead: true });
   stepMatch(match, TEST_STEP);
   assert(match.over && match.players[0].place === 1, 'you win when everyone else fell');
   assert(match.players.slice(1).filter((player) => player !== first).every((player) => player.place === 7), 'falling together shares the place');
@@ -1239,7 +1239,7 @@ test('the round title follows the shared clock and says who is still fighting', 
   const other = createMatch(heroByName('Axe'), 12);
   const fallen = humanPlayer(other).game;
   runMatchUntil(other, () => other.phase === 'fight', PREP_TIME + 1);
-  fallen.hero.dead = true;
+  Object.assign(fallen.hero, { aegis: 0, dead: true });
   runMatchUntil(other, () => fallen.phase === 'lost', 1);
   assert(endingText(fallen).title === 'Caíste' && endingText(fallen).line.includes('puesto 8 de 8'), endingText(fallen).line);
 });
@@ -1402,6 +1402,97 @@ test('duels on screen: you fight your own duel, and the betting panel fits witho
   for (const rect of controls.chips.concat(controls.sides)) {
     assert(rect.x >= panel.x && rect.x + rect.width <= panel.x + panel.width && rect.y + rect.height <= panel.y + panel.height, 'buttons inside the panel');
   }
+});
+
+// ---- Aegis, curse marks and the end of the match ----
+
+function killHero(game) {
+  applyDamage(game.sim, null, game.hero, 1e9, 'pure');
+  stepArena(game, TEST_STEP);
+}
+
+test('Aegis: dying to the wave spends one and you come back with an advantage; with none left you are out', () => {
+  const game = createGame(heroByName('Sven'), 41);
+  game.phase = 'fight';
+  addTestCreep(game.sim, 100, 100, STILL_CREEP);
+  assert(game.hero.aegis === AEGIS_START && AEGIS_START === 2, 'two Aegis to start (D3)');
+  killHero(game);
+  const hero = game.hero;
+  assert(game.phase === 'fight' && !hero.dead && hero.aegis === 1, 'back in the fight with one less');
+  assert(hero.hp === hero.stats.maxHp && hero.mana === hero.stats.maxMana, 'full health and mana');
+  assert(hero.stats.damageTakenPct === AEGIS_ADVANTAGE.damageTakenPct && hero.stats.damageDealtPct === AEGIS_ADVANTAGE.damageDealtPct, 'the advantage');
+  const hp = hero.hp;
+  applyDamage(game.sim, null, hero, 100, 'pure');
+  assertNear(hp - hero.hp, 100 * (1 + AEGIS_ADVANTAGE.damageTakenPct / 100), 0.01, 'takes less damage');
+  for (let t = 0; t < AEGIS_ADVANTAGE.duration + 0.1; t += TEST_STEP) stepArena(game, TEST_STEP);
+  assert(!findMod(hero, 'aegis') && hero.stats.damageTakenPct === 0, 'the advantage wears off');
+  killHero(game);
+  assert(hero.aegis === 0 && game.phase === 'fight', 'the second one');
+  killHero(game);
+  assert(game.phase === 'lost', 'then you are out');
+});
+
+test('curse marks (D8): 7% more damage taken, 7% less dealt and less gold, at most 3, and they stay', () => {
+  const sim = createSim(42);
+  const hero = addTestHero(sim, 'Axe', 5, 500, 500);
+  const creep = addTestCreep(sim, 600, 500, STILL_CREEP);
+  hero.aegis = 0;
+  hero.curses = 0;
+  assert(punishLoser(hero) === 'curse' && punishLoser(hero) === 'curse' && hero.curses === 2, 'a mark when no Aegis is left');
+  assert(hero.stats.damageTakenPct === 14 && hero.stats.damageDealtPct === -14, 'stats');
+  const hp = hero.hp;
+  applyDamage(sim, creep, hero, 100, 'pure');
+  assertNear(hp - hero.hp, 114, 0.01, 'takes more');
+  const creepHp = creep.hp;
+  applyDamage(sim, hero, creep, 50, 'pure');
+  assertNear(creepHp - creep.hp, 43, 0.01, 'deals less');
+  assertNear(goldFactor(hero), 0.86, 1e-9, 'earns less');
+  punishLoser(hero);
+  assert(punishLoser(hero) === null && hero.curses === CURSE.max, 'at most 3');
+  refreshPassives(hero);
+  moveHero(hero, createSim(43), 99, CREEP_TEAM, 0, 0);
+  assert(hero.stats.damageTakenPct === 21, 'the marks survive a trip to the duel arena');
+  hero.aegis = 1;
+  assert(punishLoser(hero) === 'aegis' && hero.aegis === 0, 'an Aegis goes first');
+});
+
+test('final stretch: losing a duel costs nothing with more than 3 alive; with 3 it costs an Aegis', () => {
+  const crowd = createMatch(null, 44);
+  const duel = runUntilDuel(crowd, 'fighting');
+  finishDuel(crowd, 'a');
+  assert(duel.result.penalty === null && duel.b.game.hero.aegis === AEGIS_START, 'no penalty with 8 alive');
+
+  const few = createMatch(null, 45);
+  const late = runUntilDuel(few, 'fighting');
+  const others = few.players.filter((player) => !isDuelist(late, player));
+  for (const player of others.slice(0, 5)) player.game.phase = 'lost';
+  finishDuel(few, 'b');
+  assert(late.result.penalty === 'aegis' && late.a.game.hero.aegis === AEGIS_START - 1, 'the loser pays an Aegis');
+  assert(late.b.game.hero.aegis === AEGIS_START, 'the winner does not');
+});
+
+test('the end: falling together shares the place; the win goes to the last one standing', () => {
+  const match = createMatch(heroByName('Luna'), 46);
+  runMatchUntil(match, () => match.phase === 'fight', PREP_TIME + 1);
+  for (const player of match.players) Object.assign(player.game.hero, { aegis: 0, dead: true });
+  stepMatch(match, TEST_STEP);
+  assert(match.over && match.players.every((player) => player.place === 1), 'all fell at once: all first');
+  assert(endingText(humanPlayer(match).game).title === 'Caíste', 'still, you fell');
+});
+
+test('the closing screen: everyone in order, and your gold adds up by where it came from', () => {
+  const match = createMatch(heroByName('Zeus'), 47);
+  const human = humanPlayer(match);
+  runMatchUntil(match, () => match.round >= 4 && match.phase === 'prep', 600);
+  const income = human.game.income;
+  const total = income.creeps + income.rounds + income.duels + income.bets;
+  assert(human.game.hero.gold === GOLD.start + total, `gold ${human.game.hero.gold} vs ${GOLD.start} + ${total}`);
+  assert(income.creeps > 0 && income.rounds > 0, 'creeps and rounds paid');
+  const lines = podiumLines(match);
+  assert(lines.length === 8 && lines.every((line) => line.text.includes(line.player.name)), 'one line per player');
+  assert(incomeText(human.game).startsWith('creeps '), incomeText(human.game));
+  const canvas = { width: 1280, height: 720 };
+  assert(213 + lines.length * 30 + 20 < canvas.height - 60, 'the podium fits above the last line');
 });
 
 async function runTests() {

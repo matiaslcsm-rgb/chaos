@@ -34,12 +34,15 @@ function createSim(seed) {
 // stats: armor, magicResist, attackSpeed, attackRange, damage, damagePct, moveSpeedPct, evasion,
 //        hpRegen, manaRegen, manaRegenPct, lifesteal, spellAmp, str, agi, int, moveSpeed (flat),
 //        boots (flat move speed that does not stack: only the best pair counts).
+// damageTakenPct, damageDealtPct (Aegis advantage, curse marks).
 // flags: stunned, rooted, disarmed, silenced, taunted, immune (enemies cannot put statuses on it).
 function recomputeStats(unit) {
   const stats = Object.assign({}, unit.baseStats);
   const flags = {};
   let movePct = 0;
   let damagePct = 0;
+  let takenPct = 0;
+  let dealtPct = 0;
   let manaRegenPct = 0;
   let dodge = 1;
   let moveFlat = 0;
@@ -57,6 +60,8 @@ function recomputeStats(unit) {
     stats.damageMin += (s.damage || 0) * n;
     stats.damageMax += (s.damage || 0) * n;
     damagePct += (s.damagePct || 0) * n;
+    takenPct += (s.damageTakenPct || 0) * n;
+    dealtPct += (s.damageDealtPct || 0) * n;
     movePct += (s.moveSpeedPct || 0) * n;
     manaRegenPct += (s.manaRegenPct || 0) * n;
     stats.lifesteal += (s.lifesteal || 0) * n;
@@ -79,6 +84,8 @@ function recomputeStats(unit) {
   stats.damageMax += unit.baseStats.damageMax * damagePct / 100;
   stats.manaRegen *= 1 + manaRegenPct / 100;
   stats.evasion = 1 - dodge;
+  stats.damageTakenPct = takenPct;
+  stats.damageDealtPct = dealtPct;
   if (unit.baseStats.moveSpeed > 0) {
     stats.moveSpeed = Math.max(MIN_MOVE_SPEED, (unit.baseStats.moveSpeed + moveFlat + boots) * (1 + movePct / 100));
   }
@@ -314,6 +321,8 @@ function applyDamage(sim, source, target, amount, type) {
   let dealt = amount;
   if (type === 'physical') dealt *= armorMultiplier(target.stats.armor);
   if (type === 'magical') dealt *= 1 - target.stats.magicResist / 100;
+  dealt *= Math.max(0, 1 + (target.stats.damageTakenPct || 0) / 100);
+  if (source && source.stats) dealt *= Math.max(0, 1 + (source.stats.damageDealtPct || 0) / 100);
   target.hp -= dealt;
   pushEvent(sim, { type: 'damage', targetId: target.id, x: target.x, y: target.y, amount: dealt, damageType: type });
   if (target.hp <= 0) {

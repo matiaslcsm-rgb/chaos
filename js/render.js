@@ -804,7 +804,7 @@ function drawHeroPanel(ctx, canvas, game) {
   ctx.textAlign = 'left';
   ctx.fillStyle = '#e8ecf4';
   ctx.font = `bold 18px ${FONT}`;
-  const title = `${hero.name} · nivel ${hero.level}`;
+  const title = `${hero.name} · nivel ${hero.level} · ${aegisText(hero)}`;
   ctx.fillText(title, panel.x + 12, panel.y + 24);
   if (hero.skillPoints > 0) {
     const titleWidth = ctx.measureText(title).width;
@@ -944,17 +944,22 @@ function drawGame(ctx, canvas, game, view) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.textAlign = 'center';
     ctx.fillStyle = ending.color;
-    ctx.font = `bold 64px ${FONT}`;
-    ctx.fillText(ending.title, canvas.width / 2, canvas.height / 2 - 10);
+    ctx.font = `bold 56px ${FONT}`;
+    ctx.fillText(ending.title, canvas.width / 2, 120);
     ctx.fillStyle = '#d8dce6';
-    ctx.font = `22px ${FONT}`;
-    ctx.fillText(`${ending.line} Clic para volver a elegir.`, canvas.width / 2, canvas.height / 2 + 40);
+    ctx.font = `20px ${FONT}`;
+    ctx.fillText(ending.line, canvas.width / 2, 160);
+    if (game.match) drawPodium(ctx, canvas, game);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#8a93a6';
+    ctx.font = `16px ${FONT}`;
+    ctx.fillText('Clic para volver a elegir.', canvas.width / 2, canvas.height - 40);
   }
 }
 
 // ---- The players' table (top left) ----
 
-const TABLE = { x: 16, y: 16, width: 330, header: 22, row: 24 };
+const TABLE = { x: 16, y: 16, width: 380, header: 22, row: 24 };
 const PLAYER_STATE_TEXT = {
   fight: { text: 'peleando', color: '#e8b04a' },
   done: { text: 'listo', color: '#7edb8a' },
@@ -991,6 +996,7 @@ function drawPlayerTable(ctx, canvas, match, view) {
   ctx.textAlign = 'right';
   ctx.fillText('nivel', TABLE.x + 210, TABLE.y + 15);
   ctx.fillText('valor', TABLE.x + 262, TABLE.y + 15);
+  ctx.fillText('vidas', TABLE.x + 316, TABLE.y + 15);
   for (const row of rows) {
     const player = row.player;
     const hero = player.game.hero;
@@ -1015,6 +1021,8 @@ function drawPlayerTable(ctx, canvas, match, view) {
     ctx.fillText(out ? `${player.place}º` : String(hero.level), row.x + 210, row.y + 17);
     ctx.fillStyle = '#e8c45a';
     ctx.fillText(out ? '—' : String(playerValue(player)), row.x + 262, row.y + 17);
+    ctx.fillStyle = hero.curses ? '#f08a7c' : '#c8cede';
+    ctx.fillText(out ? '' : livesText(hero), row.x + 316, row.y + 17);
     const label = PLAYER_STATE_TEXT[state];
     ctx.fillStyle = label.color;
     ctx.font = `11px ${FONT}`;
@@ -1041,7 +1049,7 @@ function drawSpyPanel(ctx, canvas, match, view) {
   ctx.fillStyle = '#8a93a6';
   ctx.font = `12px ${FONT}`;
   const out = playerState(match, player) === 'out';
-  ctx.fillText(out ? `Afuera en la ronda ${player.outRound}, puesto ${player.place}` : `Oro ${hero.gold} · valor ${playerValue(player)}`, panel.x + 12, panel.y + 40);
+  ctx.fillText(out ? `Afuera en la ronda ${player.outRound}, puesto ${player.place}` : `Oro ${hero.gold} · valor ${playerValue(player)} · ${aegisText(hero)}`, panel.x + 12, panel.y + 40);
   let y = panel.y + 62;
   ctx.fillStyle = '#b8c0d0';
   ctx.font = `bold 12px ${FONT}`;
@@ -1243,4 +1251,52 @@ function drawDuelPanel(ctx, canvas, match, view) {
   ctx.fillText(lines[0], x, panel.y + 146);
   ctx.fillStyle = '#b8c0d0';
   ctx.fillText(lines[1], x, panel.y + 164);
+}
+
+// ---- Lives and the closing screen ----
+
+// "2 Aegis", plus the curse marks if there are any.
+function aegisText(hero) {
+  const marks = hero.curses ? ` · ${hero.curses} ${hero.curses === 1 ? 'marca' : 'marcas'}` : '';
+  return `${hero.aegis} Aegis${marks}`;
+}
+
+// Short form for the table: Aegis left, and the marks with an x.
+function livesText(hero) {
+  return hero.curses ? `${hero.aegis} ·${hero.curses}✖` : String(hero.aegis);
+}
+
+const INCOME_LABELS = { creeps: 'creeps', rounds: 'rondas', duels: 'duelos', bets: 'apuestas' };
+
+// One line per player for the closing screen.
+function podiumLines(match) {
+  return playerStanding(match).map((player) => {
+    const hero = player.game.hero;
+    let fate = 'sigue en juego';
+    if (player.place === 1) fate = 'ganó';
+    else if (player.place) fate = `cayó en la ronda ${player.outRound}`;
+    const place = player.place ? `${player.place}º` : '·';
+    return { player, text: `${place}  ${player.name} · ${hero.name} · ${fate}` };
+  });
+}
+
+function incomeText(game) {
+  return Object.keys(INCOME_LABELS).map((key) => `${INCOME_LABELS[key]} ${game.income[key]}`).join(' · ');
+}
+
+function drawPodium(ctx, canvas, game) {
+  const lines = podiumLines(game.match);
+  ctx.textAlign = 'left';
+  const x = canvas.width / 2 - 200;
+  lines.forEach((line, i) => {
+    ctx.fillStyle = line.player.color;
+    ctx.fillRect(x, 202 + i * 30, 12, 12);
+    ctx.fillStyle = line.player.human ? '#e8ecf4' : '#b8c0d0';
+    ctx.font = `${line.player.human ? 'bold ' : ''}17px ${FONT}`;
+    ctx.fillText(line.text, x + 22, 213 + i * 30);
+  });
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#e8c45a';
+  ctx.font = `16px ${FONT}`;
+  ctx.fillText(`De dónde salió tu oro: ${incomeText(game)}`, canvas.width / 2, 213 + lines.length * 30 + 20);
 }

@@ -132,6 +132,9 @@ function refreshPassives(unit) {
       });
     }
   }
+  if (unit.curses) {
+    unit.mods.push({ id: 'curse', passive: true, sourceId: unit.id, duration: Infinity, stacks: unit.curses, tickTimer: 0, stats: curseStats() });
+  }
   recomputeStats(unit);
 }
 

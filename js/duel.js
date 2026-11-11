@@ -22,6 +22,8 @@ const BET = {
   maxPayout: 5, // and never more than 5 times the stake
 };
 const DUEL_PRIZE = { base: 100, perRound: 50 };
+// The final stretch: with this many players or fewer, losing a duel costs an Aegis, or a curse mark without one.
+const FINAL_STRETCH = 3;
 
 function duelRoundFor(match) {
   return match.round + 1 >= DUEL_FIRST_ROUND;
@@ -71,6 +73,7 @@ function placeBet(match, player, side, amount) {
   const problem = betProblem(match, player, side, Math.floor(amount));
   if (problem) return problem;
   player.game.hero.gold -= Math.floor(amount);
+  player.game.income.bets -= Math.floor(amount);
   match.duel.bets.push({ player, side, amount: Math.floor(amount) });
   return null;
 }
@@ -182,6 +185,18 @@ function duelPrize(round) {
   return DUEL_PRIZE.base + DUEL_PRIZE.perRound * round;
 }
 
+// Final stretch: an Aegis, or a curse mark if none is left (at most CURSE.max). Returns what it cost.
+function punishLoser(hero) {
+  if (hero.aegis > 0) {
+    hero.aegis--;
+    return 'aegis';
+  }
+  if (hero.curses >= CURSE.max) return null;
+  hero.curses++;
+  refreshPassives(hero);
+  return 'curse';
+}
+
 function finishDuel(match, winnerSide) {
   const duel = match.duel;
   const winner = winnerSide === 'a' ? duel.a : duel.b;
@@ -193,12 +208,15 @@ function finishDuel(match, winnerSide) {
     endRound(player.game);
   }
   const payouts = settleBets(duel, winnerSide);
-  for (const entry of payouts) entry.player.game.hero.gold += entry.pays;
+  for (const entry of payouts) {
+    if (entry.pays) earn(entry.player.game, entry.pays, entry.free ? 'duels' : 'bets');
+  }
   const prize = duelPrize(duel.round);
-  winner.game.hero.gold += prize;
+  earn(winner.game, prize, 'duels');
+  const penalty = playersAlive(match).length <= FINAL_STRETCH ? punishLoser(loser.game.hero) : null;
   winner.duelsWon = (winner.duelsWon || 0) + 1;
   duel.state = 'done';
-  duel.result = { winner, loser, prize, time: duel.time, payouts };
+  duel.result = { winner, loser, prize, time: duel.time, payouts, penalty };
   match.lastDuelists = [duel.a.index, duel.b.index];
   // Kept apart: the next duel may be announced in the same step and replace match.duel.
   match.lastDuel = duel;

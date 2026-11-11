@@ -95,6 +95,8 @@ function markEliminated(match) {
   if (alive.length <= 1) {
     match.over = true;
     if (alive.length === 1) alive[0].place = 1;
+    // The last ones fell in the very same moment: they share the win.
+    else for (const player of fallen) player.place = 1;
   }
 }
 
