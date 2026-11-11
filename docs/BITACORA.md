@@ -34,3 +34,20 @@ Lo que hace cada sesión de trabajo, con fecha. Lo más nuevo va al final.
 
 **Por qué frené:** hoy es miércoles y el tope es 30%. Lo que sigue, armar las oleadas de D5 y calibrarlas con el
 banco, es un trabajo grande que no entraba sin dejarlo a medias.
+
+## 2026-11-11 (miércoles, más tarde) · sesión con el usuario
+
+**Qué quedó hecho:**
+- **Oleadas de verdad (D5).** 9 tipos de creep con nombres propios: Kóbold, Arpía, Lobo, Centauro, Troll, Bicho
+  explosivo, Araña, y los pesados Gólem y Ogro. Cada ronda tiene su oleada fija, igual para los 8, con una oleada
+  pesada cada 5 rondas. En la pausa se anuncia la próxima debajo del título.
+- A los 50 segundos los creeps se enfurecen, como en el mod.
+- El premio de ronda ahora depende del puesto: el que termina primero cobra más.
+- **Las partidas terminan solas.** Calibré el crecimiento de los creeps con el banco: en 12 partidas de prueba
+  terminaron entre las rondas 49 y 72, con promedio 60 (la meta era 55-65).
+- **Decisiones tuyas anotadas:** la ventaja al revivir con Aegis queda como estaba (mitad de daño recibido y 50%
+  más de daño hecho, 5 segundos), y en la recta final, perder un duelo sin Aegis y con las 3 marcas te deja afuera.
+- Banco de partidas tildado. Pruebas: 90, todas bien.
+
+**Qué no pude verificar:** no jugué una partida entera con el mouse; la probé haciéndola avanzar desde la página y
+mirando capturas.
