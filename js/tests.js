@@ -1286,6 +1286,7 @@ test('duels: the duelists skip their wave, fight each other in a shared arena, t
   assert(a.game.hero.hp === a.game.hero.stats.maxHp && b.game.hero.mana === b.game.hero.stats.maxMana, 'full health and mana');
   assert(homes.every((home) => !home.sim.units.some((unit) => unit.kind === 'creep')), 'no wave at home');
   assert(a.game.round === match.round, 'their round counts too');
+  assert(duel.oddsA > 0 && duel.oddsA < 1, 'the odds when it started are kept for the bench');
   assert(playerState(match, a) === 'duel', 'the table says they are in a duel');
   const goldBefore = [a, b].map((player) => player.game.hero.gold);
   runUntilDuel(match, 'done');

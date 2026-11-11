@@ -127,6 +127,8 @@ function leaveDuel(game) {
 function startDuel(match) {
   const duel = match.duel;
   duel.state = 'fighting';
+  // Who looked like the favourite when it started, for the bench.
+  duel.oddsA = duelOdds(duel);
   duel.sim = createSim(Math.floor(match.rng() * 1e9));
   enterDuel(duel.sim, duel.a.game, HERO_TEAM, ARENA.width / 2 - DUEL_GAP / 2);
   enterDuel(duel.sim, duel.b.game, CREEP_TEAM, ARENA.width / 2 + DUEL_GAP / 2);
