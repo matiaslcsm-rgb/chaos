@@ -990,6 +990,226 @@ test('the shop and the inventory fit on screen without covering the rest', () =>
   for (const card of cards) assert(card.x >= panel.x && card.x + card.width <= panel.x + panel.width && card.y + card.height <= panel.y + panel.height, 'cards inside the panel');
 });
 
+// ---- Computer rivals and the match of 8 ----
+
+// Steps a match; if the human is drafting, takes a random ability.
+function stepMatchPlaying(match) {
+  const human = humanPlayer(match);
+  if (human && human.game.draft) skipDraft(human.game);
+  stepMatch(match, TEST_STEP);
+}
+
+function runMatchUntil(match, done, maxSeconds) {
+  for (let t = 0; t < maxSeconds && !done(); t += TEST_STEP) stepMatchPlaying(match);
+  assert(done(), `still waiting after ${maxSeconds} s`);
+}
+
+// A lone arena driven by a computer brain, already fighting.
+function aiArena(heroName, seed) {
+  const game = createGame(heroByName(heroName), seed);
+  game.phase = 'fight';
+  return { game, brain: createBrain(game.sim.rng, game.hero.data) };
+}
+
+function stepAiArena(arena, seconds) {
+  for (let t = 0; t < seconds; t += TEST_STEP) {
+    aiStep(arena.game, arena.brain, TEST_STEP);
+    stepArena(arena.game, TEST_STEP);
+  }
+}
+
+const STILL_CREEP = { moveSpeed: 0, damageMin: 0, damageMax: 0 };
+
+test('match: 8 players, you first, each with a different hero and an arena of their own', () => {
+  const sven = heroByName('Sven');
+  const match = createMatch(sven, 3);
+  assert(match.players.length === 8, `players: ${match.players.length}`);
+  const human = match.players[0];
+  assert(human.human && human.name === 'Vos' && human.game.hero.data === sven && !human.brain, 'you are the first player');
+  assert(match.players.slice(1).every((player) => !player.human && player.brain), 'the other 7 are the computer');
+  assert(new Set(match.players.map((player) => player.game.hero.data)).size === 8, 'eight different heroes');
+  assert(new Set(match.players.map((player) => player.game.sim)).size === 8, 'eight arenas');
+  assert(new Set(match.players.map((player) => player.name)).size === 8, 'eight names');
+  assert(match.players.every((player) => player.game.hero.gold === GOLD.start), 'everyone starts with the same gold');
+  assert(match.players.slice(1).every((player) => AI_STYLES.includes(player.brain.style) && AI_MONEY.includes(player.brain.money)), 'each rival has a personality');
+});
+
+test('every ability of the batch tells the computer what it is good for', () => {
+  for (const key of draftPool()) {
+    const info = AI_ABILITY_INFO[key];
+    assert(info && info.tags.length, `${key} has no tags`);
+    assert(info.tags.every((tag) => tag in AI_STYLE_WEIGHTS.mixed), `${key} has an unknown tag`);
+  }
+  for (const style of AI_STYLES) {
+    for (const key of AI_SHOPPING[style]) assert(DB.batch.items.includes(key), `${style} wants ${key}, not in the batch`);
+  }
+});
+
+test('match: the computer drafts, levels up and shops on its own, keeping its reserve', () => {
+  const match = createMatch(null, 4);
+  runMatchUntil(match, () => match.phase === 'fight', PREP_TIME + 1);
+  for (const player of match.players) {
+    const hero = player.game.hero;
+    assert(hero.abilities.length === 2, `${player.name} has ${hero.abilities.length} abilities`);
+    assert(hero.skillPoints === 0 && hero.abilities.some((ability) => ability.level === 1), `${player.name} spent the point`);
+    const spent = GOLD.start - hero.gold;
+    assert(spent <= GOLD.start * (1 - AI_RESERVE[player.brain.money]), `${player.name} (${player.brain.money}) spent ${spent}`);
+    if (player.brain.money === 'spender') assert(hero.items.length > 0, `${player.name} spends its gold`);
+  }
+});
+
+test('match: one clock for everyone; the next round waits for the last arena', () => {
+  const match = createMatch(heroByName('Axe'), 5);
+  let sawWaiting = false;
+  let sawPrep = false;
+  for (let t = 0; t < 400 && match.round < 4; t += TEST_STEP) {
+    stepMatchPlaying(match);
+    const alive = playersAlive(match);
+    if (match.phase === 'fight') {
+      assert(alive.every((player) => player.game.round === match.round), 'every arena is on the same round');
+      if (alive.some((player) => player.game.phase === 'prep') && alive.some((player) => player.game.phase === 'fight')) sawWaiting = true;
+    } else {
+      sawPrep = true;
+      assert(alive.every((player) => player.game.phase === 'prep'), 'nobody fights between rounds');
+      assert(alive.every((player) => player.game.timer === match.timer), 'every arena shows the same clock');
+    }
+  }
+  assert(match.round === 4, `reached round ${match.round}`);
+  assert(sawWaiting && sawPrep, 'some arenas finished first and waited');
+});
+
+test('match: everything waits while you choose an ability', () => {
+  const match = createMatch(heroByName('Luna'), 6);
+  stepMatch(match, TEST_STEP);
+  const human = humanPlayer(match);
+  assert(human.game.draft, 'your first pick is open');
+  const timer = match.timer;
+  const rivalTime = match.players[1].game.sim.time;
+  for (let t = 0; t < 5; t += TEST_STEP) stepMatch(match, TEST_STEP);
+  assert(match.timer === timer && match.players[1].game.sim.time === rivalTime, 'the clock and the rivals stand still');
+  skipDraft(human.game);
+  stepMatch(match, TEST_STEP);
+  assert(human.game.draft && human.game.draft.number === 2, 'second pick');
+  skipDraft(human.game);
+  stepMatch(match, TEST_STEP);
+  assert(!human.game.draft && match.timer < timer, 'then the clock runs again');
+});
+
+test('match: a wave past the time limit ends anyway, as the slowest clear', () => {
+  const match = createMatch(null, 7);
+  runMatchUntil(match, () => match.phase === 'fight', PREP_TIME + 1);
+  match.roundTime = ROUND_LIMIT - TEST_STEP / 2;
+  const goldBefore = match.players.map((player) => player.game.hero.gold);
+  stepMatch(match, TEST_STEP);
+  assert(match.phase === 'prep' && match.players.every((player) => player.game.phase === 'prep'), 'everyone is between rounds');
+  assert(match.players.every((player, i) => player.game.hero.gold > goldBefore[i]), 'the round still pays');
+});
+
+test('match: whoever falls takes the last place free and loses the gold; the last one standing wins', () => {
+  const match = createMatch(heroByName('Sniper'), 8);
+  runMatchUntil(match, () => match.phase === 'fight', PREP_TIME + 1);
+  const first = match.players[3];
+  first.game.hero.dead = true;
+  stepMatch(match, TEST_STEP);
+  assert(first.game.phase === 'lost' && first.place === 8 && first.outRound === 1, `place ${first.place}`);
+  assert(first.game.hero.gold === 0, 'the gold is gone, as in the mod');
+  assert(playerState(match, first) === 'out' && playerStanding(match)[7] === first, 'last in the table');
+  for (const player of match.players.slice(1)) player.game.hero.dead = true;
+  stepMatch(match, TEST_STEP);
+  assert(match.over && match.players[0].place === 1, 'you win when everyone else fell');
+  assert(match.players.slice(1).filter((player) => player !== first).every((player) => player.place === 7), 'falling together shares the place');
+});
+
+test('computer: an area ability waits for a group; a single target is enough for a nuke', () => {
+  const arena = aiArena('Crystal Maiden', 1);
+  const hero = arena.game.hero;
+  addAbility(hero, 'crystal_maiden_crystal_nova');
+  teach(hero, 'crystal_maiden_crystal_nova', 1);
+  const nova = hero.abilities[0];
+  // Two creeps far apart: the nova would only catch one of them.
+  addTestCreep(arena.game.sim, hero.x - 450, hero.y, STILL_CREEP);
+  addTestCreep(arena.game.sim, hero.x + 450, hero.y, STILL_CREEP);
+  stepAiArena(arena, 1);
+  assert(nova.cooldown === 0, 'no nova on lone creeps');
+  addTestCreep(arena.game.sim, hero.x + 500, hero.y + 40, STILL_CREEP);
+  stepAiArena(arena, 1.5);
+  assert(nova.cooldown > 0, 'nova once two are together');
+
+  const zeus = aiArena('Zeus', 2);
+  addAbility(zeus.game.hero, 'zuus_lightning_bolt');
+  teach(zeus.game.hero, 'zuus_lightning_bolt', 1);
+  addTestCreep(zeus.game.sim, zeus.game.hero.x + 400, zeus.game.hero.y, STILL_CREEP);
+  stepAiArena(zeus, 1.5);
+  assert(zeus.game.hero.abilities[0].cooldown > 0, 'the bolt goes on the only creep');
+});
+
+test('computer: walks to the wave and clears round 1 by itself', () => {
+  const game = createGame(heroByName('Phantom Assassin'), 9);
+  const brain = createBrain(game.sim.rng, game.hero.data);
+  for (let t = 0; t < 120 && game.round < 2; t += TEST_STEP) {
+    if (game.phase === 'prep' && !game.draft && draftsDue(game) > 0) openDraft(game);
+    aiStep(game, brain, TEST_STEP);
+    stepGame(game, TEST_STEP);
+  }
+  assert(game.round === 2 && game.phase !== 'lost', `round ${game.round}, ${game.phase}`);
+  assert(game.hero.abilities.length === 2, 'it drafted');
+});
+
+test('computer: shops along its list, builds items from their parts and keeps its reserve', () => {
+  const { game, brain } = aiArena('Sven', 3);
+  game.phase = 'prep';
+  Object.assign(brain, { style: 'fighter', money: 'spender' });
+  game.hero.gold = 3000;
+  aiShop(game, brain);
+  const owned = () => game.hero.items.map((item) => item.key).sort().join(',');
+  assert(owned() === 'broadsword,power_treads', `bought ${owned()}`);
+  assert(game.hero.gold === 600, `gold left ${game.hero.gold}`);
+  game.hero.gold += 300;
+  aiShop(game, brain);
+  assert(owned() === 'mask_of_madness,power_treads', `then ${owned()}: the broadsword went into the mask`);
+
+  const saver = aiArena('Sven', 3);
+  Object.assign(saver.brain, { style: 'fighter', money: 'saver' });
+  saver.game.phase = 'prep';
+  saver.game.hero.gold = 3000;
+  aiShop(saver.game, saver.brain);
+  assert(saver.game.hero.gold >= 1500, `the saver keeps half: ${saver.game.hero.gold}`);
+
+  game.phase = 'fight';
+  game.hero.gold = 10000;
+  assert(aiShop(game, brain).length === 0, 'nothing is bought during a round');
+});
+
+test('computer: buffs and items come out when they help', () => {
+  const arena = aiArena('Ogre Magi', 4);
+  const hero = arena.game.hero;
+  addAbility(hero, 'ogre_magi_bloodlust');
+  teach(hero, 'ogre_magi_bloodlust', 1);
+  hero.gold = 10000;
+  buyItem(hero, 'satanic');
+  // A creep far away keeps the round going without being close enough for a buff.
+  addTestCreep(arena.game.sim, hero.x - 1700, hero.y, STILL_CREEP);
+  stepAiArena(arena, 0.5);
+  assert(hero.abilities[0].cooldown === 0, 'no buff with nobody around');
+  addTestCreep(arena.game.sim, hero.x + 300, hero.y, STILL_CREEP);
+  hero.hp = hero.stats.maxHp * 0.3;
+  stepAiArena(arena, 1);
+  assert(hero.abilities[0].cooldown > 0, 'bloodlust before the fight');
+  assert(hero.items[0].cooldown > 0, 'Satanic when low on health');
+});
+
+test('match: the same seed plays the same match', () => {
+  const play = () => {
+    const match = createMatch(null, 21);
+    runMatchUntil(match, () => match.round >= 3 && match.phase === 'prep', 300);
+    return match.players.map((player) => {
+      const hero = player.game.hero;
+      return `${hero.gold}:${hero.abilities.map((a) => a.key + a.level).join('/')}:${hero.items.map((i) => i.key)}`;
+    }).join('|');
+  };
+  assert(play() === play(), 'two runs differ');
+});
+
 async function runTests() {
   const summary = document.getElementById('summary');
   const list = document.getElementById('results');

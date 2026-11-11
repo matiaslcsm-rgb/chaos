@@ -122,7 +122,6 @@ function stepMatch(match, dt) {
     if (!player.human && match.phase === 'prep' && !game.draft && draftsDue(game) > 0) openDraft(game);
     if (player.brain) aiStep(game, player.brain, dt);
     stepArena(game, dt);
-    game.timer = match.timer;
   }
   markEliminated(match);
   if (match.over) return;
@@ -130,8 +129,15 @@ function stepMatch(match, dt) {
   if (match.phase === 'prep') {
     match.timer -= dt;
     if (match.timer <= 0) startMatchRound(match);
-    return;
+  } else {
+    stepRoundEnd(match, dt);
   }
+  // Every arena shows the match's clock.
+  for (const player of match.players) player.game.timer = match.timer;
+}
+
+// During a round: the time limit, and back to the shop once every arena is done.
+function stepRoundEnd(match, dt) {
   match.roundTime += dt;
   if (match.roundTime >= ROUND_LIMIT) {
     for (const player of playersAlive(match)) {
