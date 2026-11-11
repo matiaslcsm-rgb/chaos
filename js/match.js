@@ -8,6 +8,9 @@ const MATCH_PLAYERS = 8;
 // other seven forever. The mod's real limit (creeps that enrage) is part of decision D5 in docs/DISENO.md.
 const ROUND_LIMIT = 120;
 const AI_NAMES = ['Lucía', 'Tomás', 'Valen', 'Martina', 'Joaco', 'Sofi', 'Nico', 'Cami', 'Bauti', 'Juli'];
+// Decision D5, provisional: the round's prize by finishing place, like the example of the analysis (round 1:
+// the fastest about 500, the slowest about 50), growing with the round.
+const ROUND_PRIZE = { ladder: [500, 400, 320, 250, 190, 140, 90, 50], growth: 0.15, duelPlace: 3 };
 const PLAYER_COLORS = ['#4cc35a', '#e65a46', '#4a8fe0', '#e8b04a', '#c792ea', '#5fd0c8', '#f28cb8', '#a0a8b8'];
 
 function shuffled(rng, list) {
@@ -41,7 +44,10 @@ function createMatch(humanHero, seed) {
     });
   }
   const match = { players, rng, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, over: false, duel: null, lastDuelists: [] };
-  for (const player of players) player.game.match = match;
+  for (const player of players) {
+    player.game.match = match;
+    player.game.payRound = (game) => roundPrize(match, game);
+  }
   return match;
 }
 
@@ -100,8 +106,20 @@ function markEliminated(match) {
   }
 }
 
+// What the round pays: by finishing place among the arenas; duelists as in the middle; a wave ended by the
+// time limit as the last place.
+function roundPrize(match, game) {
+  let place;
+  if (game.phase === 'duel') place = ROUND_PRIZE.duelPlace;
+  else if (game.forcedEnd) place = ROUND_PRIZE.ladder.length - 1;
+  else place = match.finished++;
+  const ladder = ROUND_PRIZE.ladder;
+  return Math.round(ladder[Math.min(place, ladder.length - 1)] * (1 + ROUND_PRIZE.growth * (match.round - 1)));
+}
+
 function startMatchRound(match) {
   match.round++;
+  match.finished = 0;
   match.roundTime = 0;
   match.phase = 'fight';
   const duel = match.duel && match.duel.state === 'betting' ? match.duel : null;
@@ -123,7 +141,9 @@ function forceEndRound(game) {
   for (const unit of game.sim.units) {
     if (unit.kind === 'creep') unit.dead = true;
   }
+  game.forcedEnd = true;
   endRound(game);
+  game.forcedEnd = false;
 }
 
 function stepMatch(match, dt) {

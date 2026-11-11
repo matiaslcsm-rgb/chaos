@@ -330,6 +330,7 @@ function applyDamage(sim, source, target, amount, type) {
     target.dead = true;
     target.channel = null;
     pushEvent(sim, { type: 'death', unitId: target.id, killerId: source ? source.id : null, x: target.x, y: target.y });
+    runHooks(sim, target, 'onDeath', source);
   } else if (source && source.team !== target.team) {
     runHooks(sim, target, 'onDamaged', source, dealt);
   }

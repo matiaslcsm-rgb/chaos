@@ -33,7 +33,7 @@ function addTestCreep(sim, x, y, overrides) {
     team: CREEP_TEAM,
     x,
     y,
-    stats: Object.assign(creepStats(CREEP_TYPES.melee, 1), overrides),
+    stats: Object.assign(creepStats(creepType('melee'), 1), overrides),
   });
 }
 
@@ -951,7 +951,7 @@ test('gold: creeps and rounds pay, and a faster clear pays more', () => {
   for (let t = 0; t < 120 && !(game.round === 1 && game.phase === 'prep'); t += TEST_STEP) stepPlaying(game);
   assert(game.round === 1 && game.phase === 'prep', 'round 1 cleared');
   const wave = waveForRound(1);
-  const bounties = wave.melee * GOLD.perCreep.melee + wave.ranged * GOLD.perCreep.ranged;
+  const bounties = wave.reduce((sum, entry) => sum + entry.count * creepBounty(creepType(entry.key), 1), 0);
   assert(game.hero.gold === GOLD.start + bounties + roundGold(1, game.roundTime), `gold ${game.hero.gold}`);
 });
 
@@ -1300,7 +1300,7 @@ test('duels: the duelists skip their wave, fight each other in a shared arena, t
     assert(player.game.phase !== 'lost', 'losing a duel does not knock you out');
   });
   const winnerIndex = result.winner === a ? 0 : 1;
-  const roundPay = roundGold(duel.round, GOLD.parTime / 2);
+  const roundPay = Math.round(ROUND_PRIZE.ladder[ROUND_PRIZE.duelPlace] * (1 + ROUND_PRIZE.growth * (duel.round - 1)));
   const free = result.payouts.find((entry) => entry.free && entry.player === result.winner).pays;
   assert(result.winner.game.hero.gold === goldBefore[winnerIndex] + roundPay + result.prize + free, 'the winner cashes the round, the prize and the free bet');
   assert(result.prize === duelPrize(duel.round) && result.winner.duelsWon === 1, 'prize and record');

@@ -12,47 +12,41 @@ const DRAFT_ROUNDS = [1, 1, 3, 6, 9];
 const DRAFT_OPTIONS_FEW = 8;
 const DRAFT_OPTIONS_MANY = 16;
 const DRAFT_MANY_FROM = 150;
-// Placeholder income until the mod's real numbers are researched (docs/PLAN.md, open decisions).
-// What is known: clearing the wave faster pays more. Starting gold is Dota's.
+// Decision D5: the mod does not publish its gold numbers, so these are provisional and tuned with the bench.
+// What is known: 600 to start (Dota's), clearing faster pays more, every creep pays when it dies.
 const GOLD = {
   start: 600,
-  perCreep: { melee: 30, ranged: 40 },
+  // A game on its own (no match): clearing instantly doubles the round's gold; this many seconds or more adds nothing.
   round: 150,
   roundGrowth: 25,
-  // Clearing instantly doubles the round's gold; taking this many seconds or more adds nothing.
   parTime: 45,
+  // Each creep's bounty grows this much per round.
+  bountyGrowth: 0.04,
 };
 
-// Placeholder creeps until the mod's real waves are researched (docs/PLAN.md, stage 1).
-const CREEP_TYPES = {
-  melee: {
-    name: 'Creep',
-    radius: 22,
-    maxHp: 120,
-    damageMin: 5,
-    damageMax: 7,
-    armor: 2,
-    attackRange: 100,
-    projectileSpeed: 0,
-    moveSpeed: 325,
-    baseAttackTime: 1,
-    attackPoint: 0.467,
-  },
-  ranged: {
-    name: 'Creep a distancia',
-    radius: 20,
-    maxHp: 80,
-    damageMin: 7,
-    damageMax: 9,
-    armor: 0,
-    attackRange: 500,
-    projectileSpeed: 900,
-    moveSpeed: 325,
-    baseAttackTime: 1,
-    attackPoint: 0.5,
-  },
-};
-const CREEP_GROWTH_PER_ROUND = 0.1;
+// Decision D5, provisional. The mod's creeps grow fast until round 10 and slower after 20 (history, 28 Feb 2020);
+// here: three stretches, the last one without a ceiling. From round 60 they also resist magic (history, 21 Feb 2020).
+const CREEP_GROWTH = { early: 0.3, middle: 0.18, lateRate: 1.07, magicResistFrom: 60, magicResist: 30 };
+// Waves: a few kinds of creep per round, more creeps as rounds go by, and a heavy wave every 5 rounds.
+const WAVE = { baseCount: 5, perRounds: 6, maxCount: 12, heavyEvery: 5, seed: 1009 };
+// After this long, the creeps of a wave enrage: faster, harder hitting, and nothing can slow or stop them (mod).
+const ENRAGE = { after: 50, moveSpeedPct: 50, attackSpeed: 100, damagePct: 50 };
+
+function creepType(key) {
+  return DB.waves.types[key];
+}
+
+// How much stronger the creeps are in a round than in round 1.
+function creepGrowth(round) {
+  if (round <= 10) return 1 + CREEP_GROWTH.early * (round - 1);
+  const at10 = 1 + CREEP_GROWTH.early * 9;
+  if (round <= 20) return at10 + CREEP_GROWTH.middle * (round - 10);
+  return (at10 + CREEP_GROWTH.middle * 10) * Math.pow(CREEP_GROWTH.lateRate, round - 20);
+}
+
+function creepBounty(type, round) {
+  return Math.round(type.bounty * (1 + GOLD.bountyGrowth * (round - 1)));
+}
 // Decision D3: 2 Aegis per player, as in the mod. Dying to the wave spends one and you come back on the spot
 // with a short advantage. The mod does not say how big; the size is the user's decision (docs/PLAN.md).
 const AEGIS_START = 2;
@@ -75,14 +69,15 @@ function earn(game, amount, source) {
 }
 
 function creepStats(type, round) {
-  const growth = 1 + CREEP_GROWTH_PER_ROUND * (round - 1);
+  const growth = creepGrowth(round);
+  const lateResist = round >= CREEP_GROWTH.magicResistFrom ? CREEP_GROWTH.magicResist : 0;
   return Object.assign({
     maxHp: Math.round(type.maxHp * growth),
     hpRegen: 0,
     maxMana: 0,
     manaRegen: 0,
     armor: type.armor,
-    magicResist: 0,
+    magicResist: Math.min(90, (type.magicResist || 0) + lateResist),
     damageMin: type.damageMin * growth,
     damageMax: type.damageMax * growth,
     attackSpeed: 100,
@@ -94,8 +89,35 @@ function creepStats(type, round) {
   }, attackTiming(type.baseAttackTime, type.attackPoint, 100));
 }
 
+// The wave of a round: [{ key, count }]. Fixed for each round number, so every arena gets the same one
+// (in the mod the waves are the same for everyone and announced in advance).
 function waveForRound(round) {
-  return { melee: 2 + round, ranged: Math.floor(round / 2) };
+  const rng = makeRng(WAVE.seed + round);
+  const open = (heavy) => Object.keys(DB.waves.types)
+    .filter((key) => Boolean(creepType(key).heavy) === heavy && creepType(key).from <= round);
+  const light = open(false);
+  if (round % WAVE.heavyEvery === 0 && open(true).length) {
+    // A heavy wave: a few big ones and a couple of small ones.
+    const heavy = open(true);
+    return [
+      { key: heavy[Math.floor(rng() * heavy.length)], count: Math.min(4, 2 + Math.floor(round / 20)) },
+      { key: light[Math.floor(rng() * light.length)], count: 2 },
+    ];
+  }
+  const kinds = Math.min(light.length, round < 3 ? 1 : round < 10 ? 2 : 3);
+  const picked = [];
+  while (picked.length < kinds) {
+    const key = light[Math.floor(rng() * light.length)];
+    if (!picked.includes(key)) picked.push(key);
+  }
+  const total = Math.min(WAVE.maxCount, WAVE.baseCount + Math.floor(round / WAVE.perRounds));
+  return picked.map((key, i) => ({ key, count: Math.floor(total / kinds) + (i < total % kinds ? 1 : 0) }));
+}
+
+// "6 Kóbolds y 2 Arpías", for the announcement of the next wave.
+function waveText(wave) {
+  const parts = wave.map((entry) => `${entry.count} ${creepType(entry.key).name}`);
+  return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} y ${parts[parts.length - 1]}` : parts[0];
 }
 
 // The hero is only a base of attributes: its abilities come from the draft.
@@ -118,7 +140,7 @@ function roundGold(round, seconds) {
 
 // Gold still walking around: what the creeps alive are worth.
 function bountyAlive(game) {
-  return game.sim.units.reduce((sum, unit) => sum + (unit.kind === 'creep' && !unit.dead ? GOLD.perCreep[unit.creepKind] || 0 : 0), 0);
+  return game.sim.units.reduce((sum, unit) => sum + (unit.kind === 'creep' && !unit.dead ? unit.bounty || 0 : 0), 0);
 }
 
 // The shop opens between rounds, like in the mod.
@@ -181,27 +203,74 @@ function creepsAlive(game) {
   return game.sim.units.filter((unit) => unit.kind === 'creep' && !unit.dead).length;
 }
 
+// What some creeps do beyond hitting, written like item effects so the simulation runs them the same way.
+const CREEP_TRAITS = {
+  bash: (type, round) => ({
+    key: 'creep_bash',
+    cooldown: 0,
+    def: {
+      onAttackLanded(c, target) {
+        if (c.sim.rng() * 100 < type.bash.chance) stun(c, target, type.bash.duration);
+      },
+    },
+  }),
+  explode: (type, round) => ({
+    key: 'creep_explode',
+    cooldown: 0,
+    def: {
+      onDeath(c) {
+        const damage = type.explode.damage * creepGrowth(round);
+        fxRing(c, c.caster, type.explode.radius, '#f28c38');
+        for (const enemy of enemiesNear(c.sim, c.caster.team, c.caster, type.explode.radius)) {
+          applyDamage(c.sim, c.caster, enemy, damage, 'magical');
+        }
+      },
+    },
+  }),
+};
+
+function addCreep(game, key, x, y) {
+  const type = creepType(key);
+  return addUnit(game.sim, {
+    kind: 'creep',
+    creepKind: key,
+    name: type.name,
+    team: CREEP_TEAM,
+    radius: type.radius,
+    x,
+    y,
+    facing: Math.PI / 2,
+    bounty: creepBounty(type, game.round),
+    items: Object.keys(CREEP_TRAITS).filter((trait) => type[trait]).map((trait) => CREEP_TRAITS[trait](type, game.round)),
+    stats: creepStats(type, game.round),
+  });
+}
+
 function spawnWave(game) {
   const wave = waveForRound(game.round);
-  const total = wave.melee + wave.ranged;
+  const total = wave.reduce((sum, entry) => sum + entry.count, 0);
   let index = 0;
-  for (const kind of ['melee', 'ranged']) {
-    for (let i = 0; i < wave[kind]; i++) {
-      const type = CREEP_TYPES[kind];
-      addUnit(game.sim, {
-        kind: 'creep',
-        creepKind: kind,
-        name: type.name,
-        team: CREEP_TEAM,
-        radius: type.radius,
-        // Spread along the top edge; ranged ones start a bit behind.
-        x: ARENA.width * (index + 1) / (total + 1),
-        y: kind === 'melee' ? 90 : 40,
-        facing: Math.PI / 2,
-        stats: creepStats(type, game.round),
-      });
+  for (const entry of wave) {
+    const ranged = creepType(entry.key).projectileSpeed > 0;
+    for (let i = 0; i < entry.count; i++) {
+      // Spread along the top edge; ranged ones start a bit behind.
+      addCreep(game, entry.key, ARENA.width * (index + 1) / (total + 1), ranged ? 40 : 90);
       index++;
     }
+  }
+}
+
+// A wave that takes too long gets angry.
+function enrageCreeps(game) {
+  for (const unit of game.sim.units) {
+    if (unit.kind !== 'creep' || unit.dead || findMod(unit, 'enrage')) continue;
+    addMod(game.sim, unit, {
+      id: 'enrage',
+      sourceId: unit.id,
+      duration: Infinity,
+      flags: ['immune'],
+      stats: { moveSpeedPct: ENRAGE.moveSpeedPct, attackSpeed: ENRAGE.attackSpeed, damagePct: ENRAGE.damagePct },
+    });
   }
 }
 
@@ -214,7 +283,8 @@ function startRound(game) {
 
 // The mod gives one level per round; the hero comes back at full health for the next one.
 function endRound(game) {
-  const gold = Math.round(roundGold(game.round, game.roundTime) * goldFactor(game.hero));
+  const base = game.payRound ? game.payRound(game) : roundGold(game.round, game.roundTime);
+  const gold = Math.round(base * goldFactor(game.hero));
   earn(game, gold, 'rounds');
   pushEvent(game.sim, { type: 'text', x: game.hero.x, y: game.hero.y, text: `+${gold} de oro` });
   setHeroLevel(game.hero, game.hero.level + 1);
@@ -264,6 +334,7 @@ function stepArena(game, dt) {
   if (bountyEarned) earn(game, bountyEarned, 'creeps');
   if (game.phase !== 'fight') return;
   game.roundTime += dt;
+  if (game.roundTime >= ENRAGE.after) enrageCreeps(game);
   if (game.hero.dead && game.hero.aegis > 0) {
     reviveWithAegis(game);
   } else if (game.hero.dead) {

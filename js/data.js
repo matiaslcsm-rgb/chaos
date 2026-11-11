@@ -2,7 +2,7 @@
 
 // Loads the Dota reference data and the current batch. No game rules here.
 
-const DB = { heroes: {}, abilities: {}, heroAbilities: {}, items: {}, batch: null };
+const DB = { heroes: {}, abilities: {}, heroAbilities: {}, items: {}, batch: null, waves: null };
 
 async function loadJson(file) {
   const response = await fetch(file);
@@ -11,12 +11,13 @@ async function loadJson(file) {
 }
 
 async function loadDB() {
-  const [heroes, abilities, heroAbilities, items, batch] = await Promise.all([
+  const [heroes, abilities, heroAbilities, items, batch, waves] = await Promise.all([
     loadJson('data/dota/heroes.json'),
     loadJson('data/dota/abilities.json'),
     loadJson('data/dota/hero_abilities.json'),
     loadJson('data/dota/items.json'),
     loadJson('data/batch1.json'),
+    loadJson('data/waves.json'),
   ]);
   // heroes.json is keyed by numeric id; the rest of the data uses the npc_dota_hero_* name.
   for (const hero of Object.values(heroes)) DB.heroes[hero.name] = hero;
@@ -24,6 +25,7 @@ async function loadDB() {
   DB.heroAbilities = heroAbilities;
   DB.items = items;
   DB.batch = batch;
+  DB.waves = waves;
 }
 
 // The heroes of the current batch, with their draftable abilities resolved.
