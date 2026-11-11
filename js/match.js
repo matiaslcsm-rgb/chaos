@@ -40,7 +40,7 @@ function createMatch(humanHero, seed) {
       outRound: null,
     });
   }
-  const match = { players, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, over: false };
+  const match = { players, rng, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, over: false, duel: null, lastDuelists: [] };
   for (const player of players) player.game.match = match;
   return match;
 }
@@ -67,11 +67,17 @@ function playerStanding(match) {
   });
 }
 
-// Where a player stands in the round: 'fight' | 'done' (cleared, waiting for the rest) | 'prep' | 'out'.
+// Where a player stands in the round: 'fight' | 'duel' | 'done' (finished, waiting for the rest) |
+// 'prep' | 'nextDuel' (fights the duel of the coming round) | 'out'.
 function playerState(match, player) {
   if (player.game.phase === 'lost') return 'out';
+  if (player.game.phase === 'duel') return 'duel';
   if (match.phase === 'fight') return player.game.phase === 'fight' ? 'fight' : 'done';
-  return 'prep';
+  return match.duel && match.duel.state === 'betting' && isDuelist(match.duel, player) ? 'nextDuel' : 'prep';
+}
+
+function stillPlaying(game) {
+  return game.phase === 'fight' || game.phase === 'duel';
 }
 
 // Whoever falls gets the worst place still free; players who fall in the same step share the round.
@@ -96,7 +102,18 @@ function startMatchRound(match) {
   match.round++;
   match.roundTime = 0;
   match.phase = 'fight';
-  for (const player of playersAlive(match)) startRound(player.game);
+  const duel = match.duel && match.duel.state === 'betting' ? match.duel : null;
+  if (duel) startDuel(match);
+  for (const player of playersAlive(match)) {
+    if (!isDuelist(duel, player)) startRound(player.game);
+  }
+}
+
+// The break between rounds; the duel of the coming round is announced and the break is longer.
+function startBreak(match) {
+  match.phase = 'prep';
+  match.timer = PREP_TIME;
+  if (duelRoundFor(match) && announceDuel(match)) match.timer = DUEL_PREP_TIME;
 }
 
 // A wave that ran past the limit: its creeps leave and the round counts as cleared (slowest of all).
@@ -118,9 +135,12 @@ function stepMatch(match, dt) {
 
   for (const player of playersAlive(match)) {
     const game = player.game;
+    // The two duelists are moved by the duel, in their shared arena.
+    if (game.phase === 'duel') continue;
     // Computer players choose at the same moment as the human: when the round is over for everyone.
     if (!player.human && match.phase === 'prep' && !game.draft && draftsDue(game) > 0) openDraft(game);
     if (player.brain) aiStep(game, player.brain, dt);
+    if (player.brain && match.duel && match.duel.state === 'betting' && match.phase === 'prep') aiBet(match, player);
     stepArena(game, dt);
     // Nobody draws the rivals' arenas, so what happened there for the screen is dropped.
     if (!player.human) game.sim.events.length = 0;
@@ -140,14 +160,12 @@ function stepMatch(match, dt) {
 
 // During a round: the time limit, and back to the shop once every arena is done.
 function stepRoundEnd(match, dt) {
+  stepDuel(match, dt);
   match.roundTime += dt;
   if (match.roundTime >= ROUND_LIMIT) {
     for (const player of playersAlive(match)) {
       if (player.game.phase === 'fight') forceEndRound(player.game);
     }
   }
-  if (playersAlive(match).every((player) => player.game.phase !== 'fight')) {
-    match.phase = 'prep';
-    match.timer = PREP_TIME;
-  }
+  if (!playersAlive(match).some((player) => stillPlaying(player.game))) startBreak(match);
 }

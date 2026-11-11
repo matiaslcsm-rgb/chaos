@@ -420,7 +420,7 @@ function drawUnit(ctx, unit, scale) {
 
   const barWidth = isHero ? 56 : 34;
   const barTop = y - radius - (isHero ? 16 : 10);
-  drawBar(ctx, x - barWidth / 2, barTop, barWidth, isHero ? 6 : 4, unit.hp / unit.stats.maxHp, isHero ? '#4cc35a' : '#d9534f');
+  drawBar(ctx, x - barWidth / 2, barTop, barWidth, isHero ? 6 : 4, unit.hp / unit.stats.maxHp, isHero && unit.team === HERO_TEAM ? '#4cc35a' : '#d9534f');
   if (isHero) drawBar(ctx, x - barWidth / 2, y - radius - 9, barWidth, 3, unit.mana / unit.stats.maxMana, '#4a8fe0');
 
   const labels = unitStatusLabels(unit);
@@ -851,6 +851,7 @@ function drawHud(ctx, canvas, game, view) {
   if (game.match) {
     drawPlayerTable(ctx, canvas, game.match, view);
     if (view.spy !== null) drawSpyPanel(ctx, canvas, game.match, view);
+    if (!game.draft) drawDuelPanel(ctx, canvas, game.match, view);
   }
 
   const shopping = view.shop && shopOpen(game);
@@ -959,6 +960,8 @@ const PLAYER_STATE_TEXT = {
   done: { text: 'listo', color: '#7edb8a' },
   prep: { text: '', color: '#8a93a6' },
   out: { text: 'afuera', color: '#e65a46' },
+  duel: { text: 'en duelo', color: '#c792ea' },
+  nextDuel: { text: 'a duelo', color: '#c792ea' },
 };
 
 // One clickable row per player, in the table's order (best first).
@@ -1077,6 +1080,11 @@ function roundTitle(game) {
     return game.phase === 'prep' ? `Ronda ${game.round + 1} en ${Math.ceil(game.timer)}` : `Ronda ${game.round} · quedan ${creepsAlive(game)}`;
   }
   if (match.phase === 'prep') return `Ronda ${match.round + 1} en ${Math.ceil(match.timer)}`;
+  if (game.phase === 'duel') {
+    const duel = match.duel;
+    const rival = duel.a.game === game ? duel.b : duel.a;
+    return `Duelo contra ${rival.name} · ${Math.max(0, Math.ceil(DUEL_TIME_LIMIT - duel.time))} s`;
+  }
   if (game.phase === 'fight') return `Ronda ${match.round} · quedan ${creepsAlive(game)}`;
   const busy = match.players.filter((player) => playerState(match, player) === 'fight').length;
   return `Ronda ${match.round} · listo, ${busy === 1 ? 'falta 1 jugador' : `faltan ${busy} jugadores`}`;
@@ -1094,4 +1102,145 @@ function endingText(game) {
     return { title: '¡Ganaste!', color: '#7edb8a', line: `Quedaste último en pie en la ronda ${match.round} con ${game.hero.name}.` };
   }
   return null;
+}
+
+// ---- Duels and bets (top right) ----
+
+const BET_PANEL = { width: 420, height: 176, top: 112, margin: 16 };
+const BET_CHIPS = [
+  { key: 'min', label: `${BET.min}` },
+  { key: 'quarter', label: '¼ de tu oro' },
+  { key: 'half', label: '½ de tu oro' },
+];
+
+function betPanelRect(canvas) {
+  return { x: canvas.width - BET_PANEL.margin - BET_PANEL.width, y: BET_PANEL.top, width: BET_PANEL.width, height: BET_PANEL.height };
+}
+
+function betChipAmount(player, key) {
+  if (key === 'min') return BET.min;
+  return key === 'half' ? maxBet(player) : Math.floor(player.game.hero.gold / 4);
+}
+
+// The clickable parts of the betting panel: the three amounts and the two sides.
+function betControls(canvas) {
+  const panel = betPanelRect(canvas);
+  const chipWidth = (panel.width - 24 - 2 * 8) / 3;
+  const sideWidth = (panel.width - 24 - 8) / 2;
+  return {
+    chips: BET_CHIPS.map((chip, i) => ({ key: chip.key, label: chip.label, x: panel.x + 12 + i * (chipWidth + 8), y: panel.y + 112, width: chipWidth, height: 22 })),
+    sides: ['a', 'b'].map((side, i) => ({ side, x: panel.x + 12 + i * (sideWidth + 8), y: panel.y + 142, width: sideWidth, height: 26 })),
+  };
+}
+
+// What the duel panel shows to the human right now, or null for nothing.
+function duelPanelMode(match) {
+  const human = humanPlayer(match);
+  if (!human || human.game.phase === 'lost') return null;
+  const duel = match.duel;
+  if (match.phase === 'prep' && duel && duel.state === 'betting') {
+    if (isDuelist(duel, human)) return 'yourDuel';
+    return duel.bets.some((bet) => bet.player === human) ? 'betPlaced' : 'bet';
+  }
+  if (match.phase === 'fight' && duel && duel.state === 'fighting' && !isDuelist(duel, human)) return 'watching';
+  if (match.phase === 'fight' && match.lastDuel && match.lastDuel === duel && duel.state === 'done') return 'result';
+  return null;
+}
+
+function duelSide(duel, side) {
+  return side === 'a' ? duel.a : duel.b;
+}
+
+function drawDuelist(ctx, duel, side, x, y, total) {
+  const player = duelSide(duel, side);
+  const hero = player.game.hero;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = player.color;
+  ctx.font = `bold 14px ${FONT}`;
+  ctx.fillText(`${player.name} · ${hero.name}`, x, y);
+  ctx.fillStyle = '#b8c0d0';
+  ctx.font = `12px ${FONT}`;
+  ctx.fillText(`Nivel ${hero.level} · valor ${playerValue(player)}`, x, y + 18);
+  ctx.fillText(`Duelos ganados: ${player.duelsWon || 0}`, x, y + 34);
+  ctx.fillStyle = '#e8c45a';
+  ctx.fillText(`Apostado: ${total}`, x, y + 50);
+}
+
+function drawButton(ctx, rect, label, active, hover) {
+  ctx.fillStyle = active ? '#3a4a6a' : hover ? '#2a3348' : '#1c2230';
+  ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  ctx.strokeStyle = active ? '#8fb4f0' : '#4a5468';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(rect.x + 0.5, rect.y + 0.5, rect.width - 1, rect.height - 1);
+  ctx.fillStyle = '#e8ecf4';
+  ctx.textAlign = 'center';
+  ctx.font = `12px ${FONT}`;
+  ctx.fillText(label, rect.x + rect.width / 2, rect.y + rect.height / 2 + 4);
+}
+
+// The lines under the two duelists, for every mode but betting (which shows the buttons).
+function duelPanelLines(match, mode, duel) {
+  const human = humanPlayer(match);
+  const bet = duel.bets.find((entry) => entry.player === human);
+  if (mode === 'betPlaced') return [`Apostaste ${bet.amount} a ${duelSide(duel, bet.side).name}.`, 'Se cobra cuando termina el duelo.'];
+  if (mode === 'yourDuel') {
+    const rival = duel.a === human ? duel.b : duel.a;
+    return [`Peleás contra ${rival.name} en vez de la oleada. Si ganás, cobrás ${duelPrize(duel.round)}`, 'más tu apuesta gratis. Los demás apuestan.'];
+  }
+  if (mode === 'watching') return [bet ? `Apostaste ${bet.amount} a ${duelSide(duel, bet.side).name}.` : 'No apostaste en este duelo.', ''];
+  const mine = duel.result.payouts.find((entry) => entry.player === human);
+  if (!mine) return ['No apostaste en este duelo.', ''];
+  if (mine.free) return [mine.pays ? `Ganaste el duelo: ${duel.result.prize} de premio y ${mine.pays} de tu apuesta gratis.` : 'Perdiste el duelo.', ''];
+  return [mine.pays ? `Acertaste: cobraste ${mine.pays} por tus ${mine.amount}.` : `Erraste: perdiste tus ${mine.amount}.`, ''];
+}
+
+function drawDuelPanel(ctx, canvas, match, view) {
+  const mode = duelPanelMode(match);
+  if (!mode) return;
+  const human = humanPlayer(match);
+  const duel = mode === 'result' ? match.lastDuel : match.duel;
+  const panel = betPanelRect(canvas);
+  const totals = betTotals(duel);
+  const x = panel.x + 12;
+  ctx.fillStyle = 'rgba(13, 15, 20, 0.9)';
+  ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
+  ctx.strokeStyle = '#c792ea';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(panel.x + 1, panel.y + 1, panel.width - 2, panel.height - 2);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#e8ecf4';
+  ctx.font = `bold 15px ${FONT}`;
+  const title = {
+    bet: `Duelo de la ronda ${duel.round}: ¿quién gana?`,
+    betPlaced: `Duelo de la ronda ${duel.round}`,
+    yourDuel: `Duelo de la ronda ${duel.round}: te toca pelear`,
+    watching: `Duelo en curso · ${Math.max(0, Math.ceil(DUEL_TIME_LIMIT - duel.time))} s`,
+    result: `Duelo de la ronda ${duel.round}: ganó ${duel.result ? duel.result.winner.name : ''}`,
+  }[mode];
+  ctx.fillText(title, x, panel.y + 22);
+  drawDuelist(ctx, duel, 'a', x, panel.y + 46, totals.a);
+  drawDuelist(ctx, duel, 'b', x + panel.width / 2, panel.y + 46, totals.b);
+
+  if (mode === 'bet') {
+    const controls = betControls(canvas);
+    for (const chip of controls.chips) {
+      drawButton(ctx, chip, `${chip.label} (${betChipAmount(human, chip.key)})`, view.betAmount === chip.key, inRect(view.mouse, chip));
+    }
+    for (const side of controls.sides) {
+      drawButton(ctx, side, `Apostar a ${duelSide(duel, side.side).name}`, false, inRect(view.mouse, side));
+    }
+    return;
+  }
+  if (mode === 'watching') {
+    const width = panel.width / 2 - 24;
+    drawBar(ctx, x, panel.y + 112, width, 10, healthShare(duel.a.game.hero), '#4cc35a');
+    drawBar(ctx, x + panel.width / 2, panel.y + 112, width, 10, healthShare(duel.b.game.hero), '#4cc35a');
+  }
+  const lines = duelPanelLines(match, mode, duel);
+  ctx.textAlign = 'left';
+  ctx.font = `13px ${FONT}`;
+  ctx.fillStyle = '#e8ecf4';
+  ctx.fillText(lines[0], x, panel.y + 146);
+  ctx.fillStyle = '#b8c0d0';
+  ctx.fillText(lines[1], x, panel.y + 164);
 }

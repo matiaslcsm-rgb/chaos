@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.5.0 · Etapa 3: 7 rivales de la IA';
+const GAME_VERSION = '0.6.0 · Etapa 3: duelos y apuestas';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -19,6 +19,12 @@ const CAST_MESSAGES = {
   charges: 'No le quedan cargas',
   cooldown: 'Todavía se está recargando',
   mana: 'No alcanza el maná',
+};
+const BET_MESSAGES = {
+  min: `La apuesta mínima es ${BET.min}`,
+  max: 'Podés apostar hasta la mitad de tu oro',
+  already: 'Ya apostaste en este duelo',
+  closed: 'Las apuestas cierran cuando empieza la ronda',
 };
 const SHOP_MESSAGES = {
   gold: 'No te alcanza el oro',
@@ -40,6 +46,7 @@ const view = {
   shop: false,
   hoverEnemy: null,
   spy: null,
+  betAmount: 'quarter',
   mouse: { x: 0, y: 0 },
 };
 
@@ -212,6 +219,25 @@ function onTableClick(point) {
   return false;
 }
 
+// ---- Bets ----
+
+// Returns true if the click was on the betting panel.
+function onBetClick(point) {
+  if (duelPanelMode(match) !== 'bet' || !inRect(point, betPanelRect(canvas))) return false;
+  const controls = betControls(canvas);
+  const chip = controls.chips.find((c) => inRect(point, c));
+  if (chip) view.betAmount = chip.key;
+  const side = controls.sides.find((c) => inRect(point, c));
+  if (side) {
+    const human = humanPlayer(match);
+    const amount = betChipAmount(human, view.betAmount);
+    const problem = placeBet(match, human, side.side, amount);
+    if (problem) say(BET_MESSAGES[problem] || 'No se puede apostar ahora');
+    else say(`Apostaste ${amount} a ${duelSide(match.duel, side.side).name}`);
+  }
+  return true;
+}
+
 // ---- Input ----
 
 canvas.addEventListener('mousemove', (event) => {
@@ -238,6 +264,7 @@ canvas.addEventListener('mousedown', (event) => {
   }
   if (onShopClick(point, event.button)) return;
   if (event.button === 0 && onTableClick(point)) return;
+  if (event.button === 0 && onBetClick(point)) return;
   const world = worldPoint(point);
   if (event.button === 2) {
     if (view.targeting) {

@@ -278,6 +278,38 @@ function aiFight(game, brain) {
   }
 }
 
+// ---- Betting ----
+
+// How strong a duelist looks from outside: what a player can see in the table and the betting panel.
+function duelStrength(player) {
+  return playerValue(player) + player.game.hero.level * 300 + (player.duelsWon || 0) * 200;
+}
+
+// Chance that side 'a' wins, as a computer player estimates it.
+function duelOdds(duel) {
+  const a = duelStrength(duel.a);
+  return a / (a + duelStrength(duel.b));
+}
+
+// How much of the most it may bet each personality risks: the saver kept its gold for this.
+const AI_BET_APPETITE = { saver: 0.8, balanced: 0.4, spender: 0.1 };
+
+// Bets once per duel: usually on the favourite, sometimes on the surprise, more when it is surer.
+function aiBet(match, player) {
+  const duel = match.duel;
+  if (player.brain.betRound === duel.round || isDuelist(duel, player)) return null;
+  player.brain.betRound = duel.round;
+  const rng = player.game.sim.rng;
+  const oddsA = duelOdds(duel);
+  // Squaring leans the pick towards the favourite without making it certain.
+  const leanA = oddsA * oddsA / (oddsA * oddsA + (1 - oddsA) * (1 - oddsA));
+  const side = rng() < leanA ? 'a' : 'b';
+  const sure = Math.abs((side === 'a' ? oddsA : 1 - oddsA) * 2 - 1);
+  const amount = Math.floor(maxBet(player) * AI_BET_APPETITE[player.brain.money] * (0.3 + 0.7 * sure));
+  if (amount < BET.min) return null;
+  return placeBet(match, player, side, amount) ? null : { side, amount };
+}
+
 // Everything a computer player does, called every simulation step.
 function aiStep(game, brain, dt) {
   if (game.phase === 'lost') return;
@@ -287,7 +319,7 @@ function aiStep(game, brain, dt) {
     brain.shoppedRound = game.round;
     aiShop(game, brain);
   }
-  if (game.phase !== 'fight') return;
+  if (game.phase !== 'fight' && game.phase !== 'duel') return;
   brain.thinkTimer -= dt;
   if (brain.thinkTimer > 0) return;
   brain.thinkTimer = AI_THINK_INTERVAL;
