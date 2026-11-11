@@ -1244,6 +1244,166 @@ test('the round title follows the shared clock and says who is still fighting', 
   assert(endingText(fallen).title === 'Caíste' && endingText(fallen).line.includes('puesto 8 de 8'), endingText(fallen).line);
 });
 
+// ---- Duels and bets ----
+
+function runUntilDuel(match, state) {
+  runMatchUntil(match, () => match.duel && match.duel.state === state, 400);
+  return match.duel;
+}
+
+test('duels: none in round 1; from round 2 one per round, never the same player two rounds in a row', () => {
+  const match = createMatch(null, 31);
+  let seen = null;
+  const pairs = [];
+  assert(match.timer === PREP_TIME && !match.duel, 'round 1 has a plain break');
+  for (let t = 0; t < 900 && pairs.length < 6; t += TEST_STEP) {
+    stepMatchPlaying(match);
+    if (match.duel && match.duel !== seen) {
+      seen = match.duel;
+      assert(match.phase === 'prep' && match.timer > PREP_TIME, 'a duel round has a longer break');
+      assert(match.duel.round === match.round + 1 && match.duel.round >= DUEL_FIRST_ROUND, `duel for round ${match.duel.round}`);
+      assert(match.duel.a !== match.duel.b, 'two different players');
+      assert(match.duel.a.game.phase !== 'lost' && match.duel.b.game.phase !== 'lost', 'both alive');
+      pairs.push([match.duel.a, match.duel.b]);
+    }
+  }
+  assert(pairs.length === 6, `duels seen: ${pairs.length}`);
+  for (let i = 1; i < pairs.length; i++) {
+    assert(!pairs[i].some((player) => pairs[i - 1].includes(player)), `round ${i + 2}: someone fought twice in a row`);
+  }
+});
+
+test('duels: the duelists skip their wave, fight each other in a shared arena, then go home', () => {
+  const match = createMatch(null, 32);
+  const duel = runUntilDuel(match, 'betting');
+  const { a, b } = duel;
+  const homes = [a, b].map((player) => ({ sim: player.game.sim, id: player.game.hero.id, team: player.game.hero.team, level: player.game.hero.level }));
+  runUntilDuel(match, 'fighting');
+  assert(a.game.phase === 'duel' && b.game.phase === 'duel', 'both are in the duel');
+  assert(a.game.sim === duel.sim && b.game.sim === duel.sim, 'they share the duel arena');
+  assert(duel.sim.units.length === 2 && duel.sim.units.every((unit) => unit.kind === 'hero'), 'only the two heroes');
+  assert(a.game.hero.team !== b.game.hero.team && a.game.hero.id !== b.game.hero.id, 'enemies with different ids');
+  assert(a.game.hero.hp === a.game.hero.stats.maxHp && b.game.hero.mana === b.game.hero.stats.maxMana, 'full health and mana');
+  assert(homes.every((home) => !home.sim.units.some((unit) => unit.kind === 'creep')), 'no wave at home');
+  assert(a.game.round === match.round, 'their round counts too');
+  assert(playerState(match, a) === 'duel', 'the table says they are in a duel');
+  const goldBefore = [a, b].map((player) => player.game.hero.gold);
+  runUntilDuel(match, 'done');
+  const result = duel.result;
+  assert(result && [a, b].includes(result.winner) && result.loser !== result.winner, 'one wins');
+  [a, b].forEach((player, i) => {
+    const hero = player.game.hero;
+    assert(player.game.sim === homes[i].sim && homes[i].sim.units.includes(hero), 'back home');
+    assert(hero.id === homes[i].id && hero.team === homes[i].team && !hero.dead, 'with its own id and team, alive');
+    assert(hero.level === homes[i].level + 1 && hero.hp === hero.stats.maxHp, 'levelled up and healed like after a wave');
+    assert(player.game.phase !== 'lost', 'losing a duel does not knock you out');
+  });
+  const winnerIndex = result.winner === a ? 0 : 1;
+  const roundPay = roundGold(duel.round, GOLD.parTime / 2);
+  const free = result.payouts.find((entry) => entry.free && entry.player === result.winner).pays;
+  assert(result.winner.game.hero.gold === goldBefore[winnerIndex] + roundPay + result.prize + free, 'the winner cashes the round, the prize and the free bet');
+  assert(result.prize === duelPrize(duel.round) && result.winner.duelsWon === 1, 'prize and record');
+  assert(result.loser.game.hero.gold === goldBefore[1 - winnerIndex] + roundPay, 'the loser only cashes the round');
+});
+
+test('duels: after 60 seconds the higher share of health wins (D7)', () => {
+  const match = createMatch(null, 33);
+  const duel = runUntilDuel(match, 'fighting');
+  duel.a.game.hero.hp = duel.a.game.hero.stats.maxHp * 0.3;
+  duel.b.game.hero.hp = duel.b.game.hero.stats.maxHp * 0.9;
+  duel.time = DUEL_TIME_LIMIT - TEST_STEP / 2;
+  stepMatch(match, TEST_STEP);
+  assert(duel.state === 'done' && duel.result.winner === duel.b, 'the healthier one wins');
+});
+
+test('bets: up to half your gold, at least 50, once per duel, only for those watching, only before the round', () => {
+  const match = createMatch(heroByName('Sven'), 34);
+  const duel = runUntilDuel(match, 'betting');
+  const bystanders = playersAlive(match).filter((player) => !isDuelist(duel, player));
+  const human = humanPlayer(match);
+  const bettor = bystanders.find((player) => !duel.bets.some((bet) => bet.player === player)) || human;
+  duel.bets = duel.bets.filter((bet) => bet.player !== bettor);
+  bettor.game.hero.gold = 1000;
+  assert(placeBet(match, duel.a, 'b', 100) === 'duelist', 'duelists do not bet');
+  assert(placeBet(match, bettor, 'a', 49) === 'min', 'minimum');
+  assert(placeBet(match, bettor, 'a', 501) === 'max', 'at most half');
+  assert(placeBet(match, bettor, 'a', 500) === null && bettor.game.hero.gold === 500, 'the gold leaves');
+  assert(placeBet(match, bettor, 'b', 50) === 'already', 'once');
+  assert(betTotals(duel).a >= 500, 'the side shows it');
+  match.phase = 'fight';
+  const other = bystanders.find((player) => player !== bettor);
+  duel.bets = duel.bets.filter((bet) => bet.player !== other);
+  other.game.hero.gold = 1000;
+  assert(placeBet(match, other, 'a', 100) === 'closed', 'closed once the round starts');
+});
+
+test('bets: the pot pays the winners in proportion, at least double, never more than 5 times', () => {
+  const p = (name) => ({ name, game: { hero: { gold: 0 } } });
+  const [a, b, x, y, z] = ['a', 'b', 'x', 'y', 'z'].map(p);
+  const pays = (bets, winner, round) => {
+    const result = settleBets({ round, a, b, bets }, winner);
+    return Object.fromEntries(result.map((entry) => [entry.player.name + (entry.free ? '*' : ''), entry.pays]));
+  };
+  // 500 bet, free bets of 50 each, extra max(30% of 500, 50 x 4) = 200: a pot of 800.
+  let r = pays([{ player: x, side: 'a', amount: 100 }, { player: y, side: 'b', amount: 300 }, { player: z, side: 'a', amount: 100 }], 'a', 4);
+  assert(r.x === 320 && r.z === 320 && r['a*'] === 160 && r.y === 0 && r['b*'] === 0, JSON.stringify(r));
+  // Almost everything on the favourite: no minimum double.
+  r = pays([{ player: x, side: 'a', amount: 1000 }, { player: y, side: 'b', amount: 50 }], 'a', 4);
+  assert(r.x > 1000 && r.x < 2000, `favourite pays ${r.x}`);
+  // A small bet on the surprise is capped at 5 times.
+  r = pays([{ player: x, side: 'a', amount: 50 }, { player: y, side: 'b', amount: 2000 }], 'a', 4);
+  assert(r.x === 250, `surprise pays ${r.x}`);
+  // A balanced duel pays at least double.
+  r = pays([{ player: x, side: 'a', amount: 1000 }, { player: y, side: 'b', amount: 1000 }], 'a', 2);
+  assert(r.x >= 2000, `balanced pays ${r.x}`);
+});
+
+test('computer bettors: only those watching, once, between 50 and half their gold', () => {
+  const match = createMatch(null, 35);
+  const duel = runUntilDuel(match, 'betting');
+  const gold = new Map(match.players.map((player) => [player, player.game.hero.gold]));
+  for (const player of match.players) {
+    const before = player.game.hero.gold;
+    const bet = duel.bets.find((entry) => entry.player === player);
+    if (bet) gold.set(player, before + bet.amount);
+  }
+  runMatchUntil(match, () => match.phase === 'fight', 30);
+  assert(duel.bets.length > 0, 'somebody bets');
+  assert(new Set(duel.bets.map((bet) => bet.player)).size === duel.bets.length, 'once each');
+  for (const bet of duel.bets) {
+    assert(!isDuelist(duel, bet.player), 'not the duelists');
+    assert(bet.amount >= BET.min && bet.amount <= gold.get(bet.player) / 2 + 1, `${bet.player.name} bet ${bet.amount} of ${gold.get(bet.player)}`);
+  }
+});
+
+test('duels on screen: you fight your own duel, and the betting panel fits without covering the rest', () => {
+  const canvas = { width: 1280, height: 720 };
+  const match = createMatch(heroByName('Axe'), 36);
+  const duel = runUntilDuel(match, 'betting');
+  const human = humanPlayer(match);
+  if (!isDuelist(duel, human)) {
+    assert(duelPanelMode(match) === 'bet', 'a bystander gets the betting panel');
+    duel.a = human;
+  }
+  assert(duelPanelMode(match) === 'yourDuel' && playerState(match, human) === 'nextDuel', 'you are told it is your duel');
+  runUntilDuel(match, 'fighting');
+  assert(human.game.sim === duel.sim && human.game.phase === 'duel', 'your screen is the duel arena');
+  assert(roundTitle(human.game).startsWith('Duelo contra '), roundTitle(human.game));
+  assert(duelPanelMode(match) === null, 'no panel while you fight');
+
+  const panel = betPanelRect(canvas);
+  assert(panel.x >= 0 && panel.x + panel.width <= canvas.width && panel.y > 22 + 5 * 16, 'below the controls reminder');
+  const table = playerTableRows(canvas, match);
+  const spy = spyPanelRect(canvas);
+  assert(panel.x > spy.x + spy.width && panel.x > table[0].x + table[0].width, 'clear of the table and the rival panel');
+  const inventoryTop = Math.min(...inventorySlots(canvas).map((slot) => slot.y));
+  assert(panel.y + panel.height < Math.min(inventoryTop, shopButton(canvas).y), 'above the inventory');
+  const controls = betControls(canvas);
+  for (const rect of controls.chips.concat(controls.sides)) {
+    assert(rect.x >= panel.x && rect.x + rect.width <= panel.x + panel.width && rect.y + rect.height <= panel.y + panel.height, 'buttons inside the panel');
+  }
+});
+
 async function runTests() {
   const summary = document.getElementById('summary');
   const list = document.getElementById('results');

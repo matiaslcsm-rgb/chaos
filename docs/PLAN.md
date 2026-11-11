@@ -147,9 +147,28 @@ Una partida completa, pero chica.
       - 14 pruebas nuevas (71 en total). Las 8 arenas juntas son livianas: 0,08 milésimas de segundo por paso.
       Simplificaciones a revisar: los rivales de rango no retroceden cuando los alcanzan; una oleada que no termina
       en 120 segundos se da por terminada (el límite real del mod, con creeps enfurecidos, es parte de D5); todavía
-      no hay Aegis, así que morir contra los creeps es quedar afuera (entra en "Final de partida"); el ahorrador
-      guarda la mitad del oro aunque todavía no haya apuestas.
-- [ ] Duelos y apuestas.
+      no hay Aegis, así que morir contra los creeps es quedar afuera (entra en "Final de partida").
+- [x] Duelos y apuestas (`js/duel.js`) (2026-11-11), con las decisiones D6 y D7:
+      - Desde la ronda 2 hay un duelo por ronda entre dos jugadores vivos sorteados; nadie pelea dos rondas
+        seguidas mientras queden más de 3. La pausa antes de una ronda con duelo dura 18 segundos.
+      - Los dos duelistas no pelean su oleada: se mudan a una arena aparte, con vida y maná llenos, y pelean entre
+        ellos. Si nadie muere en 60 segundos, gana el que tiene más porcentaje de vida. Después vuelven a su arena,
+        suben de nivel y cobran la ronda como si hubieran terminado a mitad de tabla. Perder no te deja afuera.
+      - Si el duelo es tuyo, lo jugás en pantalla ("Duelo contra ... · 58 s").
+      - Apuestas: durante la pausa, el panel de arriba a la derecha muestra a los dos (nivel, valor, duelos
+        ganados y cuánto se apostó a cada uno). Elegís 50, un cuarto o la mitad de tu oro y a quién. Mínimo 50,
+        máximo la mitad de tu oro, una vez por duelo. Mientras pelean ves sus barras de vida y después el
+        resultado: cuánto cobraste o perdiste.
+      - El pozo: todo lo apostado, una apuesta gratis de cada duelista a sí mismo (5% de lo apostado, mínimo 50) y
+        un extra del juego (30% de lo apostado, o 50 por número de ronda si es más). Se reparte entre los que
+        acertaron según lo que puso cada uno; paga al menos el doble salvo que más del 75% estuviera de ese lado,
+        y nunca más de 5 veces lo apostado. El ganador del duelo cobra además un premio fijo: 100 + 50 por ronda.
+      - Los rivales apuestan una vez por duelo, casi siempre al favorito (miran valor, nivel y duelos ganados) y a
+        veces a la sorpresa; el ahorrador arriesga mucho y el gastador casi nada.
+      - 7 pruebas nuevas (78 en total).
+      Simplificaciones a revisar: si no peleás, no ves el duelo de los demás en una ventana chica (solo las barras
+      de vida en el panel); el aviso "Apostaste ..." sale en rojo como los errores; los números del pozo y del
+      premio son provisorios hasta el banco (D5).
 - [ ] Final de partida: eliminados y ganador.
 - [ ] Banco de partidas: la IA juega sola cientos de partidas y mide el balance.
 
