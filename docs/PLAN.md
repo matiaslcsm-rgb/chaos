@@ -190,7 +190,14 @@ Una partida completa, pero chica.
       Aegis todavía no se compra (ver "Decisiones abiertas"); con los creeps de relleno de hoy, una partida de 8
       rivales de la IA sigue sin terminar en la ronda 40: hace falta el banco y las oleadas de D5 para que termine
       cerca de la ronda 55-65.
-- [ ] Banco de partidas: la IA juega sola cientos de partidas y mide el balance.
+- [ ] Banco de partidas: la IA juega sola cientos de partidas y mide el balance. Avance (2026-11-11):
+      - Ya existe: `node tools/bench.js 20 30` (20 partidas hasta la ronda 30) y la página `banco.html`, que hacen
+        lo mismo (`js/bench.js`). Informan cuántas partidas terminaron y en qué ronda, de dónde sale el oro, cada
+        cuánto gana el favorito del duelo, cuánto gana cada héroe y cada habilidad, y la alarma "gana sola".
+      - Falta para tildarlo: que las partidas terminen solas. Con los creeps de relleno de hoy nadie cae después de
+        las primeras rondas, así que el banco corta en la ronda máxima y da por ganador al primero de la tabla. Eso
+        se arregla con las oleadas y números provisorios de D5 (la tabla de 10 tipos de creep de `DISENO.md`),
+        calibrados con este banco hasta que la partida promedio termine entre las rondas 55 y 65.
 
 **Lista cuando:** jugás una partida de punta a punta con el primer lote.
 
