@@ -56,6 +56,13 @@ cierra con algo que se puede comprobar.
   hoy) y los del mod para los propios**; (b) multiplicar todo por un factor.
 - **Vender ítems** (decisión): (a) **a mitad de precio, como en Dota (así está hoy)**; (b) sin venta.
 
+- **Ventaja al revivir con Aegis** (decisión, 2026-11-11): el mod dice que al revivir "recibís menos daño y hacés
+  más" durante unos segundos, pero no cuánto. (a) **la mitad de daño recibido y 50% más de daño hecho durante 5
+  segundos, ajustable con el banco (así está hoy)**; (b) solo la vida llena, sin ventaja; (c) invulnerable 3
+  segundos y nada más.
+- **Comprar Aegis en la tienda**: el mod lo vende pero no se encontró el precio; entra con los demás números de D5
+  cuando esté el banco. Por ahora no se puede comprar.
+
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
 - [x] Repositorio en GitHub: `matiaslcsm-rgb/chaos` (2026-11-10).
@@ -169,7 +176,20 @@ Una partida completa, pero chica.
       Simplificaciones a revisar: si no peleás, no ves el duelo de los demás en una ventana chica (solo las barras
       de vida en el panel); el aviso "Apostaste ..." sale en rojo como los errores; los números del pozo y del
       premio son provisorios hasta el banco (D5).
-- [ ] Final de partida: eliminados y ganador.
+- [x] Final de partida: eliminados y ganador (2026-11-11), con las decisiones D3 y D8:
+      - Cada jugador arranca con 2 Aegis (se ven en la tabla, columna "vidas", y junto al nombre de tu héroe). Si
+        los creeps te matan, gastás uno y revivís en el lugar con vida y maná llenos y 5 segundos de ventaja; la
+        oleada sigue. Sin Aegis, quedás afuera.
+      - Recta final: cuando quedan 3 jugadores o menos, perder un duelo cuesta un Aegis y, si no te queda, una
+        marca de maldición: 7% más de daño recibido, 7% menos de daño hecho y 7% menos de oro cada una, hasta 3.
+      - Los que caen en el mismo momento comparten el puesto; si caen todos los que quedaban, comparten el primero.
+      - Pantalla final: "Caíste" o "¡Ganaste!", la lista de los 8 en orden (en qué ronda cayó cada uno o si sigue
+        en juego) y de dónde salió tu oro: creeps, rondas, duelos y apuestas (las apuestas, ganado menos apostado).
+      - 5 pruebas nuevas (83 en total).
+      Simplificaciones a revisar: si quedás afuera, la pantalla final no te deja seguir mirando la partida; el
+      Aegis todavía no se compra (ver "Decisiones abiertas"); con los creeps de relleno de hoy, una partida de 8
+      rivales de la IA sigue sin terminar en la ronda 40: hace falta el banco y las oleadas de D5 para que termine
+      cerca de la ronda 55-65.
 - [ ] Banco de partidas: la IA juega sola cientos de partidas y mide el balance.
 
 **Lista cuando:** jugás una partida de punta a punta con el primer lote.
