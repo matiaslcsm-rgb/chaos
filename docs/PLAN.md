@@ -10,7 +10,15 @@ cierra con algo que se puede comprobar.
 - **2026-11-10:** se evaluó hacerlo como juego del Arcade de Dota 2 para jugar desde Latam (ver `SERVIDORES.md`) y
   se sigue con el 2D para navegador.
 
+- **2026-11-11:** el diseño completo de la versión 1.0 está en `DISENO.md`. El draft no lleva reloj: el mod da
+  tiempo sin límite para elegir (historial del mod, 6 mar 2020).
+
 ## Decisiones abiertas
+Las del juego completo (largo de la partida, opciones del draft, vidas, freno a las combinaciones rotas, números de
+oro, premio del duelo, duelo que no termina, castigo por perder, Roshan, baneos, ítems para mandar creeps y
+habilidades repetidas) están en `DISENO.md`, sección 11, como D1 a D12, esperando respuesta del usuario. Mientras
+tanto vale la opción recomendada de cada una. Acá quedan las de antes:
+
 - **Nombre del proyecto** (decisión): hoy la carpeta se llama `chaos`.
 - **Nombres e imágenes** (decisión): (a) **nombres y dibujos propios parecidos (recomendada si se publica en
   internet)**; (b) los nombres reales de Dota, solo para jugar en tu PC.
@@ -26,23 +34,15 @@ cierra con algo que se puede comprobar.
 - **Clic derecho mientras apuntás** (decisión): (a) **solo cancela (así está hoy)**; (b) cancela y además mueve al
   héroe, como en Dota.
 
-- **Draft: tiempo para elegir** (decisión): las fuentes no dicen cuánto tiempo da el mod. (a) **la partida espera
-  hasta que elijas (así está hoy; recomendada mientras se juega solo)**; (b) un reloj de 20-30 segundos y al
-  terminar te toca una al azar (va a hacer falta cuando jueguen los 7 rivales al mismo tiempo).
 - **Draft: definitivas** (decisión): las fuentes no dicen si el mod limita cuántas definitivas se pueden tener.
   (a) **sin límite: las 16 opciones mezclan comunes y definitivas (así está hoy)**; (b) como mucho una definitiva;
   (c) cuatro comunes y una definitiva, con una elección reservada para la definitiva.
-- **Draft: cantidad de opciones** (decisión): (a) **16, como dice un análisis del mod (así está hoy)**; (b) menos
-  (8-10) mientras el lote tenga solo 43 habilidades, para que no se repitan tanto entre elecciones.
-- **Draft: habilidades repetidas entre jugadores** (decisión, para cuando estén los rivales): (a) **cada habilidad
-  la puede tener un solo jugador (recomendada si el mod lo hace así; hay que confirmarlo)**; (b) se pueden repetir.
+- **Draft: cantidad de opciones** y **habilidades repetidas entre jugadores**: pasaron a `DISENO.md` (D2 y D12).
 
-- **Oro por ronda y por creep** (decisión): las fuentes solo dicen que limpiar más rápido da más oro, no cuánto.
-  Hoy hay números provisorios (600 de arranque, 30-40 por creep, 150 + 25 por ronda, hasta el doble si limpiás
-  rápido). (a) **investigar los valores del mod y reemplazarlos (recomendada)**; (b) dejar los provisorios y
-  ajustarlos con el banco de partidas.
-- **Precios de los ítems** (decisión): el mod los tiene más caros que Dota, pero no sabemos cuánto. (a) **precios
-  de Dota por ahora (así está hoy)**; (b) multiplicarlos por un factor cuando se investigue.
+- **Oro por ronda y por creep**: se investigó y el mod no publica la fórmula; pasó a `DISENO.md` (D5).
+- **Precios de los ítems** (decisión): la investigación no encontró una lista; los ítems comunes parecen costar lo
+  mismo que en Dota y los propios del mod llegan a 12.000-15.000. (a) **precios de Dota para los comunes (así está
+  hoy) y los del mod para los propios**; (b) multiplicar todo por un factor.
 - **Vender ítems** (decisión): (a) **a mitad de precio, como en Dota (así está hoy)**; (b) sin venta.
 
 ## Etapa 0 · Proyecto
@@ -57,9 +57,13 @@ Sin programar nada del juego todavía.
       maná, alcance) e ítems (costo y recetas). Qué trae y qué le falta, en `DATOS.md` (2026-11-10).
 - [x] Una página para consultar esos datos: `datos.html` (buscar un héroe o una habilidad, ver ítems y recetas)
       (2026-11-10).
-- [ ] Completar las reglas del mod que faltan en `REFERENCIA-CHC.md`: oro por ronda, composición de las oleadas,
-      tiempos, cada cuánto hay duelo, cuánto pagan las apuestas.
-- [ ] Lista de lo que el mod cambia respecto de Dota (ítems más caros, libros, Aghanim para todas las habilidades).
+- [x] Completar las reglas del mod que faltan en `REFERENCIA-CHC.md` (2026-11-11): duelos en cada ronda, apuestas
+      con pozo, 2 Aegis, maldición, libros y sus precios, Roshan, ítems neutrales, tiempos. No aparecieron la
+      fórmula del oro ni la composición de las oleadas: quedaron listadas en "Lo que no se encontró".
+- [ ] Releer el historial del mod de 2021 en adelante (Steam cortó las consultas a mitad de camino).
+- [x] Lista de lo que el mod cambia respecto de Dota: en `REFERENCIA-CHC.md`, "Libros" e "Ítems" (2026-11-11).
+- [x] Diseño completo de la versión 1.0 en `DISENO.md`, con los problemas del mod y cómo evitarlos (2026-11-11).
+      Falta la respuesta del usuario a las decisiones D1-D12.
 
 **Lista cuando:** hay una tabla consultable con todo.
 
