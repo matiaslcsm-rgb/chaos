@@ -114,9 +114,9 @@ function waveForRound(round) {
   return picked.map((key, i) => ({ key, count: Math.floor(total / kinds) + (i < total % kinds ? 1 : 0) }));
 }
 
-// "6 Kóbolds y 2 Arpías", for the announcement of the next wave.
+// "6 Kóbolds y 1 Arpía", for the announcement of the next wave.
 function waveText(wave) {
-  const parts = wave.map((entry) => `${entry.count} ${creepType(entry.key).name}`);
+  const parts = wave.map((entry) => `${entry.count} ${entry.count === 1 ? creepType(entry.key).name : creepType(entry.key).plural}`);
   return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} y ${parts[parts.length - 1]}` : parts[0];
 }
 

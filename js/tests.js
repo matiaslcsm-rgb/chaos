@@ -1509,7 +1509,8 @@ test('waves: the same for everyone each round, 1 to 3 kinds, heavy every 5 round
     const heavy = wave.some((entry) => creepType(entry.key).heavy);
     assert(heavy === (round % WAVE.heavyEvery === 0), `round ${round}: heavy ${heavy}`);
   }
-  assert(waveText([{ key: 'melee', count: 6 }, { key: 'ranged', count: 2 }]) === '6 Kóbold y 2 Arpía', 'the announcement');
+  assert(waveText([{ key: 'melee', count: 6 }, { key: 'ranged', count: 1 }]) === '6 Kóbolds y 1 Arpía', 'the announcement');
+  for (const key of Object.keys(DB.waves.types)) assert(creepType(key).name && creepType(key).plural, key + ' needs a name and a plural');
 });
 
 test('waves: creeps grow fast until round 10, slower to 20, and without a ceiling after; magic resistance from 60', () => {
