@@ -845,12 +845,13 @@ function drawHud(ctx, canvas, game, view) {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#e8ecf4';
   ctx.font = `bold 26px ${FONT}`;
-  const title = game.phase === 'prep'
-    ? `Ronda ${game.round + 1} en ${Math.ceil(game.timer)}`
-    : `Ronda ${game.round} · quedan ${creepsAlive(game)}`;
-  ctx.fillText(title, canvas.width / 2, 36);
+  ctx.fillText(roundTitle(game), canvas.width / 2, 36);
 
   drawHeroPanel(ctx, canvas, game);
+  if (game.match) {
+    drawPlayerTable(ctx, canvas, game.match, view);
+    if (view.spy !== null) drawSpyPanel(ctx, canvas, game.match, view);
+  }
 
   const shopping = view.shop && shopOpen(game);
   // Controls reminder, top right, out of the way of the inventory (the shop covers that corner).
@@ -936,15 +937,160 @@ function drawGame(ctx, canvas, game, view) {
   drawHud(ctx, canvas, game, view);
   if (game.draft) drawDraft(ctx, canvas, game, view.mouse);
 
-  if (game.phase === 'lost') {
+  const ending = endingText(game);
+  if (ending) {
     ctx.fillStyle = 'rgba(13, 15, 20, 0.75)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#e65a46';
+    ctx.fillStyle = ending.color;
     ctx.font = `bold 64px ${FONT}`;
-    ctx.fillText('Caíste', canvas.width / 2, canvas.height / 2 - 10);
+    ctx.fillText(ending.title, canvas.width / 2, canvas.height / 2 - 10);
     ctx.fillStyle = '#d8dce6';
     ctx.font = `22px ${FONT}`;
-    ctx.fillText(`Llegaste a la ronda ${game.round} con ${game.hero.name}. Clic para volver a elegir.`, canvas.width / 2, canvas.height / 2 + 40);
+    ctx.fillText(`${ending.line} Clic para volver a elegir.`, canvas.width / 2, canvas.height / 2 + 40);
   }
+}
+
+// ---- The players' table (top left) ----
+
+const TABLE = { x: 16, y: 16, width: 330, header: 22, row: 24 };
+const PLAYER_STATE_TEXT = {
+  fight: { text: 'peleando', color: '#e8b04a' },
+  done: { text: 'listo', color: '#7edb8a' },
+  prep: { text: '', color: '#8a93a6' },
+  out: { text: 'afuera', color: '#e65a46' },
+};
+
+// One clickable row per player, in the table's order (best first).
+function playerTableRows(canvas, match) {
+  return playerStanding(match).map((player, i) => ({
+    player,
+    x: TABLE.x,
+    y: TABLE.y + TABLE.header + i * TABLE.row,
+    width: TABLE.width,
+    height: TABLE.row,
+  }));
+}
+
+function spyPanelRect(canvas) {
+  return { x: TABLE.x + TABLE.width + 8, y: TABLE.y, width: 280, height: 250 };
+}
+
+function drawPlayerTable(ctx, canvas, match, view) {
+  const rows = playerTableRows(canvas, match);
+  ctx.fillStyle = 'rgba(13, 15, 20, 0.8)';
+  ctx.fillRect(TABLE.x, TABLE.y, TABLE.width, TABLE.header + rows.length * TABLE.row + 4);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#8a93a6';
+  ctx.font = `11px ${FONT}`;
+  ctx.fillText('Jugador · héroe', TABLE.x + 24, TABLE.y + 15);
+  ctx.textAlign = 'right';
+  ctx.fillText('nivel', TABLE.x + 210, TABLE.y + 15);
+  ctx.fillText('valor', TABLE.x + 262, TABLE.y + 15);
+  for (const row of rows) {
+    const player = row.player;
+    const hero = player.game.hero;
+    const state = playerState(match, player);
+    const out = state === 'out';
+    if (view.spy === player.index || inRect(view.mouse, row)) {
+      ctx.fillStyle = 'rgba(232, 236, 244, 0.08)';
+      ctx.fillRect(row.x, row.y, row.width, row.height);
+    }
+    ctx.fillStyle = player.color;
+    ctx.globalAlpha = out ? 0.4 : 1;
+    ctx.fillRect(row.x + 8, row.y + 7, 10, 10);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = player.human ? '#e8ecf4' : '#c8cede';
+    ctx.font = `${player.human ? 'bold ' : ''}13px ${FONT}`;
+    ctx.fillText(player.name, row.x + 24, row.y + 17);
+    ctx.fillStyle = '#8a93a6';
+    ctx.font = `12px ${FONT}`;
+    ctx.fillText(hero.name, row.x + 84, row.y + 17);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#c8cede';
+    ctx.fillText(out ? `${player.place}º` : String(hero.level), row.x + 210, row.y + 17);
+    ctx.fillStyle = '#e8c45a';
+    ctx.fillText(out ? '—' : String(playerValue(player)), row.x + 262, row.y + 17);
+    const label = PLAYER_STATE_TEXT[state];
+    ctx.fillStyle = label.color;
+    ctx.font = `11px ${FONT}`;
+    ctx.fillText(label.text, row.x + row.width - 8, row.y + 17);
+    ctx.globalAlpha = 1;
+  }
+}
+
+// What a rival has: their abilities with level, and their items. Opens with a click on the table.
+function drawSpyPanel(ctx, canvas, match, view) {
+  const player = match.players[view.spy];
+  if (!player) return;
+  const hero = player.game.hero;
+  const panel = spyPanelRect(canvas);
+  ctx.fillStyle = 'rgba(13, 15, 20, 0.92)';
+  ctx.fillRect(panel.x, panel.y, panel.width, panel.height);
+  ctx.strokeStyle = player.color;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(panel.x + 1, panel.y + 1, panel.width - 2, panel.height - 2);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#e8ecf4';
+  ctx.font = `bold 15px ${FONT}`;
+  ctx.fillText(`${player.name} · ${hero.name} · nivel ${hero.level}`, panel.x + 12, panel.y + 22);
+  ctx.fillStyle = '#8a93a6';
+  ctx.font = `12px ${FONT}`;
+  const out = playerState(match, player) === 'out';
+  ctx.fillText(out ? `Afuera en la ronda ${player.outRound}, puesto ${player.place}` : `Oro ${hero.gold} · valor ${playerValue(player)}`, panel.x + 12, panel.y + 40);
+  let y = panel.y + 62;
+  ctx.fillStyle = '#b8c0d0';
+  ctx.font = `bold 12px ${FONT}`;
+  ctx.fillText('Habilidades', panel.x + 12, y);
+  ctx.font = `12px ${FONT}`;
+  for (const ability of hero.abilities) {
+    y += 17;
+    ctx.fillStyle = ability.level > 0 ? '#d8dce6' : '#6a7284';
+    ctx.fillText(`${DB.abilities[ability.key].dname}${ability.def.ult ? ' (definitiva)' : ''} · ${ability.level}`, panel.x + 18, y);
+  }
+  if (!hero.abilities.length) {
+    y += 17;
+    ctx.fillStyle = '#6a7284';
+    ctx.fillText('Todavía ninguna', panel.x + 18, y);
+  }
+  y += 26;
+  ctx.fillStyle = '#b8c0d0';
+  ctx.font = `bold 12px ${FONT}`;
+  ctx.fillText('Ítems', panel.x + 12, y);
+  ctx.font = `12px ${FONT}`;
+  ctx.fillStyle = '#d8dce6';
+  const items = hero.items.map((item) => DB.items[item.key].dname).join(', ') || 'Ninguno';
+  for (const line of wrapText(ctx, items, panel.width - 30).slice(0, 4)) {
+    y += 17;
+    ctx.fillText(line, panel.x + 18, y);
+  }
+  ctx.fillStyle = '#6a7284';
+  ctx.font = `11px ${FONT}`;
+  ctx.fillText('Clic de nuevo o Esc para cerrar', panel.x + 12, panel.y + panel.height - 10);
+}
+
+// The round title: the shared clock, your wave, or the wait for the others.
+function roundTitle(game) {
+  const match = game.match;
+  if (!match) {
+    return game.phase === 'prep' ? `Ronda ${game.round + 1} en ${Math.ceil(game.timer)}` : `Ronda ${game.round} · quedan ${creepsAlive(game)}`;
+  }
+  if (match.phase === 'prep') return `Ronda ${match.round + 1} en ${Math.ceil(match.timer)}`;
+  if (game.phase === 'fight') return `Ronda ${match.round} · quedan ${creepsAlive(game)}`;
+  const busy = match.players.filter((player) => playerState(match, player) === 'fight').length;
+  return `Ronda ${match.round} · listo, ${busy === 1 ? 'falta 1 jugador' : `faltan ${busy} jugadores`}`;
+}
+
+// The closing screen: you fell (and in which place), or you are the last one standing. Null while playing.
+function endingText(game) {
+  const match = game.match;
+  const player = match ? humanPlayer(match) : null;
+  if (game.phase === 'lost') {
+    const place = player && player.place ? `, puesto ${player.place} de ${match.players.length}` : '';
+    return { title: 'Caíste', color: '#e65a46', line: `Llegaste a la ronda ${game.round} con ${game.hero.name}${place}.` };
+  }
+  if (match && match.over) {
+    return { title: '¡Ganaste!', color: '#7edb8a', line: `Quedaste último en pie en la ronda ${match.round} con ${game.hero.name}.` };
+  }
+  return null;
 }

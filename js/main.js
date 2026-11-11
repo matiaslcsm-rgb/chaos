@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.4.0 · Etapa 3: oro, tienda e inventario';
+const GAME_VERSION = '0.5.0 · Etapa 3: 7 rivales de la IA';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -27,6 +27,8 @@ const SHOP_MESSAGES = {
 };
 
 let heroes = [];
+// The match of 8, and the human's own arena inside it (what is drawn and controlled).
+let match = null;
 let game = null;
 const view = {
   floaters: [],
@@ -37,6 +39,7 @@ const view = {
   targeting: null,
   shop: false,
   hoverEnemy: null,
+  spy: null,
   mouse: { x: 0, y: 0 },
 };
 
@@ -63,8 +66,9 @@ function say(text) {
 }
 
 function startGame(heroData) {
-  game = createGame(heroData, Date.now());
-  Object.assign(view, { floaters: [], effects: [], marker: null, message: null, attackMoveArmed: false, targeting: null, shop: false, hoverEnemy: null });
+  match = createMatch(heroData, Date.now());
+  game = humanPlayer(match).game;
+  Object.assign(view, { floaters: [], effects: [], marker: null, message: null, attackMoveArmed: false, targeting: null, shop: false, hoverEnemy: null, spy: null });
 }
 
 function onSelectClick(point) {
@@ -192,6 +196,22 @@ function onShopClick(point, button) {
   return true;
 }
 
+// ---- The players' table ----
+
+// A click on a row opens what that player has; a second click (or Esc) closes it.
+function onTableClick(point) {
+  const row = playerTableRows(canvas, match).find((r) => inRect(point, r));
+  if (row) {
+    view.spy = view.spy === row.player.index ? null : row.player.index;
+    return true;
+  }
+  if (view.spy !== null && inRect(point, spyPanelRect(canvas))) {
+    view.spy = null;
+    return true;
+  }
+  return false;
+}
+
 // ---- Input ----
 
 canvas.addEventListener('mousemove', (event) => {
@@ -207,8 +227,9 @@ canvas.addEventListener('mousedown', (event) => {
     if (event.button === 0) onSelectClick(point);
     return;
   }
-  if (game.phase === 'lost') {
+  if (endingText(game)) {
     game = null;
+    match = null;
     return;
   }
   if (game.draft) {
@@ -216,6 +237,7 @@ canvas.addEventListener('mousedown', (event) => {
     return;
   }
   if (onShopClick(point, event.button)) return;
+  if (event.button === 0 && onTableClick(point)) return;
   const world = worldPoint(point);
   if (event.button === 2) {
     if (view.targeting) {
@@ -243,7 +265,7 @@ canvas.addEventListener('mousedown', (event) => {
 });
 
 window.addEventListener('keydown', (event) => {
-  if (!game || game.phase === 'lost' || game.draft) return;
+  if (!game || endingText(game) || game.draft) return;
   const key = event.key.toLowerCase();
   const index = abilityHotkeys(game.hero.abilities).indexOf(key);
   const levelling = event.shiftKey || event.ctrlKey;
@@ -270,6 +292,7 @@ window.addEventListener('keydown', (event) => {
   }
   if (key === 'escape') {
     view.shop = false;
+    view.spy = null;
     view.attackMoveArmed = false;
     view.targeting = null;
   }
@@ -331,12 +354,12 @@ function frame(now) {
   if (game) {
     pending += elapsed;
     while (pending >= SIM_STEP) {
-      stepGame(game, SIM_STEP);
+      stepMatch(match, SIM_STEP);
       pending -= SIM_STEP;
     }
     ageView(elapsed);
     consumeEvents();
-    if (game.phase === 'lost' || game.draft) view.targeting = null;
+    if (endingText(game) || game.draft) view.targeting = null;
     view.hoverEnemy = enemyAt(worldPoint(view.mouse));
     drawGame(ctx, canvas, game, view);
   } else {

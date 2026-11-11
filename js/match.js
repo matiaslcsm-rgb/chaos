@@ -122,6 +122,8 @@ function stepMatch(match, dt) {
     if (!player.human && match.phase === 'prep' && !game.draft && draftsDue(game) > 0) openDraft(game);
     if (player.brain) aiStep(game, player.brain, dt);
     stepArena(game, dt);
+    // Nobody draws the rivals' arenas, so what happened there for the screen is dropped.
+    if (!player.human) game.sim.events.length = 0;
   }
   markEliminated(match);
   if (match.over) return;

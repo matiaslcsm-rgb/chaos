@@ -1210,6 +1210,40 @@ test('match: the same seed plays the same match', () => {
   assert(play() === play(), 'two runs differ');
 });
 
+test('the players table and the rival panel fit on screen without covering the rest', () => {
+  const canvas = { width: 1280, height: 720 };
+  const match = createMatch(heroByName('Zeus'), 10);
+  const rows = playerTableRows(canvas, match);
+  assert(rows.length === 8 && rows[0].player.place === null, 'one row per player');
+  const last = rows[rows.length - 1];
+  const panel = heroPanelRect(canvas);
+  // The hero panel's active effects stack up to 8 rows of 22 px above it.
+  assert(last.y + last.height < panel.y - 10 - 8 * 22, 'the table ends above the hero panel and its effects');
+  const spy = spyPanelRect(canvas);
+  assert(spy.x >= last.x + last.width && spy.x + spy.width < canvas.width / 2 + 200, 'the rival panel sits next to the table');
+  assert(spy.y + spy.height < panel.y - 10 - 8 * 22, 'and above the hero panel');
+  const help = 22 + 5 * 16;
+  assert(spy.x + spy.width < canvas.width - 300 || spy.y > help, 'it does not cover the controls reminder');
+});
+
+test('the round title follows the shared clock and says who is still fighting', () => {
+  const match = createMatch(heroByName('Axe'), 11);
+  const game = humanPlayer(match).game;
+  assert(roundTitle(game) === 'Ronda 1 en 15', roundTitle(game));
+  runMatchUntil(match, () => match.phase === 'fight', PREP_TIME + 1);
+  assert(roundTitle(game).startsWith('Ronda 1 · quedan '), roundTitle(game));
+  for (const unit of game.sim.units) if (unit.kind === 'creep') unit.dead = true;
+  stepMatch(match, TEST_STEP);
+  if (match.phase === 'fight') assert(/^Ronda 1 · listo, falta/.test(roundTitle(game)), roundTitle(game));
+  assert(endingText(game) === null, 'still playing');
+  const other = createMatch(heroByName('Axe'), 12);
+  const fallen = humanPlayer(other).game;
+  runMatchUntil(other, () => other.phase === 'fight', PREP_TIME + 1);
+  fallen.hero.dead = true;
+  runMatchUntil(other, () => fallen.phase === 'lost', 1);
+  assert(endingText(fallen).title === 'Caíste' && endingText(fallen).line.includes('puesto 8 de 8'), endingText(fallen).line);
+});
+
 async function runTests() {
   const summary = document.getElementById('summary');
   const list = document.getElementById('results');
