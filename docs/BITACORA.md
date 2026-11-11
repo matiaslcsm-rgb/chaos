@@ -51,3 +51,13 @@ banco, es un trabajo grande que no entraba sin dejarlo a medias.
 
 **Qué no pude verificar:** no jugué una partida entera con el mouse; la probé haciéndola avanzar desde la página y
 mirando capturas.
+
+**Banco de 24 partidas (con las oleadas nuevas):**
+- Las 24 terminaron solas, en la ronda 60,5 en promedio.
+- El oro sale de: rondas 50%, duelos 23%, creeps 19% y apuestas 7,5%.
+- El favorito ganó el 71% de los 1.429 duelos (la meta era menos de 75%).
+- **Hallazgo importante:** los héroes de inteligencia (Crystal Maiden, Zeus, Skywrath Mage) y Ogre Magi no ganaron
+  ninguna partida, y Luna, Sven y Phantom Assassin ganan entre el 30% y el 37% (lo esperado es 12,5%). Las
+  habilidades que más ganan son las que mejoran el ataque (Lightning Hands, Coup de Grace, Headshot, Poison Attack).
+  Ninguna llegó todavía a la alarma "gana sola", pero el estilo "mago" de la IA está claramente en desventaja: es lo
+  primero a mirar en el balance.

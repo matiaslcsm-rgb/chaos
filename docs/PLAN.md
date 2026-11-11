@@ -207,11 +207,14 @@ Una partida completa, pero chica.
       - Premio de ronda por puesto: el primero en terminar cobra 500 y el último 50 en la ronda 1, y crece con las
         rondas. Los duelistas cobran como el cuarto; una oleada cortada por tiempo, como el último.
       - Calibración: en 12 partidas de prueba la partida terminó entre las rondas 49 y 72, con un promedio de 60
-        (la meta era 55-65). El oro a la ronda 20 da unos 15.800 por jugador (las guías hablan de 10.000-15.000).
+        (la meta era 55-65). Después, un banco de 24 partidas: todas terminaron solas, en la ronda 60,5 en
+        promedio; el favorito ganó el 71% de los duelos. El oro a la ronda 20 da unos 15.800 por jugador (las guías hablan de 10.000-15.000).
       - 6 pruebas nuevas (90 en total).
       Simplificaciones a revisar: la Araña resiste la magia en vez de "apagar pasivas" como en el mod; todos los
       creeps se dibujan iguales salvo el tamaño; muchas eliminaciones caen justo en las oleadas pesadas (rondas 10,
       30, 40, 45...), lo que puede estar bien o ser un salto demasiado grande.
+      Para revisar en el balance: en ese banco los héroes de inteligencia y Ogre Magi no ganaron ninguna partida, y
+      Luna, Sven y Phantom Assassin ganaron entre 30% y 37% (se espera 12,5%). Las habilidades de ataque ganan más.
 
 **Lista cuando:** jugás una partida de punta a punta con el primer lote.
 
