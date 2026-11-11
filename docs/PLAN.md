@@ -13,11 +13,22 @@ cierra con algo que se puede comprobar.
 - **2026-11-11:** el diseño completo de la versión 1.0 está en `DISENO.md`. El draft no lleva reloj: el mod da
   tiempo sin límite para elegir (historial del mod, 6 mar 2020).
 
+- **2026-11-11 (decisión del usuario):** en las 12 decisiones de `DISENO.md` (D1 a D12) van las recomendadas:
+  - D1: partida fiel, sin límite de rondas, con botón de velocidad ×2.
+  - D2: 8 opciones por elección mientras haya menos de 150 habilidades; 16 después.
+  - D3: 2 Aegis por jugador.
+  - D4 **(cambio a propósito respecto del mod):** 1 segundo de inmunidad después de cada aturdimiento, daño por
+    porcentaje de vida a la mitad contra héroes e invocaciones más débiles en duelos, además de los baneos.
+  - D5: números provisorios de oro, oleadas y tiempos, ajustados con el banco.
+  - D6 **(cambio a propósito):** premio fijo al ganador del duelo, además de la apuesta gratis del mod.
+  - D7: el duelo dura 60 segundos como mucho; si nadie murió, gana el que tiene más porcentaje de vida.
+  - D8 **(cambio a propósito):** marcas de 7% con tope de 3, en vez de 10% sin tope.
+  - D9: Roshan cada 10 rondas.
+  - D10: baneos de habilidad desde ahora; de héroe cuando haya 40 héroes o más.
+  - D11: los ítems para mandar creeps a los rivales quedan afuera de la 1.0.
+  - D12: dos jugadores pueden tener la misma habilidad.
+
 ## Decisiones abiertas
-Las del juego completo (largo de la partida, opciones del draft, vidas, freno a las combinaciones rotas, números de
-oro, premio del duelo, duelo que no termina, castigo por perder, Roshan, baneos, ítems para mandar creeps y
-habilidades repetidas) están en `DISENO.md`, sección 11, como D1 a D12, esperando respuesta del usuario. Mientras
-tanto vale la opción recomendada de cada una. Acá quedan las de antes:
 
 - **Nombre del proyecto** (decisión): hoy la carpeta se llama `chaos`.
 - **Nombres e imágenes** (decisión): (a) **nombres y dibujos propios parecidos (recomendada si se publica en
