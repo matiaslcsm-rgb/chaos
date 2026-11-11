@@ -59,7 +59,8 @@ cierra con algo que se puede comprobar.
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
 - [x] Repositorio en GitHub: `matiaslcsm-rgb/chaos` (2026-11-10).
-- [ ] Publicación (que se pueda jugar desde un enlace).
+- [ ] Publicación (que se pueda jugar desde un enlace). La tarea diaria no publica nada: queda para hacerlo con
+      el usuario.
 - [x] Página de pruebas: `tests.html`, tiene que decir "✅ N/N pruebas" (2026-11-10).
 
 ## Etapa 1 · Copiar la información
@@ -71,7 +72,8 @@ Sin programar nada del juego todavía.
 - [x] Completar las reglas del mod que faltan en `REFERENCIA-CHC.md` (2026-11-11): duelos en cada ronda, apuestas
       con pozo, 2 Aegis, maldición, libros y sus precios, Roshan, ítems neutrales, tiempos. No aparecieron la
       fórmula del oro ni la composición de las oleadas: quedaron listadas en "Lo que no se encontró".
-- [ ] Releer el historial del mod de 2021 en adelante (Steam cortó las consultas a mitad de camino).
+- [ ] Releer el historial del mod de 2021 en adelante (Steam cortó las consultas a mitad de camino; el 2026-11-11
+      seguía respondiendo "demasiadas consultas").
 - [x] Lista de lo que el mod cambia respecto de Dota: en `REFERENCIA-CHC.md`, "Libros" e "Ítems" (2026-11-11).
 - [x] Diseño completo de la versión 1.0 en `DISENO.md`, con los problemas del mod y cómo evitarlos (2026-11-11).
       Falta la respuesta del usuario a las decisiones D1-D12.
@@ -126,7 +128,27 @@ Una partida completa, pero chica.
       - 13 pruebas nuevas (57 en total).
       Simplificaciones a revisar: BKB dura siempre 9 s, Power Treads da siempre el atributo principal, Moon Shard
       no se puede consumir, un solo crítico por golpe, la resistencia mágica se suma en vez de multiplicarse.
-- [ ] 7 rivales de la IA jugando sus arenas.
+- [x] 7 rivales de la IA jugando sus arenas (`js/ai.js`, `js/match.js`) (2026-11-11):
+      - Partida de 8: vos y 7 rivales con nombre, color y un héroe distinto cada uno. Cada uno tiene su arena, que se
+        simula de verdad aunque no se dibuje.
+      - Un solo reloj para todos: la ronda siguiente arranca cuando terminaron las 8 arenas y pasaron los 15
+        segundos. Si terminás antes, el título dice cuántos faltan. Mientras elegís una habilidad, se frena todo.
+      - Cada rival tiene una personalidad (golpeador, mago o mixto; gastador, ahorrador o equilibrado). Elige
+        habilidades según su estilo y lo que le falta, sube primero la definitiva, compra siguiendo una lista según
+        su estilo (armando los ítems por partes) y guarda oro para apostar según su personalidad.
+      - En la pelea va hacia la oleada, usa las de área cuando agarran a 2 o más (3 o más las definitivas), las de
+        un objetivo sobre el más cercano, los refuerzos cuando hay enemigos cerca, y los ítems (Satanic con poca
+        vida, BKB rodeado, Mask of Madness atacando, Phase Boots para llegar).
+      - Tabla de jugadores arriba a la izquierda, ordenada por valor (oro + ítems), con nivel y si está peleando,
+        listo o afuera. Clic en uno para ver sus habilidades e ítems.
+      - El que cae queda afuera con el último puesto libre y su oro pasa a 0, como en el mod. Al caer ves tu
+        puesto; si quedás último en pie, "¡Ganaste!".
+      - Se aplicó la decisión D2: 8 opciones por elección (16 cuando haya 150 habilidades o más).
+      - 14 pruebas nuevas (71 en total). Las 8 arenas juntas son livianas: 0,08 milésimas de segundo por paso.
+      Simplificaciones a revisar: los rivales de rango no retroceden cuando los alcanzan; una oleada que no termina
+      en 120 segundos se da por terminada (el límite real del mod, con creeps enfurecidos, es parte de D5); todavía
+      no hay Aegis, así que morir contra los creeps es quedar afuera (entra en "Final de partida"); el ahorrador
+      guarda la mitad del oro aunque todavía no haya apuestas.
 - [ ] Duelos y apuestas.
 - [ ] Final de partida: eliminados y ganador.
 - [ ] Banco de partidas: la IA juega sola cientos de partidas y mide el balance.
