@@ -172,10 +172,16 @@ function draftOptionCount(poolSize) {
   return poolSize < DRAFT_MANY_FROM ? DRAFT_OPTIONS_FEW : DRAFT_OPTIONS_MANY;
 }
 
-// Offers a random handful of the abilities the hero does not have yet.
+// Abilities banned before the match: nobody can draft them (an arena played alone has no bans).
+function bannedAbilities(game) {
+  return game.match && game.match.bannedAbilities ? game.match.bannedAbilities : [];
+}
+
+// Offers a random handful of the abilities the hero does not have yet, never a banned one.
 function openDraft(game) {
   const owned = new Set(game.hero.abilities.map((ability) => ability.key));
-  const all = draftPool();
+  const banned = new Set(bannedAbilities(game));
+  const all = draftPool().filter((key) => !banned.has(key));
   const pool = all.filter((key) => !owned.has(key));
   const count = draftOptionCount(all.length);
   const options = [];

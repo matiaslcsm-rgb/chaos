@@ -1605,6 +1605,61 @@ test('the bench plays a match alone and counts heroes, abilities, gold and duels
   assert(lines[0] === '1 partidas, hasta la ronda 4.' && lines.some((line) => line.startsWith('Sin alarmas')), lines[0]);
 });
 
+test('bans: each rival bans a different ability, you ban one more or pass, and the hero bans wait for 40 heroes', () => {
+  const setup = createSetup(31);
+  assert(setup.step === 'ban' && setup.aiBans.length === 7, `rival bans: ${setup.aiBans.length}`);
+  assert(new Set(setup.aiBans).size === 7, 'no ability banned twice');
+  assert(setup.aiBans.every((key) => draftPool().includes(key)), 'bans come from the batch');
+  assert(AI_BAN_TARGETS.every((key) => setup.aiBans.includes(key)) || setup.aiBans.every((key) => AI_BAN_TARGETS.includes(key)),
+    'rivals go for the strongest first');
+  assert(!setupBan(setup, setup.aiBans[0]), 'one already banned cannot be chosen');
+  const mine = draftPool().find((key) => !setup.aiBans.includes(key));
+  assert(setupBan(setup, mine) && setup.step === 'hero', 'your ban moves on to the hero');
+  assert(!setupBan(setup, mine), 'only one ban');
+  assert(setupBans(setup).length === 8 && setupBans(setup).includes(mine), 'eight bans in all');
+  const passed = createSetup(32);
+  assert(setupBan(passed, null) && setupBans(passed).length === 7, 'you can pass');
+  assert(!heroBansActive(), 'decision D10: no hero bans with 10 heroes');
+  // A match of 8 computer players bans 8.
+  assert(createMatch(null, 33).bannedAbilities.length === 8, 'eight bans without a human');
+});
+
+test('bans: nobody is offered a banned ability, not even in many drafts', () => {
+  const setup = createSetup(34);
+  setupBan(setup, draftPool().find((key) => !setup.aiBans.includes(key)));
+  const match = matchFromSetup(setup, setup.offer[0]);
+  const banned = new Set(match.bannedAbilities);
+  assert(banned.size === 8, `banned: ${banned.size}`);
+  for (const player of match.players) {
+    for (let i = 0; i < 5; i++) {
+      openDraft(player.game);
+      assert(player.game.draft.options.length === DRAFT_OPTIONS_FEW, 'still a full offer');
+      assert(player.game.draft.options.every((key) => !banned.has(key)), `${player.name} was offered a banned one`);
+      skipDraft(player.game);
+    }
+    assert(player.game.hero.abilities.every((ability) => !banned.has(ability.key)), 'no banned ability in a kit');
+  }
+});
+
+test('hero offer: 4 heroes, one reroll that keeps the first and brings 3 new ones, and only those can be chosen', () => {
+  const setup = createSetup(35);
+  assert(setup.offer.length === HERO_OFFER && new Set(setup.offer).size === HERO_OFFER, 'four different heroes');
+  assert(!canReroll(setup) && !rerollHeroes(setup), 'no reroll before banning');
+  assert(matchFromSetup(setup, setup.offer[0]) === null, 'no match before banning');
+  setupBan(setup, null);
+  const first = setup.offer.slice();
+  assert(rerollHeroes(setup), 'reroll');
+  assert(setup.offer.length === HERO_OFFER && setup.offer[0] === first[0], 'the first stays');
+  assert(setup.offer.slice(1).every((data) => !first.includes(data)), 'three new ones');
+  assert(new Set(first.concat(setup.offer)).size === 7, 'seven heroes seen in all');
+  assert(!rerollHeroes(setup) && setup.rerolled, 'only once');
+  const outside = batchHeroes().map((hero) => hero.data).find((data) => !setup.offer.includes(data));
+  assert(matchFromSetup(setup, outside) === null, 'a hero outside the offer cannot be chosen');
+  const match = matchFromSetup(setup, setup.offer[2]);
+  assert(match && humanPlayer(match).game.hero.data === setup.offer[2], 'you play the hero you chose');
+  assert(new Set(match.players.map((player) => player.game.hero.data)).size === 8, 'the rivals take other heroes');
+});
+
 async function runTests() {
   const summary = document.getElementById('summary');
   const list = document.getElementById('results');

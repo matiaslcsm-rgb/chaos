@@ -22,9 +22,71 @@ function shuffled(rng, list) {
   return copy;
 }
 
+// ---- Before the match ----
+
+// Decision D10: every player bans 1 ability; hero bans switch on once the roster has 40 heroes or more.
+const BANS = { abilitiesPerPlayer: 1, heroBansFrom: 40 };
+// The mod offers 4 heroes (one given plus 3 to choose from) and one reroll: 3 new ones come and the first stays.
+const HERO_OFFER = 4;
+
+function heroBansActive() {
+  return batchHeroes().length >= BANS.heroBansFrom;
+}
+
+// The steps before the match for the human: 'ban' (choose an ability to ban) and 'hero' (choose among the
+// offer, with one reroll). The computer players ban first, so their bans show as already taken.
+function createSetup(seed) {
+  const rng = makeRng(seed + 1);
+  const heroes = shuffled(rng, batchHeroes().map((hero) => hero.data));
+  return {
+    seed,
+    step: 'ban',
+    aiBans: aiBanAbilities(rng, (MATCH_PLAYERS - 1) * BANS.abilitiesPerPlayer, []),
+    humanBan: null,
+    offer: heroes.slice(0, HERO_OFFER),
+    deck: heroes.slice(HERO_OFFER),
+    rerolled: false,
+  };
+}
+
+// key: the ability to ban, or null to pass. One already banned by a rival cannot be chosen.
+function setupBan(setup, key) {
+  if (setup.step !== 'ban') return false;
+  if (key !== null && (!draftPool().includes(key) || setup.aiBans.includes(key))) return false;
+  setup.humanBan = key;
+  setup.step = 'hero';
+  return true;
+}
+
+function canReroll(setup) {
+  return setup.step === 'hero' && !setup.rerolled && setup.deck.length >= HERO_OFFER - 1;
+}
+
+// Once per match: the first hero stays and the other 3 are replaced by new ones.
+function rerollHeroes(setup) {
+  if (!canReroll(setup)) return false;
+  setup.offer = [setup.offer[0]].concat(setup.deck.splice(0, HERO_OFFER - 1));
+  setup.rerolled = true;
+  return true;
+}
+
+function setupBans(setup) {
+  return setup.humanBan ? setup.aiBans.concat(setup.humanBan) : setup.aiBans.slice();
+}
+
+// The match starts with the hero the human chose among the offer and every ban made.
+function matchFromSetup(setup, heroData) {
+  if (setup.step !== 'hero' || !setup.offer.includes(heroData)) return null;
+  return createMatch(heroData, setup.seed, setupBans(setup));
+}
+
+// ---- The match ----
+
 // humanHero: the hero data the human chose, or null for a match of 8 computer players (tests, the bench).
-function createMatch(humanHero, seed) {
+// bans: the abilities banned before the match; left out, the computer players ban (all 8 of them without a human).
+function createMatch(humanHero, seed, bans) {
   const rng = makeRng(seed);
+  const bannedAbilities = bans || aiBanAbilities(rng, (humanHero ? MATCH_PLAYERS - 1 : MATCH_PLAYERS) * BANS.abilitiesPerPlayer, []);
   const pool = shuffled(rng, batchHeroes().map((hero) => hero.data).filter((data) => data !== humanHero));
   const names = shuffled(rng, AI_NAMES);
   const players = [];
@@ -43,7 +105,7 @@ function createMatch(humanHero, seed) {
       outRound: null,
     });
   }
-  const match = { players, rng, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, over: false, duel: null, lastDuelists: [] };
+  const match = { players, rng, bannedAbilities, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, over: false, duel: null, lastDuelists: [] };
   for (const player of players) {
     player.game.match = match;
     player.game.payRound = (game) => roundPrize(match, game);

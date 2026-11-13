@@ -11,6 +11,7 @@ const FX_TIME = 0.45;
 const MESSAGE_TIME = 1.8;
 const ZONE_FADE_TIME = 0.5;
 const CARD = { width: 220, height: 220, gap: 20, columns: 5, top: 150 };
+const BAN = { columns: 6, width: 196, height: 52, gap: 7, top: 96 };
 const DRAFT = { columns: 4, width: 296, height: 126, gap: 12, top: 88 };
 const BAR = { size: 72, gap: 6, bottom: 16, plusHeight: 20, plusGap: 4 };
 const INVENTORY = { size: 54, gap: 4, columns: 3, margin: 16 };
@@ -92,17 +93,39 @@ function wrapText(ctx, text, maxWidth) {
 
 // ---- Layout shared with the click handling ----
 
-// Hero cards of the selection screen, in canvas pixels.
+// Hero cards of the selection screen (the offer of hero data), in canvas pixels.
 function selectCards(canvas, heroes) {
-  const rowWidth = CARD.columns * CARD.width + (CARD.columns - 1) * CARD.gap;
+  const columns = Math.min(CARD.columns, heroes.length);
+  const rowWidth = columns * CARD.width + (columns - 1) * CARD.gap;
   const left = (canvas.width - rowWidth) / 2;
-  return heroes.map((hero, index) => ({
-    hero,
-    x: left + (index % CARD.columns) * (CARD.width + CARD.gap),
-    y: CARD.top + Math.floor(index / CARD.columns) * (CARD.height + CARD.gap),
+  return heroes.map((data, index) => ({
+    data,
+    x: left + (index % columns) * (CARD.width + CARD.gap),
+    y: CARD.top + Math.floor(index / columns) * (CARD.height + CARD.gap),
     width: CARD.width,
     height: CARD.height,
   }));
+}
+
+function rerollButton(canvas) {
+  return { x: canvas.width / 2 - 170, y: CARD.top + CARD.height + 40, width: 340, height: 38 };
+}
+
+// The ability cells of the ban screen, in the batch order (grouped by the hero they come from).
+function banCells(canvas) {
+  const rowWidth = BAN.columns * BAN.width + (BAN.columns - 1) * BAN.gap;
+  const left = (canvas.width - rowWidth) / 2;
+  return draftPool().map((key, index) => ({
+    key,
+    x: left + (index % BAN.columns) * (BAN.width + BAN.gap),
+    y: BAN.top + Math.floor(index / BAN.columns) * (BAN.height + BAN.gap),
+    width: BAN.width,
+    height: BAN.height,
+  }));
+}
+
+function banPassButton(canvas) {
+  return { x: canvas.width / 2 - 130, y: canvas.height - 82, width: 260, height: 34 };
 }
 
 function heroPanelRect(canvas) {
@@ -218,9 +241,72 @@ function slotState(hero, ability) {
   return castProblem(hero, ability) || 'ready';
 }
 
-// ---- Hero selection ----
+// ---- Before the match: bans and hero ----
 
-function drawSelect(ctx, canvas, heroes, mouse) {
+function drawButton(ctx, rect, text, hover, enabled) {
+  ctx.fillStyle = !enabled ? '#1b2030' : hover ? '#3a4154' : '#262c3a';
+  ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = enabled ? '#d8dce6' : '#5a6274';
+  ctx.font = `15px ${FONT}`;
+  ctx.fillText(text, rect.x + rect.width / 2, rect.y + rect.height / 2 + 5);
+}
+
+function abilityNames(keys) {
+  return keys.map((key) => DB.abilities[key].dname).join(', ');
+}
+
+function drawBan(ctx, canvas, setup, mouse) {
+  ctx.fillStyle = '#151922';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#e8b04a';
+  ctx.font = `bold 34px ${FONT}`;
+  ctx.fillText('Baneá una habilidad', canvas.width / 2, 48);
+  ctx.fillStyle = '#8a93a6';
+  ctx.font = `14px ${FONT}`;
+  ctx.fillText('Nadie va a poder elegirla en esta partida. Las tachadas ya las banearon los rivales.', canvas.width / 2, 76);
+
+  let hovered = null;
+  for (const cell of banCells(canvas)) {
+    const taken = setup.aiBans.includes(cell.key);
+    const hover = !taken && inRect(mouse, cell);
+    if (inRect(mouse, cell)) hovered = cell.key;
+    const def = ABILITY_DEFS[cell.key];
+    ctx.fillStyle = taken ? '#141720' : hover ? '#3a2a2a' : '#1b2030';
+    ctx.fillRect(cell.x, cell.y, cell.width, cell.height);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = hover ? '#e65a46' : def.ult ? '#6b5a2e' : '#333a4c';
+    ctx.strokeRect(cell.x, cell.y, cell.width, cell.height);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = taken ? '#5a6274' : '#e8ecf4';
+    ctx.font = `bold 13px ${FONT}`;
+    ctx.fillText(DB.abilities[cell.key].dname, cell.x + 8, cell.y + 20, cell.width - 16);
+    ctx.fillStyle = taken ? '#4a5060' : '#8a93a6';
+    ctx.font = `11px ${FONT}`;
+    ctx.fillText(`${def.ult ? 'Definitiva · ' : ''}de ${abilityOwnerName(cell.key)}`, cell.x + 8, cell.y + 38, cell.width - 16);
+    if (taken) {
+      ctx.strokeStyle = '#e65a46';
+      ctx.beginPath();
+      ctx.moveTo(cell.x + 6, cell.y + cell.height / 2);
+      ctx.lineTo(cell.x + cell.width - 6, cell.y + cell.height / 2);
+      ctx.stroke();
+    }
+  }
+
+  const button = banPassButton(canvas);
+  drawButton(ctx, button, 'No banear nada', inRect(mouse, button), true);
+  ctx.textAlign = 'center';
+  ctx.font = `12px ${FONT}`;
+  ctx.fillStyle = '#b8c0d0';
+  // What the ability under the mouse does (the descriptions come in English from the Dota data).
+  const text = hovered ? `${DB.abilities[hovered].dname}: ${DB.abilities[hovered].desc || ''}` : '';
+  wrapText(ctx, text, canvas.width - 120).slice(0, 2).forEach((line, row) => {
+    ctx.fillText(line, canvas.width / 2, canvas.height - 30 + row * 15);
+  });
+}
+
+function drawSelect(ctx, canvas, setup, mouse) {
   ctx.fillStyle = '#151922';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.textAlign = 'center';
@@ -228,8 +314,8 @@ function drawSelect(ctx, canvas, heroes, mouse) {
   ctx.font = `bold 44px ${FONT}`;
   ctx.fillText('Elegí tu héroe', canvas.width / 2, 90);
 
-  for (const card of selectCards(canvas, heroes)) {
-    const { data } = card.hero;
+  for (const card of selectCards(canvas, setup.offer)) {
+    const { data } = card;
     const stats = heroStats(data, 1);
     ctx.fillStyle = inRect(mouse, card) ? '#262c3a' : '#1b2030';
     ctx.fillRect(card.x, card.y, card.width, card.height);
@@ -262,6 +348,20 @@ function drawSelect(ctx, canvas, heroes, mouse) {
   ctx.fillStyle = '#8a93a6';
   ctx.font = `15px ${FONT}`;
   ctx.fillText('El héroe pone los atributos. Las habilidades las vas eligiendo durante la partida, de cualquier héroe.', canvas.width / 2, 660);
+
+  const reroll = rerollButton(canvas);
+  const label = setup.rerolled ? 'Ya volviste a sortear' : 'Volver a sortear (una vez; el primero queda)';
+  drawButton(ctx, reroll, label, inRect(mouse, reroll), canReroll(setup));
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#b8c0d0';
+  ctx.font = `14px ${FONT}`;
+  const bans = setupBans(setup);
+  const bansText = bans.length ? `Habilidades baneadas: ${abilityNames(bans)}.` : 'No hay habilidades baneadas.';
+  wrapText(ctx, bansText, canvas.width - 160).forEach((line, row) => {
+    ctx.fillText(line, canvas.width / 2, reroll.y + 80 + row * 20);
+  });
+  ctx.fillStyle = '#8a93a6';
+  ctx.fillText(setup.humanBan ? `Tu baneo: ${DB.abilities[setup.humanBan].dname}.` : 'No baneaste nada.', canvas.width / 2, reroll.y + 140);
 }
 
 // ---- Draft ----

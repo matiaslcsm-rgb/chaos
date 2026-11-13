@@ -91,6 +91,26 @@ function abilityTags(key) {
   return (AI_ABILITY_INFO[key] || { tags: [] }).tags;
 }
 
+// ---- Bans ----
+
+// The abilities the bench marks as the strongest (owners who win the most). Each computer player bans one of
+// them at random, never one already banned; if the list runs out, any ability of the batch.
+const AI_BAN_TARGETS = [
+  'zuus_lightning_hands', 'phantom_assassin_coup_de_grace', 'sniper_headshot', 'viper_poison_attack',
+];
+
+function aiBanAbilities(rng, count, taken) {
+  const bans = [];
+  for (let i = 0; i < count; i++) {
+    const banned = new Set(taken.concat(bans));
+    let options = AI_BAN_TARGETS.filter((key) => !banned.has(key));
+    if (!options.length) options = draftPool().filter((key) => !banned.has(key));
+    if (!options.length) break;
+    bans.push(pickFrom(rng, options));
+  }
+  return bans;
+}
+
 // ---- Draft ----
 
 // How much this computer player wants a draft option: its style, what its kit is missing, and some luck.

@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.8.0 · Etapa 3: oleadas y banco';
+const GAME_VERSION = '0.9.0 · Etapa 4: baneos y sorteo del héroe';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -32,7 +32,8 @@ const SHOP_MESSAGES = {
   closed: 'La tienda abre entre rondas',
 };
 
-let heroes = [];
+// The bans and the hero offer before a match.
+let setup = null;
 // The match of 8, and the human's own arena inside it (what is drawn and controlled).
 let match = null;
 let game = null;
@@ -72,15 +73,29 @@ function say(text) {
   view.message = { text, age: 0 };
 }
 
+// The steps before the match (bans, then hero), until the match starts.
+function newSetup() {
+  setup = createSetup(Date.now());
+}
+
 function startGame(heroData) {
-  match = createMatch(heroData, Date.now());
+  match = matchFromSetup(setup, heroData);
+  if (!match) return;
+  setup = null;
   game = humanPlayer(match).game;
   Object.assign(view, { floaters: [], effects: [], marker: null, message: null, attackMoveArmed: false, targeting: null, shop: false, hoverEnemy: null, spy: null });
 }
 
+function onBanClick(point) {
+  const cell = banCells(canvas).find((c) => inRect(point, c));
+  if (cell) setupBan(setup, cell.key);
+  else if (inRect(point, banPassButton(canvas))) setupBan(setup, null);
+}
+
 function onSelectClick(point) {
-  const card = selectCards(canvas, heroes).find((c) => inRect(point, c));
-  if (card) startGame(card.hero.data);
+  const card = selectCards(canvas, setup.offer).find((c) => inRect(point, c));
+  if (card) startGame(card.data);
+  else if (inRect(point, rerollButton(canvas))) rerollHeroes(setup);
 }
 
 function onDraftClick(point) {
@@ -250,12 +265,15 @@ canvas.addEventListener('mousedown', (event) => {
   const point = canvasPoint(event);
   view.mouse = point;
   if (!game) {
-    if (event.button === 0) onSelectClick(point);
+    if (event.button !== 0) return;
+    if (setup.step === 'ban') onBanClick(point);
+    else onSelectClick(point);
     return;
   }
   if (endingText(game)) {
     game = null;
     match = null;
+    newSetup();
     return;
   }
   if (game.draft) {
@@ -389,8 +407,10 @@ function frame(now) {
     if (endingText(game) || game.draft) view.targeting = null;
     view.hoverEnemy = enemyAt(worldPoint(view.mouse));
     drawGame(ctx, canvas, game, view);
+  } else if (setup.step === 'ban') {
+    drawBan(ctx, canvas, setup, view.mouse);
   } else {
-    drawSelect(ctx, canvas, heroes, view.mouse);
+    drawSelect(ctx, canvas, setup, view.mouse);
   }
   requestAnimationFrame(frame);
 }
@@ -406,7 +426,7 @@ async function boot() {
     ctx.fillText('Abrí el juego desde el servidor local, no con doble clic.', canvas.width / 2, canvas.height / 2 + 30);
     return;
   }
-  heroes = batchHeroes();
+  newSetup();
   requestAnimationFrame(frame);
 }
 
