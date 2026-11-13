@@ -260,14 +260,32 @@ Una partida completa, pero chica.
       - Los baneos de héroe quedan apagados hasta que haya 40 héroes o más (D10).
       - 3 pruebas nuevas (93 en total).
       Simplificaciones a revisar: los rivales no eligen héroe según su estilo (les toca uno al azar entre los que
-      quedan); en el mod los baneos probablemente son
-      a la vez y acá los rivales banean primero; la lista de "las más fuertes" está fija en `js/ai.js` y hay que
-      actualizarla a mano con cada banco.
-- [ ] Roshan.
-- [ ] Libros para cambiar o sumar una habilidad.
-- [ ] Ítems neutrales.
-- [ ] Marcas por perder duelos seguidos y ayudas al que va abajo.
-- [ ] Aghanim para cualquier habilidad.
+      quedan); en el mod los baneos probablemente son a la vez y acá los rivales banean primero; la lista de "las
+      más fuertes" está fija en `js/ai.js` y hay que actualizarla a mano con cada banco.
+- [x] Roshan (2026-11-12), con la decisión D9:
+      - En las rondas 10, 20, 30... no hay oleada: aparece Roshan solo. Esa ronda no tiene duelo (historial del
+        mod, 2 abr 2020). En la pausa anterior se anuncia: "Próxima ronda: Roshan".
+      - Pega fuerte, a veces aturde, resiste la magia (40%: los que pegan con golpes lo matan más fácil, como en
+        el mod) y se enfurece cada 10 segundos: +10% de daño y más velocidad de ataque, sin techo. A los 50
+        segundos también se enfurece como los creeps.
+      - Cada vez que vuelve es más fuerte: crece como los creeps y, además, un 15% más por cada aparición.
+      - Matarlo rápido paga más (el premio de ronda va por puesto) y da 400 de oro base. Si tenés menos de 2 Aegis,
+        te da uno (ver "Roshan: Aegis o libro" en las decisiones abiertas).
+      - Se dibuja violeta, más grande, con su nombre y su nivel de furia.
+      - El banco ahora dice cuántos jugadores caen en las rondas de Roshan y en las oleadas pesadas.
+      - 2 pruebas nuevas.
+      Calibración: con un script aparte medí qué pasa en cada ronda de Roshan. Con los primeros números (más
+      fuerte en la ronda 10) caían 7 de 8; con un Aegis para todos los que lo mataban, las partidas terminaban
+      todas en la ronda 60. Quedó: unos pocos eliminados en cada Roshan, más en los de las rondas 50 y 60.
+      Simplificaciones a revisar: el nombre "Roshan" es el de Dota (entra en la decisión de nombres); el "tope del
+      daño por porcentaje de vida contra Roshan" de `DISENO.md` no hace falta todavía porque ninguna habilidad del
+      lote hace ese daño.
+- [ ] Libros para cambiar o sumar una habilidad. Espera dos decisiones: "Libros: el nivel de la habilidad nueva"
+      y "Libros gratis para los que van últimos".
+- [ ] Ítems neutrales. Espera la decisión "Ítems neutrales: en qué rondas cae cada nivel".
+- [ ] Marcas por perder duelos seguidos y ayudas al que va abajo. Las marcas ya están (D8, en "Final de
+      partida"); las ayudas son los libros gratis, que esperan las decisiones de los libros.
+- [ ] Aghanim para cualquier habilidad. Espera la decisión "Aghanim".
 
 **Lista cuando:** comparado con `REFERENCIA-CHC.md`, no queda nada "distinto" sin que sea una decisión anotada.
 
