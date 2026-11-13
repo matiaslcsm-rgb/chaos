@@ -245,14 +245,15 @@ const CREEP_TRAITS = {
       },
     },
   }),
-  // Killing it gives the arena's hero one more Aegis.
+  // Decision D9 says "an Aegis or a book": killing it gives an Aegis to whoever has fewer than they started
+  // with. With more, it will be a book once books exist; meanwhile nothing (see docs/PLAN.md).
   aegis: () => ({
     key: 'creep_aegis',
     cooldown: 0,
     def: {
       onDeath(c) {
         const hero = c.sim.units.find((unit) => unit.kind === 'hero' && unit.team === HERO_TEAM);
-        if (!hero) return;
+        if (!hero || (hero.aegis || 0) >= AEGIS_START) return;
         hero.aegis = (hero.aegis || 0) + 1;
         pushEvent(c.sim, { type: 'text', x: c.caster.x, y: c.caster.y, text: `¡${c.caster.name} soltó un Aegis!` });
       },

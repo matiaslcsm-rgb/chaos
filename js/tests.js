@@ -1688,7 +1688,7 @@ test('Roshan: alone every 10 rounds, stronger each time, announced, and no duel 
   assert(other.timer === PREP_TIME, 'a normal break');
 });
 
-test('Roshan: resists magic, grows angrier every 10 seconds, and killing it gives an Aegis', () => {
+test('Roshan: resists magic, grows angrier every 10 seconds, and killing it gives an Aegis to who has fewer than 2', () => {
   const game = createGame(heroByName('Sven'), 43);
   game.round = 9;
   startRound(game);
@@ -1705,13 +1705,20 @@ test('Roshan: resists magic, grows angrier every 10 seconds, and killing it give
   const rage = creepType('roshan').rage;
   assertNear(roshan.stats.damageMin, damage * (1 + 2 * rage.damagePct / 100), 0.01, 'two rages of damage');
   assertNear(roshan.stats.attackSpeed, attackSpeed + 2 * rage.attackSpeed, 0.01, 'two rages of attack speed');
-  const aegis = game.hero.aegis;
+  game.hero.aegis = 1;
   const gold = game.hero.gold;
   applyDamage(game.sim, game.hero, roshan, 1e9, 'pure');
   stepArena(game, TEST_STEP);
-  assert(game.hero.aegis === aegis + 1, `aegis ${game.hero.aegis}`);
+  assert(game.hero.aegis === 2, `aegis ${game.hero.aegis}`);
   assert(game.hero.gold > gold, 'its bounty and the round pay');
   assert(game.phase === 'prep', 'the round is over');
+  // With the 2 of the start, no Aegis (decision D9: then it will be a book).
+  const full = createGame(heroByName('Sven'), 44);
+  full.round = 9;
+  startRound(full);
+  applyDamage(full.sim, full.hero, full.sim.units.find((unit) => unit.creepKind === 'roshan'), 1e9, 'pure');
+  stepArena(full, TEST_STEP);
+  assert(full.hero.aegis === AEGIS_START, `aegis ${full.hero.aegis}`);
 });
 
 async function runTests() {
