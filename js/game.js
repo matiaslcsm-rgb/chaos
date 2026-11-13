@@ -78,7 +78,8 @@ function earn(game, amount, source) {
 }
 
 function creepStats(type, round) {
-  const growth = creepGrowth(round);
+  // A boss grows like the creeps and, on top, a bit more each time it comes back.
+  const growth = creepGrowth(round) * (type.bossGrowth ? 1 + type.bossGrowth * (Math.floor(round / ROSHAN_EVERY) - 1) : 1);
   const lateResist = round >= CREEP_GROWTH.magicResistFrom ? CREEP_GROWTH.magicResist : 0;
   return Object.assign({
     maxHp: Math.round(type.maxHp * growth),

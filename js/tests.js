@@ -1673,6 +1673,7 @@ test('Roshan: alone every 10 rounds, stronger each time, announced, and no duel 
   for (const round of [1, 5, 9, 15, 25]) assert(!isRoshanRound(round), `round ${round}`);
   const type = creepType('roshan');
   assert(creepStats(type, 20).maxHp > creepStats(type, 10).maxHp, 'stronger each time');
+  assert(creepStats(type, 20).maxHp > creepStats(creepType('golem'), 20).maxHp * creepStats(type, 10).maxHp / creepStats(creepType('golem'), 10).maxHp, 'it grows faster than the creeps');
   assert(waveText(waveForRound(10)) === 'Roshan', waveText(waveForRound(10)));
   const match = createMatch(null, 41);
   match.round = 9;
@@ -1693,7 +1694,7 @@ test('Roshan: resists magic, grows angrier every 10 seconds, and killing it give
   startRound(game);
   const roshan = game.sim.units.find((unit) => unit.kind === 'creep' && !unit.dead);
   assert(roshan.creepKind === 'roshan' && creepsAlive(game) === 1, 'Roshan alone');
-  assert(roshan.stats.magicResist >= 50, `magic resist ${roshan.stats.magicResist}`);
+  assert(roshan.stats.magicResist === creepType('roshan').magicResist && roshan.stats.magicResist > 0, `magic resist ${roshan.stats.magicResist}`);
   // Keep it still and harmless to watch it grow.
   roshan.baseStats.moveSpeed = 0;
   game.hero.x = 100;
