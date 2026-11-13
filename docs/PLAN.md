@@ -80,6 +80,15 @@ cierra con algo que se puede comprobar.
 - **Ítems neutrales: en qué rondas cae cada nivel** (decisión): para *Chaos* no se encontró. (a) **como *Clash*, que
   los entrega al terminar las rondas 10, 20, 30 y 40, y el quinto nivel en la 50 (recomendada)**; (b) que los suelten los creeps al
   azar, con más chance de nivel alto en rondas altas.
+- **Aghanim** (decisión, 2026-11-12): el mod dice que el cetro y el fragmento "funcionan con cualquier habilidad",
+  pero en Dota cada héroe tiene una sola mejora de cetro y una de fragmento, y la mitad de esas mejoras son una
+  habilidad nueva (por ejemplo, el cetro de Ogre Magi da "Unrefined Fireblast"). En el lote 1, 6 habilidades
+  tienen mejora de cetro y 5 de fragmento; las otras 32 no tienen ninguna. Además, en Dota el cetro se arma con
+  4 ítems que no están en el lote. (a) **mejorar solo las habilidades que en Dota tienen mejora propia, y cuando
+  la mejora es una habilidad nueva, dársela al que tenga la habilidad "madre" (Fireblast → Unrefined Fireblast)
+  (recomendada: es lo que se puede hacer sin inventar)**; (b) inventar una mejora para cada habilidad (más trabajo
+  y menos fiel); (c) dejar el Aghanim para después de los lotes de contenido. Para el precio: el cetro a 4.200 y
+  el fragmento a 1.400, como en Dota, comprados de una sola vez.
 
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
