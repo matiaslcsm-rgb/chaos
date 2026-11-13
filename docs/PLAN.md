@@ -140,9 +140,10 @@ Una partida completa, pero chica.
         (aturdido, provocado, inmóvil, silenciado, desarmado, lento) y los efectos activos del héroe con su tiempo.
       - 28 pruebas nuevas, una por pieza, más una que lanza las 43 habilidades a nivel 1 y al máximo.
         `node tools/run-tests.js` corre las mismas pruebas sin abrir el navegador.
-      Simplificaciones a revisar: Battle Hunger siempre ralentiza, Lunar Orbit es un área alrededor de Luna, Great
-      Cleave es un cono de 120°, Bloodlust solo se lanza sobre uno mismo. (Resuelta el 2026-11-12: la lentitud de
-      Viper Strike ahora baja de a poco hasta desaparecer, como en Dota, con su prueba.)
+      Simplificaciones a revisar: Lunar Orbit es un área alrededor de Luna, Great Cleave es un cono de 120°,
+      Bloodlust solo se lanza sobre uno mismo, Battle Hunger no se corta cuando el enemigo mata a alguien.
+      Resueltas el 2026-11-12, con sus pruebas: la lentitud de Viper Strike baja de a poco hasta desaparecer, y
+      Battle Hunger solo ralentiza mientras el enemigo le da la espalda a Axe, como en Dota.
 - [x] Una arena con oleadas de creeps y el héroe controlado al estilo Dota: elegís entre los 10 héroes, clic derecho
       para mover o atacar, A + clic para avanzar atacando, S para frenar; un nivel por ronda (`js/game.js`,
       `js/render.js`, `js/main.js`). Los creeps son provisorios hasta investigar las oleadas del mod (2026-11-10).

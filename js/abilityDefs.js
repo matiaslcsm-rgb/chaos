@@ -7,6 +7,13 @@
 
 const FX = { fire: '#f28c38', ice: '#8fd3f4', bolt: '#f2e08a', poison: '#8bc34a', arcane: '#c792ea', steel: '#d8dce6' };
 
+// Whether a unit has its back to another one: the other is more than 90° away from where it looks.
+function facesAway(unit, other) {
+  const toOther = Math.atan2(other.y - unit.y, other.x - unit.x);
+  const diff = Math.abs(Math.atan2(Math.sin(toOther - unit.facing), Math.cos(toOther - unit.facing)));
+  return diff > Math.PI / 2;
+}
+
 function slowStats(move, attack) {
   return { stats: { moveSpeedPct: neg(move), attackSpeed: neg(attack || 0) } };
 }
@@ -142,10 +149,25 @@ const ABILITY_DEFS = {
   },
   axe_battle_hunger: {
     cast: 'unit',
+    // As in Dota, the slow only holds while the target faces away from Axe.
     hit(c) {
+      // Damage once per second; where the target looks is checked four times as often.
+      const damage = dot(c, c.v('damage_per_second'), 'pure');
+      const slow = { moveSpeedPct: neg(c.v('slow')) };
+      const facingAway = (unit) => !c.caster.dead && facesAway(unit, c.caster);
       status(c, c.target, 'hunger', c.v('duration'), {
-        stats: { moveSpeedPct: neg(c.v('slow')) },
-        tick: dot(c, c.v('damage_per_second'), 'pure'),
+        stats: facingAway(c.target) ? slow : {},
+        checks: 0,
+        tick: {
+          interval: damage.interval / 4,
+          run(mod, unit) {
+            if (++mod.checks % 4 === 0) damage.run(mod, unit);
+            const next = facingAway(unit) ? slow : {};
+            if (next === mod.stats) return;
+            mod.stats = next;
+            recomputeStats(unit);
+          },
+        },
       });
     },
   },

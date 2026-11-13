@@ -1687,6 +1687,26 @@ test('Viper Strike: the slow fades as the poison wears off, and the damage over 
   assertNear(dealt, abilityValue(viper.abilities[index], 'damage') * total, abilityValue(viper.abilities[index], 'damage') * 0.6, 'damage over the whole poison');
 });
 
+test('Battle Hunger: slows only while the target has its back to Axe', () => {
+  const sim = createSim(1);
+  const axe = addTestHero(sim, 'Axe', 10, 500, 500);
+  fillMana(axe);
+  const index = teach(axe, 'axe_battle_hunger', 1);
+  const target = addDummy(sim, 700, 500, { moveSpeed: 300 });
+  target.facing = Math.PI; // looking at Axe
+  assert(!orderCast(axe, index, target), 'cast');
+  runUntil(sim, 3, () => findMod(target, 'axe_battle_hunger:hunger'), 'the hunger lands');
+  const mod = findMod(target, 'axe_battle_hunger:hunger');
+  assert(!mod.stats.moveSpeedPct, 'no slow while facing Axe');
+  target.facing = 0; // its back to Axe
+  runFor(sim, 0.3);
+  assert(mod.stats.moveSpeedPct === -abilityValue(axe.abilities[index], 'slow'), `slowed: ${mod.stats.moveSpeedPct}`);
+  assert(target.stats.moveSpeed < 300, 'slower');
+  target.facing = Math.PI;
+  runFor(sim, 0.3);
+  assert(!mod.stats.moveSpeedPct && target.stats.moveSpeed === 300, 'free again when it turns around');
+});
+
 // ---- Roshan (decision D9) ----
 
 test('Roshan: alone every 10 rounds, stronger each time, announced, and no duel that round', () => {
