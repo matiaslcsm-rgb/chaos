@@ -1502,6 +1502,11 @@ test('waves: the same for everyone each round, 1 to 3 kinds, heavy every 5 round
   for (let round = 1; round <= 90; round++) {
     const wave = waveForRound(round);
     assert(JSON.stringify(wave) === JSON.stringify(waveForRound(round)), `round ${round} changes`);
+    if (isRoshanRound(round)) {
+      assert(wave.length === 1 && wave[0].key === 'roshan' && wave[0].count === 1, `round ${round}: Roshan alone`);
+      continue;
+    }
+    assert(wave.every((entry) => !creepType(entry.key).boss), `round ${round}: a boss in a normal wave`);
     assert(wave.length >= 1 && wave.length <= 3, `round ${round}: ${wave.length} kinds`);
     const total = wave.reduce((sum, entry) => sum + entry.count, 0);
     assert(total >= 4 && total <= WAVE.maxCount, `round ${round}: ${total} creeps`);
@@ -1658,6 +1663,53 @@ test('hero offer: 4 heroes, one reroll that keeps the first and brings 3 new one
   const match = matchFromSetup(setup, setup.offer[2]);
   assert(match && humanPlayer(match).game.hero.data === setup.offer[2], 'you play the hero you chose');
   assert(new Set(match.players.map((player) => player.game.hero.data)).size === 8, 'the rivals take other heroes');
+});
+
+// ---- Roshan (decision D9) ----
+
+test('Roshan: alone every 10 rounds, stronger each time, announced, and no duel that round', () => {
+  for (const round of [10, 20, 30, 60]) assert(isRoshanRound(round), `round ${round}`);
+  for (const round of [1, 5, 9, 15, 25]) assert(!isRoshanRound(round), `round ${round}`);
+  const type = creepType('roshan');
+  assert(creepStats(type, 20).maxHp > creepStats(type, 10).maxHp, 'stronger each time');
+  assert(waveText(waveForRound(10)) === 'Roshan', waveText(waveForRound(10)));
+  const match = createMatch(null, 41);
+  match.round = 9;
+  assert(!duelRoundFor(match), 'round 10 has no duel');
+  match.round = 10;
+  assert(duelRoundFor(match), 'round 11 has one again');
+  // Played: the break before round 10 announces no duel.
+  const other = createMatch(null, 42);
+  other.round = 9;
+  startBreak(other);
+  assert(!other.duel || other.duel.state !== 'betting', 'nobody announced for the duel');
+  assert(other.timer === PREP_TIME, 'a normal break');
+});
+
+test('Roshan: resists magic, grows angrier every 10 seconds, and killing it gives an Aegis', () => {
+  const game = createGame(heroByName('Sven'), 43);
+  game.round = 9;
+  startRound(game);
+  const roshan = game.sim.units.find((unit) => unit.kind === 'creep' && !unit.dead);
+  assert(roshan.creepKind === 'roshan' && creepsAlive(game) === 1, 'Roshan alone');
+  assert(roshan.stats.magicResist >= 50, `magic resist ${roshan.stats.magicResist}`);
+  // Keep it still and harmless to watch it grow.
+  roshan.baseStats.moveSpeed = 0;
+  game.hero.x = 100;
+  game.hero.y = ARENA.height - 60;
+  const damage = roshan.stats.damageMin;
+  const attackSpeed = roshan.stats.attackSpeed;
+  for (let t = 0; t < 21; t += TEST_STEP) stepSim(game.sim, TEST_STEP);
+  const rage = creepType('roshan').rage;
+  assertNear(roshan.stats.damageMin, damage * (1 + 2 * rage.damagePct / 100), 0.01, 'two rages of damage');
+  assertNear(roshan.stats.attackSpeed, attackSpeed + 2 * rage.attackSpeed, 0.01, 'two rages of attack speed');
+  const aegis = game.hero.aegis;
+  const gold = game.hero.gold;
+  applyDamage(game.sim, game.hero, roshan, 1e9, 'pure');
+  stepArena(game, TEST_STEP);
+  assert(game.hero.aegis === aegis + 1, `aegis ${game.hero.aegis}`);
+  assert(game.hero.gold > gold, 'its bounty and the round pay');
+  assert(game.phase === 'prep', 'the round is over');
 });
 
 async function runTests() {

@@ -26,7 +26,8 @@ const DUEL_PRIZE = { base: 100, perRound: 50 };
 const FINAL_STRETCH = 3;
 
 function duelRoundFor(match) {
-  return match.round + 1 >= DUEL_FIRST_ROUND;
+  // Roshan's round has no duel (history, 2 Apr 2020).
+  return match.round + 1 >= DUEL_FIRST_ROUND && !isRoshanRound(match.round + 1);
 }
 
 // Two living players, all equally likely; nobody fights two rounds in a row unless 3 or fewer are left.

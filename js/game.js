@@ -32,6 +32,15 @@ const WAVE = { baseCount: 5, perRounds: 6, maxCount: 12, heavyEvery: 5, seed: 10
 // After this long, the creeps of a wave enrage: faster, harder hitting, and nothing can slow or stop them (mod).
 const ENRAGE = { after: 50, moveSpeedPct: 50, attackSpeed: 100, damagePct: 50 };
 
+// Decision D9: Roshan every 10 rounds (10, 20, 30...), alone instead of the wave, stronger each time. It grows
+// angrier the longer the fight goes, resists magic (fighters kill it more easily than mages, as in the mod) and
+// drops an Aegis. Its numbers are provisional (D5), tuned with the bench.
+const ROSHAN_EVERY = 10;
+
+function isRoshanRound(round) {
+  return round > 0 && round % ROSHAN_EVERY === 0;
+}
+
 function creepType(key) {
   return DB.waves.types[key];
 }
@@ -92,9 +101,10 @@ function creepStats(type, round) {
 // The wave of a round: [{ key, count }]. Fixed for each round number, so every arena gets the same one
 // (in the mod the waves are the same for everyone and announced in advance).
 function waveForRound(round) {
+  if (isRoshanRound(round)) return [{ key: 'roshan', count: 1 }];
   const rng = makeRng(WAVE.seed + round);
   const open = (heavy) => Object.keys(DB.waves.types)
-    .filter((key) => Boolean(creepType(key).heavy) === heavy && creepType(key).from <= round);
+    .filter((key) => !creepType(key).boss && Boolean(creepType(key).heavy) === heavy && creepType(key).from <= round);
   const light = open(false);
   if (round % WAVE.heavyEvery === 0 && open(true).length) {
     // A heavy wave: a few big ones and a couple of small ones.
@@ -114,8 +124,9 @@ function waveForRound(round) {
   return picked.map((key, i) => ({ key, count: Math.floor(total / kinds) + (i < total % kinds ? 1 : 0) }));
 }
 
-// "6 Kóbolds y 1 Arpía", for the announcement of the next wave.
+// "6 Kóbolds y 1 Arpía", for the announcement of the next wave; a boss goes by its name alone.
 function waveText(wave) {
+  if (wave.length === 1 && creepType(wave[0].key).boss) return creepType(wave[0].key).name;
   const parts = wave.map((entry) => `${entry.count} ${entry.count === 1 ? creepType(entry.key).name : creepType(entry.key).plural}`);
   return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} y ${parts[parts.length - 1]}` : parts[0];
 }
@@ -233,11 +244,44 @@ const CREEP_TRAITS = {
       },
     },
   }),
+  // Killing it gives the arena's hero one more Aegis.
+  aegis: () => ({
+    key: 'creep_aegis',
+    cooldown: 0,
+    def: {
+      onDeath(c) {
+        const hero = c.sim.units.find((unit) => unit.kind === 'hero' && unit.team === HERO_TEAM);
+        if (!hero) return;
+        hero.aegis = (hero.aegis || 0) + 1;
+        pushEvent(c.sim, { type: 'text', x: c.caster.x, y: c.caster.y, text: `¡${c.caster.name} soltó un Aegis!` });
+      },
+    },
+  }),
 };
+
+// Rage: every few seconds of fight, more damage and attack speed, without a ceiling.
+function addRage(game, unit, rage) {
+  addMod(game.sim, unit, {
+    id: 'rage',
+    sourceId: unit.id,
+    duration: Infinity,
+    passive: true,
+    level: 0,
+    stats: {},
+    tick: {
+      interval: rage.every,
+      run(mod, target) {
+        mod.level++;
+        mod.stats = { damagePct: rage.damagePct * mod.level, attackSpeed: rage.attackSpeed * mod.level };
+        recomputeStats(target);
+      },
+    },
+  });
+}
 
 function addCreep(game, key, x, y) {
   const type = creepType(key);
-  return addUnit(game.sim, {
+  const unit = addUnit(game.sim, {
     kind: 'creep',
     creepKind: key,
     name: type.name,
@@ -250,6 +294,8 @@ function addCreep(game, key, x, y) {
     items: Object.keys(CREEP_TRAITS).filter((trait) => type[trait]).map((trait) => CREEP_TRAITS[trait](type, game.round)),
     stats: creepStats(type, game.round),
   });
+  if (type.rage) addRage(game, unit, type.rage);
+  return unit;
 }
 
 function spawnWave(game) {
@@ -259,8 +305,8 @@ function spawnWave(game) {
   for (const entry of wave) {
     const ranged = creepType(entry.key).projectileSpeed > 0;
     for (let i = 0; i < entry.count; i++) {
-      // Spread along the top edge; ranged ones start a bit behind.
-      addCreep(game, entry.key, ARENA.width * (index + 1) / (total + 1), ranged ? 40 : 90);
+      // Spread along the top edge; ranged ones start a bit behind; a boss comes alone, from the middle.
+      addCreep(game, entry.key, ARENA.width * (index + 1) / (total + 1), ranged ? 40 : creepType(entry.key).boss ? 110 : 90);
       index++;
     }
   }

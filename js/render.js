@@ -1414,6 +1414,7 @@ function nextWaveText(game) {
   if (!prep || game.phase === 'lost') return null;
   if (match && match.duel && match.duel.state === 'betting' && isDuelist(match.duel, humanPlayer(match))) return null;
   const round = (match ? match.round : game.round) + 1;
+  if (isRoshanRound(round)) return `Próxima ronda: ${waveText(waveForRound(round))}. Sin duelo; si lo matás, suelta un Aegis`;
   const heavy = round % WAVE.heavyEvery === 0 ? ' pesada' : '';
   return `Próxima oleada${heavy}: ${waveText(waveForRound(round))}`;
 }
