@@ -1608,6 +1608,7 @@ test('the bench plays a match alone and counts heroes, abilities, gold and duels
   assert(tally.income.rounds > 0 && tally.income.creeps > 0, 'gold counted');
   const lines = benchReport(tally, 4);
   assert(lines[0] === '1 partidas, hasta la ronda 4.' && lines.some((line) => line.startsWith('Sin alarmas')), lines[0]);
+  assert(lines.some((line) => line.startsWith('Eliminados')), 'where players fall');
 });
 
 test('bans: each rival bans a different ability, you ban one more or pass, and the hero bans wait for 40 heroes', () => {

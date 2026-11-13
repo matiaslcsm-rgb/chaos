@@ -29,6 +29,7 @@ function createBenchTally() {
   return {
     matches: 0, abilities: new Map(), pairs: new Map(), heroes: new Map(),
     income: { creeps: 0, rounds: 0, duels: 0, bets: 0 }, endRounds: [], unfinished: 0, duels: 0, favouriteWins: 0,
+    outRounds: new Map(),
   };
 }
 
@@ -53,6 +54,7 @@ function tallyBenchMatch(tally, played) {
       for (let b = a + 1; b < keys.length; b++) benchCount(tally.pairs, `${keys[a]} + ${keys[b]}`, won);
     }
     benchCount(tally.heroes, player.game.hero.name, won);
+    if (player.outRound !== null && player.place > 1) tally.outRounds.set(player.outRound, (tally.outRounds.get(player.outRound) || 0) + 1);
     for (const source of Object.keys(tally.income)) tally.income[source] += player.game.income[source];
   }
   for (const duel of duels) {
@@ -83,6 +85,7 @@ function benchReport(tally, maxRounds) {
   lines.push(`Terminaron solas: ${ended}${average ? ` (ronda promedio ${average})` : ''}; cortadas en la ronda ${maxRounds}: ${tally.unfinished}.`);
   const total = Object.values(tally.income).reduce((a, b) => a + b, 0) || 1;
   lines.push(`De dónde sale el oro: ${Object.entries(tally.income).map(([key, value]) => `${BENCH_INCOME_NAMES[key]} ${benchPercent(value / total)}`).join(' · ')}.`);
+  lines.push(benchEliminations(tally));
   lines.push(`Duelos: ${tally.duels}; el favorito ganó ${benchPercent(tally.duels ? tally.favouriteWins / tally.duels : 0)} (meta: menos de 75%).`);
   lines.push('');
   lines.push('Héroes: veces que ganó sobre veces que jugó (se espera 12,5%).');
@@ -101,6 +104,16 @@ function benchReport(tally, maxRounds) {
     lines.push(`Sin alarmas (habilidad > ${benchPercent(BENCH_ALARM.single)} o par > ${benchPercent(BENCH_ALARM.pair)}, con ${BENCH_ALARM.minSeen} apariciones o más).`);
   }
   return lines;
+}
+
+// Where players fall: Roshan's rounds, the heavy waves, and the three rounds with the most eliminations.
+function benchEliminations(tally) {
+  const rows = [...tally.outRounds.entries()];
+  const total = rows.reduce((sum, [, count]) => sum + count, 0);
+  if (!total) return 'Eliminados: ninguno.';
+  const share = (test) => benchPercent(rows.filter(([round]) => test(round)).reduce((sum, [, count]) => sum + count, 0) / total);
+  const top = rows.sort((a, b) => b[1] - a[1]).slice(0, 3).map(([round, count]) => `${round} (${count})`).join(', ');
+  return `Eliminados: ${total}; ${share(isRoshanRound)} en rondas de Roshan, ${share((round) => !isRoshanRound(round) && round % WAVE.heavyEvery === 0)} en oleadas pesadas. Las rondas con más: ${top}.`;
 }
 
 function benchAlarms(tally) {

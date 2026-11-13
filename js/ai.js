@@ -93,10 +93,12 @@ function abilityTags(key) {
 
 // ---- Bans ----
 
-// The abilities the bench marks as the strongest (owners who win the most). Each computer player bans one of
-// them at random, never one already banned; if the list runs out, any ability of the batch.
+// The abilities the bench marks as the strongest (owners who win the most; bench of 24 matches, 2026-11-12, before
+// the bans). Each computer player bans one of them at random, never one already banned; if the list runs out,
+// any ability of the batch. To be updated by hand after each bench.
 const AI_BAN_TARGETS = [
-  'zuus_lightning_hands', 'phantom_assassin_coup_de_grace', 'sniper_headshot', 'viper_poison_attack',
+  'sniper_headshot', 'zuus_lightning_hands', 'phantom_assassin_phantom_strike', 'sven_great_cleave',
+  'ogre_magi_bloodlust', 'sniper_take_aim', 'phantom_assassin_coup_de_grace', 'viper_poison_attack',
 ];
 
 function aiBanAbilities(rng, count, taken) {
