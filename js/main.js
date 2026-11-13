@@ -69,8 +69,8 @@ function enemyAt(point) {
     && distance(unit, point) <= unit.radius + CLICK_SLACK) || null;
 }
 
-function say(text) {
-  view.message = { text, age: 0 };
+function say(text, good) {
+  view.message = { text, age: 0, good: Boolean(good) };
 }
 
 // The steps before the match (bans, then hero), until the match starts.
@@ -248,7 +248,7 @@ function onBetClick(point) {
     const amount = betChipAmount(human, view.betAmount);
     const problem = placeBet(match, human, side.side, amount);
     if (problem) say(BET_MESSAGES[problem] || 'No se puede apostar ahora');
-    else say(`Apostaste ${amount} a ${duelSide(match.duel, side.side).name}`);
+    else say(`Apostaste ${amount} a ${duelSide(match.duel, side.side).name}`, true);
   }
   return true;
 }

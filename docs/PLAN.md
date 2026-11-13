@@ -64,6 +64,23 @@ cierra con algo que se puede comprobar.
 - **Comprar Aegis en la tienda**: el mod lo vende pero no se encontró el precio; entra con los demás números de D5
   cuando esté el banco. Por ahora no se puede comprar.
 
+- **Roshan: Aegis o libro** (decisión, 2026-11-12): D9 dice que Roshan "deja caer un Aegis o un libro", sin decir
+  cuándo cada uno. Probé darle un Aegis a todos los que lo matan y el banco salió mal: llegaban a la ronda 50 con 5
+  o 6 Aegis guardados y el Roshan de la ronda 60 los barría a todos juntos (todas las partidas terminaban justo en
+  la 60). Hoy funciona (a) **un Aegis si tenés menos de 2; si tenés 2 o más, un libro (cuando haya libros; por
+  ahora nada) (recomendada)**. Otras: (b) siempre un libro, nunca Aegis; (c) al azar, mitad Aegis y mitad libro.
+- **Libros: el nivel de la habilidad nueva** (decisión): no se encontró qué hace el mod cuando cambiás una
+  habilidad que ya tenía puntos. (a) **la nueva entra con el mismo nivel que tenía la vieja (recomendada: el
+  libro no te castiga por haber subido la habilidad)**; (b) la nueva entra en 0 y te devuelven los puntos para
+  repartir; (c) la nueva entra en 0 y los puntos se pierden.
+- **Libros gratis para los que van últimos** (decisión): las fuentes no coinciden. (a) **como la nota oficial y el
+  historial: al terminar las rondas 10, 20, 30 y 40, los dos últimos en oro reciben un libro y una página rota, y
+  el antepenúltimo una página (recomendada: es lo que escribió el creador)**; (b) como el análisis de 2023, en 4
+  escalones (el último, dos páginas y un libro; ...).
+- **Ítems neutrales: en qué rondas cae cada nivel** (decisión): para *Chaos* no se encontró. (a) **como *Clash*, que
+  los entrega al terminar las rondas 10, 20, 30 y 40, y el quinto nivel en la 50 (recomendada)**; (b) que los suelten los creeps al
+  azar, con más chance de nivel alto en rondas altas.
+
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
 - [x] Repositorio en GitHub: `matiaslcsm-rgb/chaos` (2026-11-10).
@@ -81,7 +98,8 @@ Sin programar nada del juego todavía.
       con pozo, 2 Aegis, maldición, libros y sus precios, Roshan, ítems neutrales, tiempos. No aparecieron la
       fórmula del oro ni la composición de las oleadas: quedaron listadas en "Lo que no se encontró".
 - [ ] Releer el historial del mod de 2021 en adelante (Steam cortó las consultas a mitad de camino; el 2026-11-11
-      seguía respondiendo "demasiadas consultas").
+      y el 2026-11-12 seguía respondiendo "demasiadas consultas"). Ahí se podrían encontrar las reglas que faltan
+      para los libros y los ítems neutrales.
 - [x] Lista de lo que el mod cambia respecto de Dota: en `REFERENCIA-CHC.md`, "Libros" e "Ítems" (2026-11-11).
 - [x] Diseño completo de la versión 1.0 en `DISENO.md`, con los problemas del mod y cómo evitarlos (2026-11-11).
       Falta la respuesta del usuario a las decisiones D1-D12.

@@ -440,6 +440,14 @@ function drawDraft(ctx, canvas, game, mouse) {
     });
   }
 
+  const banned = bannedAbilities(game);
+  if (banned.length) {
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#8a93a6';
+    ctx.font = `13px ${FONT}`;
+    ctx.fillText(`Baneadas en esta partida: ${abilityNames(banned)}`, canvas.width / 2, canvas.height - 74, canvas.width - 80);
+  }
+
   const button = draftSkipButton(canvas);
   ctx.fillStyle = inRect(mouse, button) ? '#3a4154' : '#262c3a';
   ctx.fillRect(button.x, button.y, button.width, button.height);
@@ -1016,7 +1024,8 @@ function drawHud(ctx, canvas, game, view) {
     // Over the shop's title strip while shopping, so it does not cover the cards.
     const top = shopping ? shopPanelRect(canvas).y + 3 : 74;
     ctx.fillRect(canvas.width / 2 - width / 2, top, width, 30);
-    ctx.fillStyle = `rgba(240, 110, 100, ${alpha})`;
+    // Problems in red; good news (a bet placed) in green.
+    ctx.fillStyle = view.message.good ? `rgba(110, 210, 120, ${alpha})` : `rgba(240, 110, 100, ${alpha})`;
     ctx.fillText(view.message.text, canvas.width / 2, top + 21);
   }
 }
