@@ -5,6 +5,7 @@
 const ATTR_COLORS = { str: '#c0392b', agi: '#27ae60', int: '#2980b9', all: '#8e44ad' };
 const ATTR_LABELS = { str: 'Fuerza', agi: 'Agilidad', int: 'Inteligencia', all: 'Universal' };
 const CREEP_COLOR = '#a84a3a';
+const BOSS_COLOR = '#7a3a6a';
 const FLOATER_TIME = 0.8;
 const MARKER_TIME = 0.5;
 const FX_TIME = 0.45;
@@ -504,8 +505,9 @@ function drawUnit(ctx, unit, scale) {
   const y = unit.y * scale;
   const radius = unit.radius * scale;
   const isHero = unit.kind === 'hero';
+  const boss = unit.creepKind && creepType(unit.creepKind).boss;
 
-  ctx.fillStyle = isHero ? ATTR_COLORS[unit.data.primary_attr] : CREEP_COLOR;
+  ctx.fillStyle = isHero ? ATTR_COLORS[unit.data.primary_attr] : boss ? BOSS_COLOR : CREEP_COLOR;
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fill();
@@ -518,9 +520,17 @@ function drawUnit(ctx, unit, scale) {
   ctx.lineTo(x + Math.cos(unit.facing) * radius * 1.35, y + Math.sin(unit.facing) * radius * 1.35);
   ctx.stroke();
 
-  const barWidth = isHero ? 56 : 34;
+  const barWidth = isHero ? 56 : boss ? 90 : 34;
   const barTop = y - radius - (isHero ? 16 : 10);
-  drawBar(ctx, x - barWidth / 2, barTop, barWidth, isHero ? 6 : 4, unit.hp / unit.stats.maxHp, isHero && unit.team === HERO_TEAM ? '#4cc35a' : '#d9534f');
+  if (boss) {
+    // The boss shows its name and how angry it got.
+    const rage = findMod(unit, 'rage');
+    ctx.textAlign = 'center';
+    ctx.font = `bold 13px ${FONT}`;
+    ctx.fillStyle = '#e8b04a';
+    ctx.fillText(rage && rage.level ? `${unit.name} · furia ${rage.level}` : unit.name, x, Math.max(16, barTop - 6));
+  }
+  drawBar(ctx, x - barWidth / 2, barTop, barWidth, isHero || boss ? 6 : 4, unit.hp / unit.stats.maxHp, isHero && unit.team === HERO_TEAM ? '#4cc35a' : '#d9534f');
   if (isHero) drawBar(ctx, x - barWidth / 2, y - radius - 9, barWidth, 3, unit.mana / unit.stats.maxMana, '#4a8fe0');
 
   const labels = unitStatusLabels(unit);
@@ -531,7 +541,7 @@ function drawUnit(ctx, unit, scale) {
     ctx.font = `bold 11px ${FONT}`;
     labels.forEach((label, row) => {
       ctx.fillStyle = label.color;
-      ctx.fillText(label.text, x, barTop - 4 - row * 12);
+      ctx.fillText(label.text, x, barTop - 4 - row * 12 - (boss ? 18 : 0));
     });
   }
 }
