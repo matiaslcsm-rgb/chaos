@@ -296,11 +296,23 @@ const ABILITY_DEFS = {
     cast: 'unit',
     ult: true,
     projectile: 'projectile_speed',
+    // The slow fades as the poison wears off, as in Dota: full at the start, nothing at the end.
     hit(c) {
-      status(c, c.target, 'strike', c.v('duration'), Object.assign(
-        slowStats(c.v('bonus_movement_speed'), c.v('bonus_attack_speed')),
-        { tick: dot(c, c.v('damage')) },
-      ));
+      const total = c.v('duration');
+      const full = slowStats(c.v('bonus_movement_speed'), c.v('bonus_attack_speed')).stats;
+      const damage = dot(c, c.v('damage'), undefined, 0.5);
+      status(c, c.target, 'strike', total, {
+        stats: Object.assign({}, full),
+        tick: {
+          interval: damage.interval,
+          run(mod, unit) {
+            damage.run(mod, unit);
+            const left = Math.max(0, mod.duration / total);
+            mod.stats = { moveSpeedPct: full.moveSpeedPct * left, attackSpeed: full.attackSpeed * left };
+            recomputeStats(unit);
+          },
+        },
+      });
     },
   },
 

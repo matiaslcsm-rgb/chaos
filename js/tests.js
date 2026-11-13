@@ -1666,6 +1666,27 @@ test('hero offer: 4 heroes, one reroll that keeps the first and brings 3 new one
   assert(new Set(match.players.map((player) => player.game.hero.data)).size === 8, 'the rivals take other heroes');
 });
 
+test('Viper Strike: the slow fades as the poison wears off, and the damage over time is the same', () => {
+  const sim = createSim(1);
+  const viper = addTestHero(sim, 'Viper', 18, 500, 500);
+  fillMana(viper);
+  const index = teach(viper, 'viper_viper_strike', 1);
+  const target = addDummy(sim, 700, 500, { moveSpeed: 300 });
+  assert(!orderCast(viper, index, target), 'cast');
+  runUntil(sim, 3, () => findMod(target, 'viper_viper_strike:strike'), 'the strike lands');
+  const mod = findMod(target, 'viper_viper_strike:strike');
+  const total = abilityValue(viper.abilities[index], 'duration');
+  const fullSlow = -abilityValue(viper.abilities[index], 'bonus_movement_speed');
+  assert(mod.stats.moveSpeedPct === fullSlow, `full slow at the start: ${mod.stats.moveSpeedPct}`);
+  const hp = target.hp;
+  runFor(sim, total / 2);
+  assert(mod.stats.moveSpeedPct > fullSlow * 0.65 && mod.stats.moveSpeedPct < fullSlow * 0.35, `about half way: ${mod.stats.moveSpeedPct}`);
+  runFor(sim, total / 2 + 0.2);
+  assert(!findMod(target, 'viper_viper_strike:strike'), 'gone at the end');
+  const dealt = (hp - target.hp) / (1 - target.stats.magicResist / 100);
+  assertNear(dealt, abilityValue(viper.abilities[index], 'damage') * total, abilityValue(viper.abilities[index], 'damage') * 0.6, 'damage over the whole poison');
+});
+
 // ---- Roshan (decision D9) ----
 
 test('Roshan: alone every 10 rounds, stronger each time, announced, and no duel that round', () => {

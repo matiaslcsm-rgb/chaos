@@ -140,8 +140,9 @@ Una partida completa, pero chica.
         (aturdido, provocado, inmóvil, silenciado, desarmado, lento) y los efectos activos del héroe con su tiempo.
       - 28 pruebas nuevas, una por pieza, más una que lanza las 43 habilidades a nivel 1 y al máximo.
         `node tools/run-tests.js` corre las mismas pruebas sin abrir el navegador.
-      Simplificaciones a revisar: Battle Hunger siempre ralentiza, Viper Strike no decae, Lunar Orbit es un área
-      alrededor de Luna, Great Cleave es un cono de 120°, Bloodlust solo se lanza sobre uno mismo.
+      Simplificaciones a revisar: Battle Hunger siempre ralentiza, Lunar Orbit es un área alrededor de Luna, Great
+      Cleave es un cono de 120°, Bloodlust solo se lanza sobre uno mismo. (Resuelta el 2026-11-12: la lentitud de
+      Viper Strike ahora baja de a poco hasta desaparecer, como en Dota, con su prueba.)
 - [x] Una arena con oleadas de creeps y el héroe controlado al estilo Dota: elegís entre los 10 héroes, clic derecho
       para mover o atacar, A + clic para avanzar atacando, S para frenar; un nivel por ronda (`js/game.js`,
       `js/render.js`, `js/main.js`). Los creeps son provisorios hasta investigar las oleadas del mod (2026-11-10).
@@ -253,11 +254,12 @@ Una partida completa, pero chica.
         más ganan); cuando se acaban, cualquiera.
       - Una habilidad baneada no sale en ningún draft de la partida, ni para vos ni para los rivales.
       - Elegir héroe: te ofrecen 4. Podés volver a sortear una vez: el primero queda y vienen 3 nuevos (7 vistos en
-        total, como cuenta el análisis del mod). Debajo se ve la lista de habilidades baneadas.
+        total, como cuenta el análisis del mod). Debajo se ve la lista de habilidades baneadas, y también en cada
+        draft.
       - Los baneos de héroe quedan apagados hasta que haya 40 héroes o más (D10).
       - 3 pruebas nuevas (93 en total).
       Simplificaciones a revisar: los rivales no eligen héroe según su estilo (les toca uno al azar entre los que
-      quedan); durante la partida no se ve qué habilidades están baneadas; en el mod los baneos probablemente son
+      quedan); en el mod los baneos probablemente son
       a la vez y acá los rivales banean primero; la lista de "las más fuertes" está fija en `js/ai.js` y hay que
       actualizarla a mano con cada banco.
 - [ ] Roshan.
