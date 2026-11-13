@@ -219,7 +219,20 @@ Una partida completa, pero chica.
 **Lista cuando:** jugás una partida de punta a punta con el primer lote.
 
 ## Etapa 4 · Las reglas del mod
-- [ ] Baneos y volver a sortear el héroe.
+- [x] Baneos y volver a sortear el héroe (2026-11-12), con la decisión D10:
+      - Antes de la partida, una pantalla con las 43 habilidades: elegís una para banear (o "No banear nada"). Los
+        7 rivales banean antes que vos y sus baneos aparecen tachados; nadie banea dos veces la misma.
+      - Los rivales banean al azar entre las habilidades que el banco marca como las más fuertes (las de los que
+        más ganan); cuando se acaban, cualquiera.
+      - Una habilidad baneada no sale en ningún draft de la partida, ni para vos ni para los rivales.
+      - Elegir héroe: te ofrecen 4. Podés volver a sortear una vez: el primero queda y vienen 3 nuevos (7 vistos en
+        total, como cuenta el análisis del mod). Debajo se ve la lista de habilidades baneadas.
+      - Los baneos de héroe quedan apagados hasta que haya 40 héroes o más (D10).
+      - 3 pruebas nuevas (93 en total).
+      Simplificaciones a revisar: los rivales no eligen héroe según su estilo (les toca uno al azar entre los que
+      quedan); durante la partida no se ve qué habilidades están baneadas; en el mod los baneos probablemente son
+      a la vez y acá los rivales banean primero; la lista de "las más fuertes" está fija en `js/ai.js` y hay que
+      actualizarla a mano con cada banco.
 - [ ] Roshan.
 - [ ] Libros para cambiar o sumar una habilidad.
 - [ ] Ítems neutrales.
