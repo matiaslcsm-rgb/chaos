@@ -214,7 +214,24 @@ function aiShop(game, brain) {
     spent += before - hero.gold;
     bought.push(key);
   }
+  // With the list done, a sixth ability.
+  const listDone = AI_SHOPPING[brain.style].every((key) => ownsItem(hero, key));
+  if (listDone && BOOKS.paragon.cost <= budgetStart - spent && buyBook(game, 'paragon') === null) bought.push('paragon');
   return bought;
+}
+
+// ---- Books ----
+
+// A torn page right away (it takes a random one anyway); a retraining book on the ability it wanted the least.
+function aiUseBooks(game, brain) {
+  const books = bookStash(game.hero);
+  if (books.page) return useBook(game, 'page');
+  if (!books.retrain) return 'none';
+  let worst = 0;
+  game.hero.abilities.forEach((ability, index) => {
+    if ((brain.scores[ability.key] || 0) < (brain.scores[game.hero.abilities[worst].key] || 0)) worst = index;
+  });
+  return useBook(game, 'retrain', worst);
 }
 
 // ---- Fighting ----
@@ -336,6 +353,7 @@ function aiBet(match, player) {
 function aiStep(game, brain, dt) {
   if (game.phase === 'lost') return;
   if (game.draft) aiPickDraft(game, brain);
+  else if (shopOpen(game) && draftsDue(game) <= 0) aiUseBooks(game, brain);
   aiSpendPoints(game.hero, brain);
   if (game.phase === 'prep' && brain.shoppedRound !== game.round && shopOpen(game)) {
     brain.shoppedRound = game.round;

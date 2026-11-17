@@ -979,7 +979,7 @@ test('the shop and the inventory fit on screen without covering the rest', () =>
   const button = shopButton(canvas);
   const panel = shopPanelRect(canvas);
   const cards = shopCards(canvas);
-  assert(slots.length === INVENTORY_SIZE && cards.length === 25, 'six slots and 25 cards');
+  assert(slots.length === INVENTORY_SIZE && cards.length === 25 + BOOK_KINDS.length, 'six slots, 25 items and the books');
   for (const slot of slots) {
     assert(slot.x + slot.width <= canvas.width && slot.y + slot.height <= canvas.height, 'inventory on screen');
     assert(!bar.some((other) => overlap(slot, other) || overlap(slot, other.plus)), 'inventory clear of the ability bar');
@@ -1753,13 +1753,126 @@ test('Roshan: resists magic, grows angrier every 10 seconds, and killing it give
   assert(game.hero.aegis === 2, `aegis ${game.hero.aegis}`);
   assert(game.hero.gold > gold, 'its bounty and the round pay');
   assert(game.phase === 'prep', 'the round is over');
-  // With the 2 of the start, no Aegis (decision D9: then it will be a book).
+  // With the 2 of the start, no Aegis but a retraining book (decision D9).
   const full = createGame(heroByName('Sven'), 44);
   full.round = 9;
   startRound(full);
   applyDamage(full.sim, full.hero, full.sim.units.find((unit) => unit.creepKind === 'roshan'), 1e9, 'pure');
   stepArena(full, TEST_STEP);
   assert(full.hero.aegis === AEGIS_START, `aegis ${full.hero.aegis}`);
+  assert(full.hero.books.retrain === 1, 'a book instead');
+});
+
+// ---- Books (user's decisions of 2026-11-17) ----
+
+// A game between rounds with these abilities at these levels and the hero at this level.
+function bookGame(keys, levels, heroLevel) {
+  const game = createGame(heroByName('Sven'), 51);
+  for (const key of keys) addAbility(game.hero, key);
+  game.picks = keys.length;
+  setHeroLevel(game.hero, heroLevel);
+  game.hero.abilities.forEach((ability, index) => { ability.level = levels[index]; });
+  game.hero.skillPoints = 0;
+  refreshPassives(game.hero);
+  return game;
+}
+
+test('books: a retraining book swaps the ability you choose and the new one keeps its level', () => {
+  const game = bookGame(['sven_storm_bolt', 'axe_counter_helix', 'luna_lunar_orbit'], [2, 3, 1], 7);
+  game.hero.gold = 3000;
+  assert(buyBook(game, 'retrain') === null, 'bought');
+  assert(game.hero.gold === 3000 - BOOKS.retrain.cost && game.hero.books.retrain === 1, 'paid and stashed');
+  assert(useBook(game, 'retrain', 1) === null, 'used');
+  assert(game.hero.books.retrain === 0 && game.draft && game.draft.replace === 1, 'a draft to replace the second');
+  assert(!game.draft.options.some((key) => game.hero.abilities.some((ability) => ability.key === key)), 'nothing you have');
+  const key = game.draft.options.find((option) => !ABILITY_DEFS[option].ult);
+  assert(pickDraft(game, key), 'picked');
+  const swapped = game.hero.abilities[1];
+  assert(swapped.key === key && swapped.level === 3, `${swapped.key} at level ${swapped.level}`);
+  assert(game.hero.abilities[0].key === 'sven_storm_bolt' && game.hero.abilities[2].key === 'luna_lunar_orbit', 'the rest stay');
+  assert(game.picks === 3 && game.hero.skillPoints === 0, 'no pick spent, no points moved');
+  assert(!findMod(game.hero, 'passive:axe_counter_helix'), 'the old passive is gone');
+});
+
+test('books: an ability that cannot go that high yet gives the points back', () => {
+  const game = bookGame(['sven_storm_bolt', 'axe_counter_helix'], [3, 1], 5);
+  giveBook(game.hero, 'retrain');
+  useBook(game, 'retrain', 0);
+  game.draft.options = ['luna_eclipse'];
+  pickDraft(game, 'luna_eclipse');
+  assert(game.hero.abilities[0].level === 0 && game.hero.skillPoints === 3, 'an ultimate before level 6 starts unlearned');
+  const later = bookGame(['sven_storm_bolt'], [4], 12);
+  giveBook(later.hero, 'retrain');
+  useBook(later, 'retrain', 0);
+  later.draft.options = ['luna_eclipse'];
+  pickDraft(later, 'luna_eclipse');
+  assert(later.hero.abilities[0].level === 2 && later.hero.skillPoints === 2, 'at level 12 an ultimate fits 2 levels');
+});
+
+test('books: a torn page takes one at random; books are used and bought only between rounds', () => {
+  const game = bookGame(['sven_storm_bolt', 'axe_counter_helix', 'luna_lunar_orbit'], [1, 1, 1], 5);
+  assert(useBook(game, 'page') === 'none', 'no page, no draft');
+  giveBook(game.hero, 'page');
+  assert(useBook(game, 'page') === null && game.draft.book === 'page', 'used');
+  assert(game.draft.replace >= 0 && game.draft.replace < 3, `replace ${game.draft.replace}`);
+  skipDraft(game);
+  assert(game.hero.abilities.length === 3 && game.picks === 3, 'still three, no pick spent');
+  giveBook(game.hero, 'page');
+  game.phase = 'fight';
+  assert(useBook(game, 'page') === 'closed', 'not during a round');
+  game.hero.gold = 1e6;
+  assert(buyBook(game, 'page') === 'closed', 'the shop is closed');
+});
+
+test('books: the Paragon Book adds a sixth ability once, after the five picks, and it gets a key', () => {
+  const keys = ['sven_storm_bolt', 'axe_counter_helix', 'luna_lunar_orbit', 'viper_poison_attack'];
+  const game = bookGame(keys, [1, 1, 1, 1], 9);
+  game.hero.gold = 20000;
+  assert(buyBook(game, 'paragon') === 'paragon', 'not before the fifth pick');
+  addAbility(game.hero, 'zuus_arc_lightning');
+  game.picks = 5;
+  game.hero.gold = 5000;
+  assert(buyBook(game, 'paragon') === 'gold', 'it costs 13.000');
+  game.hero.gold = 20000;
+  assert(buyBook(game, 'paragon') === null && game.draft && game.draft.replace === null, 'a draft for one more');
+  const key = game.draft.options.find((option) => !ABILITY_DEFS[option].ult);
+  pickDraft(game, key);
+  assert(game.hero.abilities.length === 6 && game.picks === 5, 'six abilities, picks unchanged');
+  assert(abilityHotkeys(game.hero.abilities).join('') === 'qwedfr', `keys ${abilityHotkeys(game.hero.abilities)}`);
+  assert(buyBook(game, 'paragon') === 'paragon', 'only once');
+});
+
+test('free books: after rounds 10, 20, 30 and 40 the last two get a book and a page, the third last a page', () => {
+  const match = createMatch(null, 61);
+  match.players.forEach((player, i) => { player.game.hero.gold = 1000 * (i + 1); });
+  match.round = 9;
+  assert(giveFreeBooks(match).length === 0, 'nothing after round 9');
+  match.round = 10;
+  const given = giveFreeBooks(match);
+  const books = (i) => match.players[i].game.hero.books;
+  assert(given.length === 3, `given to ${given.length}`);
+  assert(books(0).retrain === 1 && books(0).page === 1 && books(1).retrain === 1 && books(1).page === 1, 'the last two');
+  assert(books(2).retrain === 0 && books(2).page === 1, 'the third last');
+  assert(match.players.slice(3).every((player) => !player.game.hero.books.retrain && !player.game.hero.books.page), 'nobody else');
+  // With two left, only the one behind gets them.
+  for (const player of match.players.slice(2)) player.game.phase = 'lost';
+  match.round = 20;
+  assert(giveFreeBooks(match).length === 1 && books(0).retrain === 2, 'never the leader');
+});
+
+test('computer: uses its books between rounds on the ability it wanted least', () => {
+  const arena = aiArena('Sven', 71);
+  const game = arena.game;
+  for (const key of ['sven_storm_bolt', 'axe_counter_helix', 'luna_lunar_orbit']) addAbility(game.hero, key);
+  game.picks = 3;
+  game.phase = 'prep';
+  arena.brain.scores = { sven_storm_bolt: 5, axe_counter_helix: 1, luna_lunar_orbit: 4 };
+  giveBook(game.hero, 'retrain');
+  aiStep(game, arena.brain, TEST_STEP);
+  assert(game.draft && game.draft.replace === 1, 'it drops the one it wanted least');
+  aiStep(game, arena.brain, TEST_STEP);
+  assert(!game.draft && !game.hero.abilities.some((ability) => ability.key === 'axe_counter_helix'), 'and picks another');
+  assert(game.hero.books.retrain === 0, 'the book is spent');
 });
 
 async function runTests() {

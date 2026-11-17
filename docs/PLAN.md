@@ -33,6 +33,15 @@ cierra con algo que se puede comprobar.
 - **2026-11-11 (decisión del usuario):** al revivir con Aegis, durante 5 segundos recibís la mitad de daño y hacés
   50% más. El mod no publica el número; se puede ajustar con el banco.
 
+- **2026-11-17 (decisión del usuario):** en las cuatro decisiones que frenaban la etapa 4 van las recomendadas:
+  - Libros: la habilidad nueva entra con el mismo nivel que tenía la vieja. Si todavía no puede llegar a ese nivel
+    (una definitiva antes del nivel 6 del héroe), los puntos que sobran vuelven para repartir.
+  - Libros gratis: como la nota oficial. Al terminar las rondas 10, 20, 30 y 40, los dos últimos reciben un libro
+    y una página rota, y el antepenúltimo una página. "Últimos" se cuenta por valor (oro + ítems), como la tabla.
+  - Ítems neutrales: como *Clash*, al terminar las rondas 10, 20, 30 y 40 un nivel más, y el quinto en la 50.
+  - Aghanim: solo mejora las habilidades que en Dota tienen mejora propia; si la mejora es una habilidad nueva, la
+    recibe el que tenga la habilidad madre. Cetro a 4.200 y fragmento a 1.400, de una sola vez.
+
 ## Decisiones abiertas
 
 - **Nombre del proyecto** (decisión): hoy la carpeta se llama `chaos`.
@@ -67,28 +76,8 @@ cierra con algo que se puede comprobar.
 - **Roshan: Aegis o libro** (decisión, 2026-11-12): D9 dice que Roshan "deja caer un Aegis o un libro", sin decir
   cuándo cada uno. Probé darle un Aegis a todos los que lo matan y el banco salió mal: llegaban a la ronda 50 con 5
   o 6 Aegis guardados y el Roshan de la ronda 60 los barría a todos juntos (todas las partidas terminaban justo en
-  la 60). Hoy funciona (a) **un Aegis si tenés menos de 2; si tenés 2 o más, un libro (cuando haya libros; por
-  ahora nada) (recomendada)**. Otras: (b) siempre un libro, nunca Aegis; (c) al azar, mitad Aegis y mitad libro.
-- **Libros: el nivel de la habilidad nueva** (decisión): no se encontró qué hace el mod cuando cambiás una
-  habilidad que ya tenía puntos. (a) **la nueva entra con el mismo nivel que tenía la vieja (recomendada: el
-  libro no te castiga por haber subido la habilidad)**; (b) la nueva entra en 0 y te devuelven los puntos para
-  repartir; (c) la nueva entra en 0 y los puntos se pierden.
-- **Libros gratis para los que van últimos** (decisión): las fuentes no coinciden. (a) **como la nota oficial y el
-  historial: al terminar las rondas 10, 20, 30 y 40, los dos últimos en oro reciben un libro y una página rota, y
-  el antepenúltimo una página (recomendada: es lo que escribió el creador)**; (b) como el análisis de 2023, en 4
-  escalones (el último, dos páginas y un libro; ...).
-- **Ítems neutrales: en qué rondas cae cada nivel** (decisión): para *Chaos* no se encontró. (a) **como *Clash*, que
-  los entrega al terminar las rondas 10, 20, 30 y 40, y el quinto nivel en la 50 (recomendada)**; (b) que los suelten los creeps al
-  azar, con más chance de nivel alto en rondas altas.
-- **Aghanim** (decisión, 2026-11-12): el mod dice que el cetro y el fragmento "funcionan con cualquier habilidad",
-  pero en Dota cada héroe tiene una sola mejora de cetro y una de fragmento, y la mitad de esas mejoras son una
-  habilidad nueva (por ejemplo, el cetro de Ogre Magi da "Unrefined Fireblast"). En el lote 1, 6 habilidades
-  tienen mejora de cetro y 5 de fragmento; las otras 32 no tienen ninguna. Además, en Dota el cetro se arma con
-  4 ítems que no están en el lote. (a) **mejorar solo las habilidades que en Dota tienen mejora propia, y cuando
-  la mejora es una habilidad nueva, dársela al que tenga la habilidad "madre" (Fireblast → Unrefined Fireblast)
-  (recomendada: es lo que se puede hacer sin inventar)**; (b) inventar una mejora para cada habilidad (más trabajo
-  y menos fiel); (c) dejar el Aghanim para después de los lotes de contenido. Para el precio: el cetro a 4.200 y
-  el fragmento a 1.400, como en Dota, comprados de una sola vez.
+  la 60). Hoy funciona (a) **un Aegis si tenés menos de 2; si tenés 2 o más, un libro de reentrenamiento (así
+  está hoy) (recomendada)**. Otras: (b) siempre un libro, nunca Aegis; (c) al azar, mitad Aegis y mitad libro.
 
 ## Etapa 0 · Proyecto
 - [x] Carpeta, git y página base (2026-11-10).
@@ -270,7 +259,7 @@ Una partida completa, pero chica.
         segundos también se enfurece como los creeps.
       - Cada vez que vuelve es más fuerte: crece como los creeps y, además, un 15% más por cada aparición.
       - Matarlo rápido paga más (el premio de ronda va por puesto) y da 400 de oro base. Si tenés menos de 2 Aegis,
-        te da uno (ver "Roshan: Aegis o libro" en las decisiones abiertas).
+        te da uno; si no, un libro (ver "Roshan: Aegis o libro" en las decisiones abiertas).
       - Se dibuja violeta, más grande, con su nombre y su nivel de furia.
       - El banco ahora dice cuántos jugadores caen en las rondas de Roshan y en las oleadas pesadas.
       - 2 pruebas nuevas.
@@ -280,11 +269,26 @@ Una partida completa, pero chica.
       Simplificaciones a revisar: el nombre "Roshan" es el de Dota (entra en la decisión de nombres); el "tope del
       daño por porcentaje de vida contra Roshan" de `DISENO.md` no hace falta todavía porque ninguna habilidad del
       lote hace ese daño.
-- [ ] Libros para cambiar o sumar una habilidad. Espera dos decisiones: "Libros: el nivel de la habilidad nueva"
-      y "Libros gratis para los que van últimos".
+- [x] Libros para cambiar o sumar una habilidad (`js/books.js`) (2026-11-17):
+      - En la tienda, en violeta: Reentrenamiento (2.900: elegís qué habilidad cambiar), Página rota (1.200: te saca
+        una al azar) y Libro Parangón (13.000: una sexta habilidad, una vez, con las 5 elegidas). Los precios son los
+        del análisis y el historial del mod.
+      - Los libros se guardan y se usan entre rondas con los botones que aparecen a la izquierda del inventario. El
+        de reentrenamiento pide tocar la habilidad en la barra (o su tecla). Después se abre una elección como la
+        del draft, con el nombre de la que se va.
+      - La nueva ocupa el lugar y el nivel de la vieja (decisión del 2026-11-17); si no puede llegar a ese nivel,
+        los puntos vuelven. Una sexta habilidad sin definitiva usa la tecla R.
+      - Libros gratis al terminar las rondas 10, 20, 30 y 40 para los tres que van últimos en valor, y Roshan suelta
+        un libro a quien ya tiene 2 Aegis.
+      - La IA usa sus libros entre rondas (la página enseguida, el libro sobre la habilidad que menos quería) y
+        compra el Parangón cuando terminó su lista de compras.
+      - 6 pruebas nuevas (103 en total). Banco de 6 partidas: todas terminaron solas, entre las rondas 57 y 67.
+      Simplificaciones a revisar: no están Omniscient Book, Book of Summoner ni los tomos de atributo (no se
+      encontró su precio); la IA no compra libros de reentrenamiento ni páginas; si cambiás una habilidad mejorada
+      con Aghanim todavía no se pierde la mejora (el Aghanim no existe aún).
 - [ ] Ítems neutrales. Espera la decisión "Ítems neutrales: en qué rondas cae cada nivel".
-- [ ] Marcas por perder duelos seguidos y ayudas al que va abajo. Las marcas ya están (D8, en "Final de
-      partida"); las ayudas son los libros gratis, que esperan las decisiones de los libros.
+- [x] Marcas por perder duelos seguidos y ayudas al que va abajo (2026-11-17): las marcas están desde el
+      2026-11-11 (D8, en "Final de partida") y las ayudas son los libros gratis de cada 10 rondas.
 - [ ] Aghanim para cualquier habilidad. Espera la decisión "Aghanim".
 
 **Lista cuando:** comparado con `REFERENCIA-CHC.md`, no queda nada "distinto" sin que sea una decisión anotada.

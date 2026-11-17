@@ -8,13 +8,14 @@ const path = require('path');
 const vm = require('vm');
 
 const root = path.join(__dirname, '..');
-const SCRIPTS = ['data', 'stats', 'sim', 'abilities', 'abilityDefs', 'items', 'game', 'ai', 'match', 'duel', 'bench'];
 const context = vm.createContext({
   console,
   fetch: async (file) => ({ ok: true, json: async () => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8')) }),
 });
-for (const name of SCRIPTS) {
-  vm.runInContext(fs.readFileSync(path.join(root, 'js', `${name}.js`), 'utf8'), context, { filename: `js/${name}.js` });
+// The same scripts as banco.html, in its order (its inline script needs the DOM and is left out).
+const page = fs.readFileSync(path.join(root, 'banco.html'), 'utf8');
+for (const [, file] of page.matchAll(/<script src="([^"]+)"/g)) {
+  vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
 }
 
 const MATCHES = Number(process.argv[2] || 20);

@@ -195,6 +195,11 @@ function startMatchRound(match) {
 function startBreak(match) {
   match.phase = 'prep';
   match.timer = PREP_TIME;
+  match.freeBooks = giveFreeBooks(match);
+  for (const { player, kinds } of match.freeBooks) {
+    const hero = player.game.hero;
+    pushEvent(player.game.sim, { type: 'text', x: hero.x, y: hero.y, text: `Libros gratis: ${booksText(kinds)}` });
+  }
   if (duelRoundFor(match) && announceDuel(match)) match.timer = DUEL_PREP_TIME;
 }
 

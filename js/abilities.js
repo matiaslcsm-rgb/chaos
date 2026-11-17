@@ -49,17 +49,13 @@ function abilityAoe(ability) {
 }
 
 // Dota's layout: basic abilities on Q W E D F in order, the ultimate on R.
-// A second ultimate (possible once abilities are drafted) takes the next free basic key.
+// A second ultimate (possible once abilities are drafted) takes the next free basic key; without any ultimate,
+// a sixth basic one (Paragon Book) takes R.
 function abilityHotkeys(abilities) {
   const free = BASIC_HOTKEYS.slice();
-  let ultFree = true;
-  return abilities.map((ability) => {
-    if (ability.def.ult && ultFree) {
-      ultFree = false;
-      return ULT_HOTKEY;
-    }
-    return free.shift() || null;
-  });
+  const ult = abilities.findIndex((ability) => ability.def.ult);
+  if (ult === -1) free.push(ULT_HOTKEY);
+  return abilities.map((ability, index) => (index === ult ? ULT_HOTKEY : free.shift() || null));
 }
 
 // What an ability's code receives: who casts, on what, and `v` to read its numbers.

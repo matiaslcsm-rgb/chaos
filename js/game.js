@@ -139,6 +139,8 @@ function createGame(heroData, seed) {
   hero.gold = GOLD.start;
   hero.aegis = AEGIS_START;
   hero.curses = 0;
+  hero.books = { retrain: 0, page: 0 };
+  hero.paragon = false;
   const income = { creeps: 0, rounds: 0, duels: 0, bets: 0 };
   return { sim, hero, income, round: 0, phase: 'prep', timer: PREP_TIME, roundTime: 0, picks: 0, draft: null };
 }
@@ -190,7 +192,8 @@ function bannedAbilities(game) {
 }
 
 // Offers a random handful of the abilities the hero does not have yet, never a banned one.
-function openDraft(game) {
+// A book opens one too (js/books.js): book is its kind and replace the index of the ability that goes.
+function openDraft(game, book) {
   const owned = new Set(game.hero.abilities.map((ability) => ability.key));
   const banned = new Set(bannedAbilities(game));
   const all = draftPool().filter((key) => !banned.has(key));
@@ -200,13 +203,19 @@ function openDraft(game) {
   while (options.length < count && pool.length) {
     options.push(pool.splice(Math.floor(game.sim.rng() * pool.length), 1)[0]);
   }
-  game.draft = { options, number: game.picks + 1 };
+  game.draft = Object.assign({ options, number: game.picks + 1, book: null, replace: null }, book);
 }
 
 function pickDraft(game, key) {
-  if (!game.draft || !game.draft.options.includes(key)) return false;
-  addAbility(game.hero, key);
-  game.picks++;
+  const draft = game.draft;
+  if (!draft || !draft.options.includes(key)) return false;
+  if (draft.replace !== null) {
+    swapAbility(game.hero, draft.replace, key);
+  } else {
+    addAbility(game.hero, key);
+    // The Paragon Book's sixth ability is not one of the draft's five picks.
+    if (!draft.book) game.picks++;
+  }
   game.draft = null;
   return true;
 }
@@ -246,14 +255,19 @@ const CREEP_TRAITS = {
     },
   }),
   // Decision D9 says "an Aegis or a book": killing it gives an Aegis to whoever has fewer than they started
-  // with. With more, it will be a book once books exist; meanwhile nothing (see docs/PLAN.md).
+  // with, and a retraining book to the rest (see docs/PLAN.md).
   aegis: () => ({
     key: 'creep_aegis',
     cooldown: 0,
     def: {
       onDeath(c) {
         const hero = c.sim.units.find((unit) => unit.kind === 'hero' && unit.team === HERO_TEAM);
-        if (!hero || (hero.aegis || 0) >= AEGIS_START) return;
+        if (!hero) return;
+        if ((hero.aegis || 0) >= AEGIS_START) {
+          giveBook(hero, 'retrain');
+          pushEvent(c.sim, { type: 'text', x: c.caster.x, y: c.caster.y, text: `¡${c.caster.name} soltó un libro!` });
+          return;
+        }
         hero.aegis = (hero.aegis || 0) + 1;
         pushEvent(c.sim, { type: 'text', x: c.caster.x, y: c.caster.y, text: `¡${c.caster.name} soltó un Aegis!` });
       },

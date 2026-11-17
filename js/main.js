@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.9.0 · Etapa 4: baneos y sorteo del héroe';
+const GAME_VERSION = '0.10.0 · Etapa 4: libros';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -30,6 +30,9 @@ const SHOP_MESSAGES = {
   gold: 'No te alcanza el oro',
   full: 'El inventario está lleno',
   closed: 'La tienda abre entre rondas',
+  paragon: 'El Libro Parangón se compra una vez, con las 5 habilidades elegidas',
+  none: 'No tenés ese libro',
+  empty: 'Todavía no tenés habilidades para cambiar',
 };
 
 // The bans and the hero offer before a match.
@@ -83,7 +86,7 @@ function startGame(heroData) {
   if (!match) return;
   setup = null;
   game = humanPlayer(match).game;
-  Object.assign(view, { floaters: [], effects: [], marker: null, message: null, attackMoveArmed: false, targeting: null, shop: false, hoverEnemy: null, spy: null });
+  Object.assign(view, { floaters: [], effects: [], marker: null, message: null, attackMoveArmed: false, targeting: null, retraining: false, shop: false, hoverEnemy: null, spy: null });
 }
 
 function onBanClick(point) {
@@ -165,6 +168,10 @@ function tryLevelUp(index) {
 // Returns true if the click was on the ability bar (a slot or its "+").
 function onBarClick(point) {
   for (const slot of abilityBarSlots(canvas, game.hero)) {
+    if (view.retraining && inRect(point, slot)) {
+      retrainAbility(slot.index);
+      return true;
+    }
     if (inRect(point, slot.plus) && canLevelAbility(game.hero, slot.ability)) {
       tryLevelUp(slot.index);
       return true;
@@ -196,15 +203,48 @@ function trySellItem(slot) {
   else say('Los ítems se venden entre rondas');
 }
 
-// Returns true if the click was on the shop, its button or the inventory.
+// ---- Books ----
+
+function retrainAbility(index) {
+  view.retraining = false;
+  const problem = useBook(game, 'retrain', index);
+  if (problem) say(SHOP_MESSAGES[problem]);
+}
+
+// A book waits for you to choose the ability; a torn page goes at once.
+function onBookButton(kind) {
+  const problem = bookUseProblem(game, kind);
+  if (problem) {
+    say(SHOP_MESSAGES[problem]);
+    return;
+  }
+  view.targeting = null;
+  view.attackMoveArmed = false;
+  if (kind === 'retrain') {
+    view.retraining = !view.retraining;
+    view.shop = false;
+  } else {
+    useBook(game, 'page');
+  }
+}
+
+function buyCard(card) {
+  const problem = card.book ? buyBook(game, card.book) : buyFromShop(game, card.key);
+  if (problem) say(SHOP_MESSAGES[problem]);
+  else if (card.book && card.book !== 'paragon') say(`Compraste ${BOOKS[card.book].name}: se usa abajo, junto al inventario`, true);
+}
+
+// Returns true if the click was on the shop, its button, the books or the inventory.
 function onShopClick(point, button) {
   const shopping = view.shop && shopOpen(game);
   if (shopping && inRect(point, shopPanelRect(canvas))) {
     const card = shopCards(canvas).find((c) => inRect(point, c));
-    if (card && button === 0) {
-      const problem = buyFromShop(game, card.key);
-      if (problem) say(SHOP_MESSAGES[problem]);
-    }
+    if (card && button === 0) buyCard(card);
+    return true;
+  }
+  const book = bookButtons(canvas, game.hero).find((b) => inRect(point, b));
+  if (book) {
+    if (button === 0) onBookButton(book.kind);
     return true;
   }
   if (inRect(point, shopButton(canvas))) {
@@ -319,7 +359,8 @@ window.addEventListener('keydown', (event) => {
     // Ctrl + key is Dota's way to level up, but the browser keeps some (Ctrl+W closes the tab), so Shift works too.
     event.preventDefault();
     if (event.repeat) return;
-    if (levelling) tryLevelUp(index);
+    if (view.retraining) retrainAbility(index);
+    else if (levelling) tryLevelUp(index);
     else if (!event.altKey && !event.metaKey) useAbility(index);
     return;
   }
@@ -336,6 +377,7 @@ window.addEventListener('keydown', (event) => {
     view.targeting = null;
   }
   if (key === 'escape') {
+    view.retraining = false;
     view.shop = false;
     view.spy = null;
     view.attackMoveArmed = false;
@@ -405,6 +447,7 @@ function frame(now) {
     ageView(elapsed);
     consumeEvents();
     if (endingText(game) || game.draft) view.targeting = null;
+    if (!shopOpen(game)) view.retraining = false;
     view.hoverEnemy = enemyAt(worldPoint(view.mouse));
     drawGame(ctx, canvas, game, view);
   } else if (setup.step === 'ban') {

@@ -16,7 +16,7 @@ const BAN = { columns: 6, width: 196, height: 52, gap: 7, top: 96 };
 const DRAFT = { columns: 4, width: 296, height: 126, gap: 12, top: 88 };
 const BAR = { size: 72, gap: 6, bottom: 16, plusHeight: 20, plusGap: 4 };
 const INVENTORY = { size: 54, gap: 4, columns: 3, margin: 16 };
-const SHOP = { columns: 5, width: 196, height: 96, gap: 8, left: 60, top: 84 };
+const SHOP = { columns: 6, width: 166, height: 96, gap: 8, left: 32, top: 84 };
 const HOTKEY_ORDER = BASIC_HOTKEYS.concat(ULT_HOTKEY);
 const FONT = 'system-ui, sans-serif';
 
@@ -177,13 +177,30 @@ function shopButton(canvas) {
   return { x: first.x, y: first.y - 34, width: canvas.width - INVENTORY.margin - first.x, height: 28 };
 }
 
+// The items of the batch, then the books.
 function shopCards(canvas) {
-  return DB.batch.items.map((key, index) => ({
+  const entries = DB.batch.items.map((key) => ({ key, book: null }))
+    .concat(BOOK_KINDS.map((kind) => ({ key: kind, book: kind })));
+  return entries.map(({ key, book }, index) => ({
     key,
+    book,
     x: SHOP.left + (index % SHOP.columns) * (SHOP.width + SHOP.gap),
     y: SHOP.top + Math.floor(index / SHOP.columns) * (SHOP.height + SHOP.gap),
     width: SHOP.width,
     height: SHOP.height,
+  }));
+}
+
+// The books you own, left of the inventory; only those you have.
+function bookButtons(canvas, hero) {
+  const left = inventorySlots(canvas)[0].x - 12 - 170;
+  const books = bookStash(hero);
+  return ['retrain', 'page'].filter((kind) => books[kind] > 0).map((kind, row) => ({
+    kind,
+    x: left,
+    y: canvas.height - INVENTORY.margin - 30 - row * 36,
+    width: 170,
+    height: 30,
   }));
 }
 
@@ -392,17 +409,34 @@ function perLevel(value) {
   return [].concat(value).join('/');
 }
 
+// A draft pick, or a book: which ability goes, or the sixth one.
+function draftTitle(game) {
+  const draft = game.draft;
+  if (draft.replace !== null) {
+    const old = DB.abilities[game.hero.abilities[draft.replace].key].dname;
+    return `${BOOKS[draft.book].name}: cambiás ${old}`;
+  }
+  if (draft.book === 'paragon') return `${BOOKS.paragon.name}: elegí tu sexta habilidad`;
+  return `Elegí una habilidad (${draft.number} de ${DRAFT_ROUNDS.length})`;
+}
+
+function draftSubtitle(game) {
+  const draft = game.draft;
+  if (draft.replace !== null) return 'La nueva entra con el mismo nivel; si todavía no puede llegar a ese nivel, te devuelven los puntos.';
+  const owned = game.hero.abilities.map((ability) => DB.abilities[ability.key].dname).join(', ');
+  return owned ? `Ya tenés: ${owned}` : 'Todavía no tenés ninguna. La partida espera mientras elegís.';
+}
+
 function drawDraft(ctx, canvas, game, mouse) {
   ctx.fillStyle = 'rgba(13, 15, 20, 0.88)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.textAlign = 'center';
   ctx.fillStyle = '#e8b04a';
   ctx.font = `bold 30px ${FONT}`;
-  ctx.fillText(`Elegí una habilidad (${game.draft.number} de ${DRAFT_ROUNDS.length})`, canvas.width / 2, 44);
+  ctx.fillText(draftTitle(game), canvas.width / 2, 44);
   ctx.fillStyle = '#8a93a6';
   ctx.font = `14px ${FONT}`;
-  const owned = game.hero.abilities.map((ability) => DB.abilities[ability.key].dname).join(', ');
-  ctx.fillText(owned ? `Ya tenés: ${owned}` : 'Todavía no tenés ninguna. La partida espera mientras elegís.', canvas.width / 2, 70);
+  ctx.fillText(draftSubtitle(game), canvas.width / 2, 70, canvas.width - 80);
 
   for (const card of draftCards(canvas, game)) {
     const info = DB.abilities[card.key];
@@ -884,6 +918,10 @@ function drawShop(ctx, canvas, game, view) {
   ctx.fillText('Clic para comprar. Las partes que ya tenés se usan y pagás lo que falta.', panel.x + panel.width - 12, panel.y + 24);
 
   for (const card of shopCards(canvas)) {
+    if (card.book) {
+      drawBookCard(ctx, game, card, view);
+      continue;
+    }
     const info = DB.items[card.key];
     const plan = purchasePlan(hero, card.key);
     const problem = buyProblem(hero, card.key);
@@ -895,21 +933,80 @@ function drawShop(ctx, canvas, game, view) {
     ctx.strokeRect(card.x, card.y, card.width, card.height);
     ctx.textAlign = 'left';
     ctx.fillStyle = problem ? '#8a93a6' : '#e8ecf4';
-    ctx.font = `bold 13px ${FONT}`;
-    ctx.fillText(info.dname, card.x + 8, card.y + 18);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = problem === 'gold' ? '#e65a46' : '#e8b04a';
-    ctx.fillText(String(plan.cost), card.x + card.width - 8, card.y + 18);
-    ctx.textAlign = 'left';
-    ctx.font = `11px ${FONT}`;
+    drawCardTitle(ctx, card, info.dname, plan.cost, problem);
     let text = itemSummary(card.key);
     const parts = info.components || [];
     if (plan.used.length) text += ` Usa tu ${plan.used.map((part) => DB.items[part].dname).join(' y tu ')}.`;
-    else if (parts.length) text += ` Se arma con ${parts.map((part) => DB.items[part].dname).join(' + ')}.`;
-    ctx.fillStyle = '#b8c0d0';
-    wrapText(ctx, text, card.width - 16).slice(0, 5).forEach((line, row) => {
-      ctx.fillText(line, card.x + 8, card.y + 34 + row * 13);
-    });
+    // The recipe goes only if it fits; what the item does comes first.
+    else if (parts.length) {
+      const withRecipe = `${text} Se arma con ${parts.map((part) => DB.items[part].dname).join(' + ')}.`;
+      ctx.font = `11px ${FONT}`;
+      if (wrapText(ctx, withRecipe, card.width - 16).length <= SHOP_CARD_LINES) text = withRecipe;
+    }
+    drawCardText(ctx, card, text);
+  }
+}
+
+const SHOP_CARD_LINES = 5;
+
+// Name on the left, price on the right; a long name is squeezed so it never runs into the price.
+function drawCardTitle(ctx, card, name, cost, problem) {
+  ctx.font = `bold 13px ${FONT}`;
+  const price = String(cost);
+  const priceWidth = ctx.measureText(price).width;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = problem ? '#8a93a6' : '#e8ecf4';
+  ctx.fillText(name, card.x + 8, card.y + 18, card.width - 24 - priceWidth);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = problem === 'gold' ? '#e65a46' : '#e8b04a';
+  ctx.fillText(price, card.x + card.width - 8, card.y + 18);
+}
+
+function drawCardText(ctx, card, text) {
+  ctx.textAlign = 'left';
+  ctx.font = `11px ${FONT}`;
+  ctx.fillStyle = '#b8c0d0';
+  wrapText(ctx, text, card.width - 16).slice(0, SHOP_CARD_LINES).forEach((line, row) => {
+    ctx.fillText(line, card.x + 8, card.y + 34 + row * 13);
+  });
+}
+
+const BOOK_COLOR = '#c792ea';
+
+function drawBookCard(ctx, game, card, view) {
+  const book = BOOKS[card.book];
+  const problem = bookBuyProblem(game, card.book);
+  const hover = inRect(view.mouse, card);
+  ctx.fillStyle = hover ? '#2a2638' : '#1f1b2a';
+  ctx.fillRect(card.x, card.y, card.width, card.height);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = hover && !problem ? BOOK_COLOR : '#3e3550';
+  ctx.strokeRect(card.x, card.y, card.width, card.height);
+  drawCardTitle(ctx, card, book.name, book.cost, problem);
+  let text = book.text;
+  if (card.book === 'paragon' && game.hero.paragon) text += ' Ya lo usaste.';
+  else if (card.book === 'paragon' && game.picks < DRAFT_ROUNDS.length) text += ' Se compra con las 5 habilidades elegidas.';
+  else if (card.book !== 'paragon') text += ' Se guarda hasta que lo uses, entre rondas.';
+  drawCardText(ctx, card, text);
+}
+
+// The books waiting in the stash, as buttons. Returns nothing; clicks are read in main.js.
+function drawBookButtons(ctx, canvas, game, view) {
+  const books = bookStash(game.hero);
+  const open = shopOpen(game);
+  for (const button of bookButtons(canvas, game.hero)) {
+    const active = view.retraining && button.kind === 'retrain';
+    const hover = inRect(view.mouse, button);
+    ctx.fillStyle = active ? BOOK_COLOR : open && hover ? '#3a3150' : '#1f1b2a';
+    ctx.fillRect(button.x, button.y, button.width, button.height);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = open ? BOOK_COLOR : '#3e3550';
+    ctx.strokeRect(button.x, button.y, button.width, button.height);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = active ? '#151922' : open ? '#e8ecf4' : '#5a6274';
+    ctx.font = `bold 12px ${FONT}`;
+    const name = button.kind === 'page' ? 'Página rota' : 'Libro';
+    ctx.fillText(`${name} ×${books[button.kind]} · ${open ? 'usar' : 'entre rondas'}`, button.x + button.width / 2, button.y + 19);
   }
 }
 
@@ -991,12 +1088,15 @@ function drawHud(ctx, canvas, game, view) {
   }
 
   const hoveredItem = drawInventory(ctx, canvas, game, view);
+  drawBookButtons(ctx, canvas, game, view);
   drawAbilityBar(ctx, canvas, game, view);
   if (shopping) drawShop(ctx, canvas, game, view);
   if (hoveredItem) drawItemTooltip(ctx, canvas, game, hoveredItem);
 
   let hint = null;
-  if (view.targeting) {
+  if (view.retraining) {
+    hint = 'Libro: tocá la habilidad que querés cambiar (Esc cancela)';
+  } else if (view.targeting) {
     const ability = game.hero.abilities[view.targeting.index];
     const what = ability.def.cast === 'unit' ? 'elegí un enemigo' : 'elegí dónde';
     hint = `${DB.abilities[ability.key].dname}: ${what} (clic derecho o Esc para cancelar)`;
@@ -1005,7 +1105,7 @@ function drawHud(ctx, canvas, game, view) {
   }
   if (hint) {
     ctx.textAlign = 'center';
-    ctx.fillStyle = view.targeting ? '#e8b04a' : '#e65a46';
+    ctx.fillStyle = view.retraining ? BOOK_COLOR : view.targeting ? '#e8b04a' : '#e65a46';
     ctx.font = `bold 16px ${FONT}`;
     ctx.fillText(hint, canvas.width / 2, 62);
   } else if (nextWaveText(game)) {
@@ -1433,7 +1533,7 @@ function nextWaveText(game) {
   if (!prep || game.phase === 'lost') return null;
   if (match && match.duel && match.duel.state === 'betting' && isDuelist(match.duel, humanPlayer(match))) return null;
   const round = (match ? match.round : game.round) + 1;
-  if (isRoshanRound(round)) return `Próxima ronda: ${waveText(waveForRound(round))}. Sin duelo; si lo matás y tenés menos de ${AEGIS_START} Aegis, te da uno`;
+  if (isRoshanRound(round)) return `Próxima ronda: ${waveText(waveForRound(round))}. Sin duelo; si lo matás y tenés menos de ${AEGIS_START} Aegis, te da uno; si no, un libro`;
   const heavy = round % WAVE.heavyEvery === 0 ? ' pesada' : '';
   return `Próxima oleada${heavy}: ${waveText(waveForRound(round))}`;
 }
