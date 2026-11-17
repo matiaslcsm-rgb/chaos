@@ -61,3 +61,29 @@ mirando capturas.
   habilidades que más ganan son las que mejoran el ataque (Lightning Hands, Coup de Grace, Headshot, Poison Attack).
   Ninguna llegó todavía a la alarma "gana sola", pero el estilo "mago" de la IA está claramente en desventaja: es lo
   primero a mirar en el balance.
+
+## 2026-11-17 (lunes) · sesión con el usuario
+
+**Qué quedó hecho** (en la rama `final-version`, subido a GitHub):
+- **Tus 4 decisiones de la etapa 4**, todas las recomendadas, anotadas en `docs/PLAN.md`.
+- **Libros.** En la tienda: Reentrenamiento (2.900, elegís qué habilidad cambiar), Página rota (1.200, una al azar)
+  y Libro Parangón (13.000, una sexta habilidad). La nueva entra con el nivel de la vieja. Libros gratis para los
+  tres últimos al terminar las rondas 10, 20, 30 y 40, y Roshan da un libro a quien ya tiene 2 Aegis.
+- **Ítems neutrales.** Después de las rondas 10, 20, 30, 40 y 50 elegís uno entre 3 del nivel que toca. Van en su
+  propio casillero (tecla G). Hay 20 de los 49 de Dota.
+- **Aghanim.** Cetro (4.200) y fragmento (1.400) en la tienda, con 8 mejoras de habilidades del lote, entre ellas
+  Unrefined Fireblast para el que tenga Fireblast.
+- La IA usa todo esto: elige neutrales, usa libros y compra el fragmento, el cetro y el Parangón.
+- La tienda pasó a 6 columnas para que entren los libros y el Aghanim.
+- Pruebas: de 97 a 115, todas bien.
+
+**Qué no pude verificar:** no jugué una partida entera con el mouse; probé las pantallas nuevas en el navegador
+haciendo avanzar la partida desde la página y mirando capturas.
+
+**Banco de 6 partidas al final:** todas terminaron solas, en la ronda 55,5 en promedio. Ganó por primera vez un
+héroe de inteligencia (Crystal Maiden). A vigilar: muchas eliminaciones en el Roshan de la ronda 50 (16 de 42).
+
+**Quedó pendiente:** las mejoras de Aghanim cuyos números no están en los datos (lista en el PLAN), y pasar la rama
+`final-version` a `main`.
+
+**Uso:** al empezar, 2% del límite de 5 horas; al terminar, 38%.
