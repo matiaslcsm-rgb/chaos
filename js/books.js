@@ -64,8 +64,11 @@ function useBook(game, kind, index) {
   const problem = bookUseProblem(game, kind);
   if (problem) return problem;
   const abilities = game.hero.abilities;
-  const replace = kind === 'page' ? Math.floor(game.sim.rng() * abilities.length) : index;
+  // An ability an upgrade gives (Unrefined Fireblast) comes with the item, not from the draft: it cannot be swapped.
+  const own = abilities.map((ability, i) => i).filter((i) => !abilities[i].def.granted);
+  const replace = kind === 'page' ? own[Math.floor(game.sim.rng() * own.length)] : index;
   if (!abilities[replace]) return 'empty';
+  if (abilities[replace].def.granted) return 'granted';
   bookStash(game.hero)[kind]--;
   openDraft(game, { book: kind, replace });
   return null;

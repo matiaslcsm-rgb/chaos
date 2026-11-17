@@ -177,13 +177,15 @@ function shopButton(canvas) {
   return { x: first.x, y: first.y - 34, width: canvas.width - INVENTORY.margin - first.x, height: 28 };
 }
 
-// The items of the batch, then the books.
+// The items of the batch, then the books, then Aghanim's Scepter and Shard.
 function shopCards(canvas) {
-  const entries = DB.batch.items.map((key) => ({ key, book: null }))
-    .concat(BOOK_KINDS.map((kind) => ({ key: kind, book: kind })));
-  return entries.map(({ key, book }, index) => ({
+  const entries = DB.batch.items.map((key) => ({ key, book: null, aghanim: null }))
+    .concat(BOOK_KINDS.map((kind) => ({ key: kind, book: kind, aghanim: null })))
+    .concat([{ key: SCEPTER, book: null, aghanim: 'scepter' }, { key: SHARD, book: null, aghanim: 'shard' }]);
+  return entries.map(({ key, book, aghanim }, index) => ({
     key,
     book,
+    aghanim,
     x: SHOP.left + (index % SHOP.columns) * (SHOP.width + SHOP.gap),
     y: SHOP.top + Math.floor(index / SHOP.columns) * (SHOP.height + SHOP.gap),
     width: SHOP.width,
@@ -839,7 +841,8 @@ function drawTooltip(ctx, canvas, hero, slot) {
   const x = Math.min(canvas.width - width - 8, Math.max(8, slot.x + slot.width / 2 - width / 2));
 
   const facts = [CAST_LABELS[ability.def.cast], `Nivel ${ability.level}/${maxAbilityLevel(ability)}`];
-  if (abilityManaCost(ability) > 0) facts.push(`Maná ${abilityManaCost(ability)}`);
+  if (ability.def.manaCost) facts.push(`Maná ${Math.round(abilityManaCost(ability, hero))} (35% del que tenés)`);
+  else if (abilityManaCost(ability) > 0) facts.push(`Maná ${abilityManaCost(ability)}`);
   if (abilityCooldown(ability) > 0) facts.push(`Recarga ${abilityCooldown(ability)} s`);
   if (abilityCastRange(ability) > 0) facts.push(`Alcance ${abilityCastRange(ability)}`);
 
@@ -852,7 +855,11 @@ function drawTooltip(ctx, canvas, hero, slot) {
   const factLines = wrapText(ctx, facts.join(' · '), width - 24);
   const stateLines = wrapText(ctx, stateText, width - 24);
   const descLines = wrapText(ctx, info.desc || '', width - 24).slice(0, 5);
-  const height = 38 + (factLines.length + stateLines.length + descLines.length) * 16 + 8;
+  const upgrades = [];
+  if (ability.def.scepter) upgrades.push(`${hasScepter(hero) ? '✔' : 'Con'} cetro: ${ability.def.scepter}`);
+  if (ability.def.shard) upgrades.push(`${hasShard(hero) ? '✔' : 'Con'} fragmento: ${ability.def.shard}`);
+  const upgradeLines = upgrades.flatMap((text) => wrapText(ctx, text, width - 24));
+  const height = 38 + (factLines.length + stateLines.length + descLines.length + upgradeLines.length) * 16 + 8;
   const y = slot.plus.y - 8 - height;
 
   ctx.fillStyle = 'rgba(13, 15, 20, 0.94)';
@@ -876,6 +883,7 @@ function drawTooltip(ctx, canvas, hero, slot) {
   print(factLines, '#6aa8f0');
   print(stateLines, '#e8b04a');
   print(descLines, '#b8c0d0');
+  print(upgradeLines, AGHANIM_COLOR);
 }
 
 function drawAbilityBar(ctx, canvas, game, view) {
@@ -1009,6 +1017,10 @@ function drawShop(ctx, canvas, game, view) {
       drawBookCard(ctx, game, card, view);
       continue;
     }
+    if (card.aghanim) {
+      drawAghanimCard(ctx, game, card, view);
+      continue;
+    }
     const info = DB.items[card.key];
     const plan = purchasePlan(hero, card.key);
     const problem = buyProblem(hero, card.key);
@@ -1059,6 +1071,33 @@ function drawCardText(ctx, card, text) {
 }
 
 const BOOK_COLOR = '#c792ea';
+const AGHANIM_COLOR = '#4a8fe0';
+
+// What the scepter or the shard would upgrade for you, by name.
+function aghanimText(hero, kind) {
+  const names = aghanimUpgrades(hero, kind).map((key) => DB.abilities[key].dname);
+  const what = kind === 'scepter' ? 'cetro' : 'fragmento';
+  if (!names.length) return `Ninguna de tus habilidades tiene mejora de ${what} todavía.`;
+  return `Mejora: ${names.join(', ')}.`;
+}
+
+function drawAghanimCard(ctx, game, card, view) {
+  const hero = game.hero;
+  const scepter = card.aghanim === 'scepter';
+  const problem = scepter ? buyProblem(hero, SCEPTER) : shardBuyProblem(game);
+  const cost = scepter ? purchasePlan(hero, SCEPTER).cost : itemCost(SHARD);
+  const hover = inRect(view.mouse, card);
+  ctx.fillStyle = hover ? '#1f2a3d' : '#1b2030';
+  ctx.fillRect(card.x, card.y, card.width, card.height);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = hover && !problem ? AGHANIM_COLOR : '#2c3a55';
+  ctx.strokeRect(card.x, card.y, card.width, card.height);
+  drawCardTitle(ctx, card, DB.items[card.key].dname, cost, problem);
+  let text = aghanimText(hero, card.aghanim);
+  if (scepter) text = `+10 a los atributos, +175 de vida y maná. ${text}`;
+  else text += problem === 'owned' ? ' Ya lo tenés.' : ' Se usa al comprarlo.';
+  drawCardText(ctx, card, text);
+}
 
 function drawBookCard(ctx, game, card, view) {
   const book = BOOKS[card.book];

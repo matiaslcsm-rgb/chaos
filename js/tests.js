@@ -643,10 +643,15 @@ test('every aimed ability of the batch has a cast range', () => {
   }
 });
 
-// Casts everything a hero has, then lets it fight for a while.
-function exerciseHero(name, maxed) {
+// Casts everything a hero has, then lets it fight for a while. aghanim: with the scepter and the shard.
+function exerciseHero(name, maxed, aghanim) {
   const sim = createSim(3);
   const hero = addTestHero(sim, name, 25, 1000, 600);
+  if (aghanim) {
+    hero.gold = 1e5;
+    assert(buyItem(hero, SCEPTER) === null, 'could not buy the scepter');
+    hero.shard = true;
+  }
   fillMana(hero);
   const enemyHero = addTestHero(sim, 'Axe', 25, 1200, 600, CREEP_TEAM);
   enemyHero.acquireRange = HERO_ACQUIRE_RANGE;
@@ -691,6 +696,13 @@ test('all 43 abilities of the batch work at level 1', () => {
 
 test('all 43 abilities of the batch work at their maximum level', () => {
   for (const { data } of batchHeroes()) exerciseHero(data.localized_name, true);
+});
+
+test('all 43 abilities work with the Aghanim scepter and shard, at level 1 and at their maximum', () => {
+  for (const { data } of batchHeroes()) {
+    exerciseHero(data.localized_name, false, true);
+    exerciseHero(data.localized_name, true, true);
+  }
 });
 
 // ---- Draft ----
@@ -979,7 +991,7 @@ test('the shop and the inventory fit on screen without covering the rest', () =>
   const button = shopButton(canvas);
   const panel = shopPanelRect(canvas);
   const cards = shopCards(canvas);
-  assert(slots.length === INVENTORY_SIZE && cards.length === 25 + BOOK_KINDS.length, 'six slots, 25 items and the books');
+  assert(slots.length === INVENTORY_SIZE && cards.length === 25 + BOOK_KINDS.length + 2, 'six slots, 25 items, the books and Aghanim');
   for (const slot of slots) {
     assert(slot.x + slot.width <= canvas.width && slot.y + slot.height <= canvas.height, 'inventory on screen');
     assert(!bar.some((other) => overlap(slot, other) || overlap(slot, other.plus)), 'inventory clear of the ability bar');
@@ -1994,6 +2006,117 @@ test('all 20 neutral items can be taken, used and fought with', () => {
       }
     }
   }
+});
+
+// ---- Aghanim (user's decision of 2026-11-17) ----
+
+// A hero of the batch with the abilities it brings, all at level 1, enough mana, and an enemy in front.
+function aghanimHero(name) {
+  const sim = createSim(9);
+  const hero = addTestHero(sim, name, 25, 1000, 600);
+  for (const ability of hero.abilities) teach(hero, ability.key, 1);
+  fillMana(hero);
+  return { sim, hero };
+}
+
+function castAt(sim, hero, key, target) {
+  const index = hero.abilities.findIndex((ability) => ability.key === key);
+  assert(orderCast(hero, index, target) === null, `could not cast ${key}`);
+  runUntil(sim, 3, () => hero.abilities[index].cooldown > 0, `${key} cast`);
+}
+
+test('Aghanim: the scepter costs 4.200 in one go and gives its stats; the shard costs 1.400, once, and takes no slot', () => {
+  const game = createGame(heroByName('Sven'), 91);
+  game.hero.gold = 10000;
+  const stats = Object.assign({}, game.hero.stats);
+  assert(purchasePlan(game.hero, SCEPTER).cost === 4200, `scepter ${purchasePlan(game.hero, SCEPTER).cost}`);
+  assert(buyFromShop(game, SCEPTER) === null, 'scepter bought');
+  assert(game.hero.items.length === 1 && hasScepter(game.hero), 'it takes a slot');
+  assertNear(game.hero.stats.str, stats.str + 10, 1e-9, 'strength');
+  assertNear(game.hero.stats.maxMana, stats.maxMana + 175 + 10 * 12, 1e-6, 'mana: 175 plus 10 intelligence');
+  assert(buyShard(game) === null && hasShard(game.hero), 'shard bought');
+  assert(game.hero.gold === 10000 - 4200 - 1400, `gold ${game.hero.gold}`);
+  assert(game.hero.items.length === 1, 'the shard takes no slot');
+  assert(buyShard(game) === 'owned', 'only once');
+});
+
+test('Aghanim: Storm Hammer hits 180 harder with the scepter', () => {
+  const hit = (scepter) => {
+    const { sim, hero } = aghanimHero('Sven');
+    if (scepter) {
+      hero.gold = 1e5;
+      buyItem(hero, SCEPTER);
+    }
+    hero.baseStats.spellAmp = 0;
+    hero.stats.spellAmp = 0;
+    const dummy = addDummy(sim, 1200, 600, { magicResist: 0 });
+    castAt(sim, hero, 'sven_storm_bolt', dummy);
+    runUntil(sim, 3, () => dummy.hp < dummy.stats.maxHp, 'the bolt');
+    return dummy.stats.maxHp - dummy.hp;
+  };
+  assertNear(hit(true) - hit(false), 180, 1, 'scepter bonus damage');
+});
+
+test('Aghanim: the scepter gives Unrefined Fireblast to whoever has Fireblast; it costs 35% of the mana and books cannot swap it', () => {
+  const { sim, hero } = aghanimHero('Ogre Magi');
+  hero.gold = 1e5;
+  const count = hero.abilities.length;
+  buyItem(hero, SCEPTER);
+  const index = hero.abilities.findIndex((ability) => ability.key === 'ogre_magi_unrefined_fireblast');
+  assert(index === count && hero.abilities[index].level === 1, 'added at the end, learned');
+  assert(abilityHotkeys(hero.abilities)[index], 'it has a key');
+  const dummy = addDummy(sim, 1200, 600, { magicResist: 0 });
+  hero.mana = 1000;
+  castAt(sim, hero, 'ogre_magi_unrefined_fireblast', dummy);
+  assertNear(1000 - hero.mana, 350, 5, '35% of the mana');
+  const expected = 150 + 1.5 * hero.stats.str;
+  assert(dummy.stats.maxHp - dummy.hp >= expected * 0.99, `damage ${dummy.stats.maxHp - dummy.hp}, expected ${expected}`);
+  assert(findMod(dummy, 'ogre_magi_unrefined_fireblast:stun'), 'it stuns');
+  sellItem(hero, 0);
+  assert(!hero.abilities.some((ability) => ability.key === 'ogre_magi_unrefined_fireblast'), 'gone with the scepter');
+
+  const game = bookGame(['ogre_magi_fireblast', 'sven_storm_bolt'], [1, 1], 5);
+  game.hero.gold = 1e5;
+  buyFromShop(game, SCEPTER);
+  giveBook(game.hero, 'retrain');
+  assert(useBook(game, 'retrain', 2) === 'granted', 'a book cannot take it');
+  giveBook(game.hero, 'page');
+  for (let i = 0; i < 20; i++) {
+    game.hero.books.page = 1;
+    useBook(game, 'page');
+    assert(game.draft.replace !== 2, 'a torn page never takes it');
+    game.draft = null;
+  }
+});
+
+test('Aghanim: with the shard Battle Hunger stacks and Arcane Bolt fires three', () => {
+  const axe = aghanimHero('Axe');
+  axe.hero.shard = true;
+  const target = addDummy(axe.sim, 1200, 600);
+  castAt(axe.sim, axe.hero, 'axe_battle_hunger', target);
+  axe.hero.abilities.find((ability) => ability.key === 'axe_battle_hunger').cooldown = 0;
+  castAt(axe.sim, axe.hero, 'axe_battle_hunger', target);
+  assert(target.mods.filter((mod) => mod.id.startsWith('axe_battle_hunger:hunger')).length === 2, 'two at once');
+
+  const sky = aghanimHero('Skywrath Mage');
+  sky.hero.shard = true;
+  const first = addDummy(sky.sim, 1300, 600);
+  addDummy(sky.sim, 1400, 650);
+  addDummy(sky.sim, 1400, 550);
+  const index = sky.hero.abilities.findIndex((ability) => ability.key === 'skywrath_mage_arcane_bolt');
+  orderCast(sky.hero, index, first);
+  runUntil(sky.sim, 3, () => sky.sim.projectiles.length > 0, 'the bolts');
+  assert(sky.sim.projectiles.length === 3, `${sky.sim.projectiles.length} bolts`);
+});
+
+test('Aghanim: with the scepter Mystic Flare falls twice, the second on another enemy close by', () => {
+  const { sim, hero } = aghanimHero('Skywrath Mage');
+  hero.gold = 1e5;
+  buyItem(hero, SCEPTER);
+  const first = addDummy(sim, 1300, 600);
+  addDummy(sim, 1600, 600);
+  castAt(sim, hero, 'skywrath_mage_mystic_flare', { x: first.x, y: first.y });
+  assert(sim.zones.length === 2, `${sim.zones.length} flares`);
 });
 
 async function runTests() {

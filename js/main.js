@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.11.0 · Etapa 4: libros e ítems neutrales';
+const GAME_VERSION = '0.12.0 · Etapa 4: libros, neutrales y Aghanim';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -33,6 +33,8 @@ const SHOP_MESSAGES = {
   paragon: 'El Libro Parangón se compra una vez, con las 5 habilidades elegidas',
   none: 'No tenés ese libro',
   empty: 'Todavía no tenés habilidades para cambiar',
+  owned: 'Ya tenés el fragmento',
+  granted: 'Esa viene con el cetro: no se cambia con libros',
 };
 
 // The bans and the hero offer before a match.
@@ -235,7 +237,7 @@ function onBookButton(kind) {
 }
 
 function buyCard(card) {
-  const problem = card.book ? buyBook(game, card.book) : buyFromShop(game, card.key);
+  const problem = card.book ? buyBook(game, card.book) : card.aghanim === 'shard' ? buyShard(game) : buyFromShop(game, card.key);
   if (problem) say(SHOP_MESSAGES[problem]);
   else if (card.book && card.book !== 'paragon') say(`Compraste ${BOOKS[card.book].name}: se usa abajo, junto al inventario`, true);
 }

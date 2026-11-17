@@ -60,6 +60,7 @@ function recomputeStats(unit) {
     stats.damageMin += (s.damage || 0) * n;
     stats.damageMax += ((s.damage || 0) + (s.damageMax || 0)) * n;
     stats.maxHp += (s.maxHp || 0) * n;
+    stats.maxMana += (s.maxMana || 0) * n;
     damagePct += (s.damagePct || 0) * n;
     takenPct += (s.damageTakenPct || 0) * n;
     dealtPct += (s.damageDealtPct || 0) * n;

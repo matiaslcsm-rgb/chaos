@@ -303,7 +303,25 @@ Una partida completa, pero chica.
       de 8 cuando los soltaban los creeps, y acá cada uno recibe el suyo.
 - [x] Marcas por perder duelos seguidos y ayudas al que va abajo (2026-11-17): las marcas están desde el
       2026-11-11 (D8, en "Final de partida") y las ayudas son los libros gratis de cada 10 rondas.
-- [ ] Aghanim para cualquier habilidad. Espera la decisión "Aghanim".
+- [x] Aghanim para cualquier habilidad (`js/aghanim.js`) (2026-11-17), con la decisión del 2026-11-17:
+      - En la tienda: Aghanim's Scepter (4.200 de una vez; ocupa un casillero y da +10 a los atributos y +175 de
+        vida y maná) y Aghanim's Shard (1.400, se usa al comprarlo, una vez). Cada carta dice qué habilidades tuyas
+        mejora, y la descripción de cada habilidad en la barra dice qué le hace el cetro o el fragmento.
+      - Mejoras hechas, con los números de los datos o del texto de Dota: Storm Hammer (+180 de daño), Eclipse (rayos
+        al doble de velocidad y sin límite por enemigo), Mystic Flare (un segundo flare sobre otro enemigo a 500),
+        Freezing Field (20% más de explosiones) y Fireblast (suma Unrefined Fireblast) con el cetro; Battle Hunger (se
+        apila), Arcane Bolt (3 rayos) y Lunar Orbit (+20% de velocidad) con el fragmento.
+      - Unrefined Fireblast aparece al final de la barra si tenés Fireblast y el cetro, y se va si vendés el cetro o
+        cambiás Fireblast. No se puede cambiar con libros.
+      - La IA compra el fragmento apenas le mejora algo y el cetro (entero) como cuarto ítem si le mejora algo.
+      - 6 pruebas nuevas (115 en total), una de ellas lanza las 43 habilidades con cetro y fragmento. Banco de 6
+        partidas: todas terminaron solas, en la ronda 55,5 en promedio; por primera vez ganó un héroe de
+        inteligencia (Crystal Maiden). A vigilar: 16 de 42 eliminados cayeron en el Roshan de la ronda 50.
+      **Faltan** (sus números no están en los datos y hay que buscarlos): con el cetro, Counter Helix, Assassinate
+      y que Freezing Field deje moverse; con el fragmento, Warcry, Poison Attack, el daño reducido de Lunar Orbit e
+      Immaterial (en Dota, Blur); y las habilidades nuevas que dan Crystal Maiden (Crystal Clone), Zeus (Nimbus),
+      Phantom Assassin (Fan of Knives) y Ogre Magi (Fire Shield). Las de Zeus (Lightning Hands), Sniper (Concussive
+      Grenade) y Viper (Nosedive) ya están en el lote como habilidades comunes.
 
 **Lista cuando:** comparado con `REFERENCIA-CHC.md`, no queda nada "distinto" sin que sea una decisión anotada.
 

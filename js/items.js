@@ -159,6 +159,11 @@ function critOnAttack(c, target, attack) {
 
 // text: what the shop says about the item, besides its plain stats.
 const ITEM_DEFS = {
+  // Bought in one go (user's decision 2026-11-17); what it upgrades is in js/aghanim.js.
+  ultimate_scepter: {
+    text: 'Mejora las habilidades que tienen mejora de cetro.',
+    stats: (c) => ({ str: c.v('bonus_all_stats'), agi: c.v('bonus_all_stats'), int: c.v('bonus_all_stats'), maxHp: c.v('bonus_health'), maxMana: c.v('bonus_mana') }),
+  },
   phase_boots: {
     text: 'Más daño (18 cuerpo a cuerpo, 12 a distancia). Activa: 3 s de más velocidad.',
     stats: (c) => ({ damage: c.v(isRanged(c.caster) ? 'bonus_damage_range' : 'bonus_damage_melee') }),

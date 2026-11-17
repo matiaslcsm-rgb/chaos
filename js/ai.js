@@ -19,6 +19,7 @@ const AI_ABILITY_INFO = {
   sven_warcry: { tags: ['buff', 'defense'] },
   sven_gods_strength: { tags: ['attack', 'buff'] },
   ogre_magi_fireblast: { tags: ['stun', 'nuke'] },
+  ogre_magi_unrefined_fireblast: { tags: ['stun', 'nuke'] },
   ogre_magi_ignite: { tags: ['nuke'] },
   ogre_magi_bloodlust: { tags: ['attack', 'buff'] },
   ogre_magi_multicast: { tags: ['magic'] },
@@ -198,16 +199,30 @@ function nextPurchase(hero, key, budget) {
   return null;
 }
 
+// The style's list, with Aghanim's Scepter as the fourth item when it would upgrade something.
+function shoppingList(hero, brain) {
+  const list = AI_SHOPPING[brain.style].slice();
+  if (aghanimUpgrades(hero, 'scepter').length) list.splice(3, 0, SCEPTER);
+  return list;
+}
+
 // Buys along the shopping list while the gold it is willing to spend allows.
 function aiShop(game, brain) {
   const hero = game.hero;
   const budgetStart = hero.gold * (1 - AI_RESERVE[brain.money]);
   let spent = 0;
   const bought = [];
+  // The shard is cheap: as soon as it upgrades something.
+  if (aghanimUpgrades(hero, 'shard').length && itemCost(SHARD) <= budgetStart && buyShard(game) === null) {
+    spent += itemCost(SHARD);
+    bought.push(SHARD);
+  }
   for (let guard = 0; guard < 20; guard++) {
-    const goal = AI_SHOPPING[brain.style].find((key) => !ownsItem(hero, key));
+    const goal = shoppingList(hero, brain).find((key) => !ownsItem(hero, key));
     if (!goal) break;
-    const key = nextPurchase(hero, goal, budgetStart - spent);
+    // The scepter is bought whole (its parts are not in the shop).
+    const whole = goal === SCEPTER && buyProblem(hero, SCEPTER) === null && purchasePlan(hero, SCEPTER).cost <= budgetStart - spent;
+    const key = goal === SCEPTER ? (whole ? SCEPTER : null) : nextPurchase(hero, goal, budgetStart - spent);
     if (!key) break;
     const before = hero.gold;
     if (buyFromShop(game, key)) break;
@@ -215,7 +230,7 @@ function aiShop(game, brain) {
     bought.push(key);
   }
   // With the list done, a sixth ability.
-  const listDone = AI_SHOPPING[brain.style].every((key) => ownsItem(hero, key));
+  const listDone = shoppingList(hero, brain).every((key) => ownsItem(hero, key));
   if (listDone && BOOKS.paragon.cost <= budgetStart - spent && buyBook(game, 'paragon') === null) bought.push('paragon');
   return bought;
 }

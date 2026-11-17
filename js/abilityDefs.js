@@ -54,10 +54,12 @@ const ABILITY_DEFS = {
     cast: 'unit',
     aoe: 'bolt_aoe',
     projectile: 'bolt_speed',
+    scepter: '+180 de daño.',
     hit(c) {
       fxRing(c, c.target, c.v('bolt_aoe'), FX.steel);
+      const damage = c.dmg() + (hasScepter(c.caster) ? c.v('scepter_bonus_damage') : 0);
       for (const enemy of enemiesOf(c, c.target, c.v('bolt_aoe'))) {
-        spellDamage(c, enemy, c.dmg());
+        spellDamage(c, enemy, damage);
         stun(c, enemy, c.v('bolt_stun_duration'));
       }
     },
@@ -92,6 +94,7 @@ const ABILITY_DEFS = {
   // ---- Ogre Magi ----
   ogre_magi_fireblast: {
     cast: 'unit',
+    scepter: 'Suma Unrefined Fireblast: 150 + 1,5 × tu fuerza de daño, aturde 1,2 s y cuesta el 35% de tu maná.',
     hit(c) {
       fxRing(c, c.target, 60, FX.fire);
       spellDamage(c, c.target, c.v('fireblast_damage'));
@@ -149,13 +152,17 @@ const ABILITY_DEFS = {
   },
   axe_battle_hunger: {
     cast: 'unit',
+    shard: 'Se apila: varias a la vez sobre el mismo enemigo.',
     // As in Dota, the slow only holds while the target faces away from Axe.
     hit(c) {
       // Damage once per second; where the target looks is checked four times as often.
       const damage = dot(c, c.v('damage_per_second'), 'pure');
       const slow = { moveSpeedPct: neg(c.v('slow')) };
       const facingAway = (unit) => !c.caster.dead && facesAway(unit, c.caster);
-      status(c, c.target, 'hunger', c.v('duration'), {
+      // Each cast is a status of its own with the shard, so they stack instead of refreshing.
+      c.ability.casts = (c.ability.casts || 0) + 1;
+      const name = hasShard(c.caster) ? `hunger:${c.ability.casts}` : 'hunger';
+      status(c, c.target, name, c.v('duration'), {
         stats: facingAway(c.target) ? slow : {},
         checks: 0,
         tick: {
@@ -349,7 +356,9 @@ const ABILITY_DEFS = {
   },
   luna_lunar_orbit: {
     cast: 'none',
+    shard: '20% más de velocidad de movimiento mientras dura.',
     hit(c) {
+      if (hasShard(c.caster)) status(c, c.caster, 'orbit_speed', c.v('rotating_glaives_duration'), { stats: { moveSpeedPct: LUNAR_ORBIT_SHARD_SPEED } });
       const radius = c.v('rotating_glaives_movement_radius') + 60;
       const tick = 0.5;
       addZone(c.sim, {
@@ -382,13 +391,17 @@ const ABILITY_DEFS = {
     cast: 'none',
     aoe: 'radius',
     ult: true,
+    scepter: 'Los rayos caen el doble de rápido y no hay límite de rayos por enemigo.',
     hit(c) {
       const beam = borrowAbility(c, 'luna_lucent_beam');
       const hits = new Map();
+      const scepter = hasScepter(c.caster);
+      const interval = c.v(scepter ? 'beam_interval_scepter' : 'beam_interval');
+      const limit = scepter ? Infinity : c.v('hit_count');
       for (let i = 0; i < c.v('beams'); i++) {
-        after(c.sim, i * c.v('beam_interval'), () => {
+        after(c.sim, i * interval, () => {
           if (c.caster.dead) return;
-          const pool = enemiesOf(c, c.caster, c.v('radius')).filter((enemy) => (hits.get(enemy.id) || 0) < c.v('hit_count'));
+          const pool = enemiesOf(c, c.caster, c.v('radius')).filter((enemy) => (hits.get(enemy.id) || 0) < limit);
           if (!pool.length) return;
           const enemy = pool[Math.floor(c.sim.rng() * pool.length)];
           hits.set(enemy.id, (hits.get(enemy.id) || 0) + 1);
@@ -466,6 +479,7 @@ const ABILITY_DEFS = {
     cast: 'none',
     aoe: 'radius',
     ult: true,
+    scepter: '20% más de explosiones.',
     hit(c) {
       // Channeled: the zone ends as soon as she gets a new order or is stunned.
       c.caster.channel = addZone(c.sim, {
@@ -475,7 +489,7 @@ const ABILITY_DEFS = {
         channelOf: c.caster.id,
         radius: c.v('radius'),
         duration: c.v('abilitychanneltime'),
-        interval: c.v('explosion_interval'),
+        interval: c.v('explosion_interval') / (hasScepter(c.caster) ? 1 + FREEZING_FIELD_SCEPTER_EXPLOSIONS : 1),
         color: FX.ice,
         run: (zone) => {
           const angle = c.sim.rng() * Math.PI * 2;
@@ -552,6 +566,12 @@ const ABILITY_DEFS = {
   skywrath_mage_arcane_bolt: {
     cast: 'unit',
     projectile: 'bolt_speed',
+    shard: 'Salen 3 rayos: el tuyo y dos más a enemigos cerca del objetivo.',
+    extraTargets(c) {
+      if (!hasShard(c.caster)) return [];
+      return enemiesOf(c, c.target, c.v('extra_bolt_search_radius')).filter((enemy) => enemy !== c.target)
+        .sort((a, b) => (b.kind === 'hero') - (a.kind === 'hero')).slice(0, ARCANE_BOLT_SHARD_EXTRA);
+    },
     hit(c) {
       spellDamage(c, c.target, c.v('bolt_damage') + c.v('int_multiplier') * (c.caster.baseStats.int || 0));
     },
@@ -589,24 +609,42 @@ const ABILITY_DEFS = {
     cast: 'point',
     aoe: 'radius',
     ult: true,
+    scepter: 'Cae un segundo Mystic Flare sobre otro enemigo a 500 o menos del primero.',
     hit(c) {
-      const point = c.point;
-      const perTick = c.v('damage') * c.v('damage_interval') / c.v('duration');
-      addZone(c.sim, {
-        x: point.x,
-        y: point.y,
-        radius: c.v('radius'),
-        duration: c.v('duration'),
-        interval: c.v('damage_interval'),
-        color: FX.arcane,
-        run: () => {
-          // Split evenly among heroes in the area; with no heroes there, among whoever is.
-          const inside = enemiesOf(c, point, c.v('radius'));
-          const heroes = inside.filter((enemy) => enemy.kind === 'hero');
-          const pool = heroes.length ? heroes : inside;
-          for (const enemy of pool) spellDamage(c, enemy, perTick / pool.length);
-        },
-      });
+      mysticFlareAt(c, c.point);
+      if (!hasScepter(c.caster)) return;
+      // Heroes first, as in Dota.
+      const others = enemiesOf(c, c.point, MYSTIC_FLARE_SCEPTER_RADIUS).filter((enemy) => distance(enemy, c.point) > c.v('radius'));
+      const heroes = others.filter((enemy) => enemy.kind === 'hero');
+      const pool = heroes.length ? heroes : others;
+      if (!pool.length) return;
+      const second = pool[Math.floor(c.sim.rng() * pool.length)];
+      mysticFlareAt(c, { x: second.x, y: second.y });
     },
   },
 };
+
+// Numbers of the Aghanim upgrades that the data gives only in words (js/aghanim.js).
+const LUNAR_ORBIT_SHARD_SPEED = 20;
+const FREEZING_FIELD_SCEPTER_EXPLOSIONS = 0.2;
+const ARCANE_BOLT_SHARD_EXTRA = 2;
+const MYSTIC_FLARE_SCEPTER_RADIUS = 500;
+
+function mysticFlareAt(c, point) {
+  const perTick = c.v('damage') * c.v('damage_interval') / c.v('duration');
+  addZone(c.sim, {
+    x: point.x,
+    y: point.y,
+    radius: c.v('radius'),
+    duration: c.v('duration'),
+    interval: c.v('damage_interval'),
+    color: FX.arcane,
+    run: () => {
+      // Split evenly among heroes in the area; with no heroes there, among whoever is.
+      const inside = enemiesOf(c, point, c.v('radius'));
+      const heroes = inside.filter((enemy) => enemy.kind === 'hero');
+      const pool = heroes.length ? heroes : inside;
+      for (const enemy of pool) spellDamage(c, enemy, perTick / pool.length);
+    },
+  });
+}

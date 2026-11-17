@@ -34,7 +34,9 @@ function abilityCooldown(ability) {
   return cooldown === undefined ? 0 : levelValue(cooldown, ability.level);
 }
 
-function abilityManaCost(ability) {
+// owner: whoever casts it, for the abilities whose cost depends on them (Unrefined Fireblast).
+function abilityManaCost(ability, owner) {
+  if (ability.def.manaCost && owner) return ability.def.manaCost(owner);
   const cost = DB.abilities[ability.key].mc;
   return cost === undefined ? 0 : levelValue(cost, ability.level);
 }
@@ -98,6 +100,8 @@ function heroLevelForNextLevel(ability) {
 
 // Why an ability cannot be levelled right now ('max' | 'points' | 'heroLevel'), or null if it can.
 function levelProblem(hero, ability) {
+  // An ability given by an upgrade follows its own rule (see syncGrantedAbilities).
+  if (ability.def.granted) return 'max';
   if (ability.level >= maxAbilityLevel(ability)) return 'max';
   if (hero.skillPoints <= 0) return 'points';
   if (hero.level < heroLevelForNextLevel(ability)) return 'heroLevel';
@@ -111,6 +115,7 @@ function canLevelAbility(hero, ability) {
 // Passive stat bonuses (abilities and items) are statuses that never expire, rebuilt whenever
 // a level, a toggle or the inventory changes.
 function refreshPassives(unit) {
+  syncGrantedAbilities(unit);
   unit.mods = unit.mods.filter((mod) => !mod.passive);
   equippedItems(unit).forEach((item, slot) => {
     unit.mods.push({ id: `item:${item.neutral ? 'neutral' : slot}`, passive: true, sourceId: unit.id, duration: Infinity, stacks: 1, tickTimer: 0, stats: itemStats(unit, item) });
@@ -173,7 +178,7 @@ function castProblem(unit, ability) {
   if (unit.flags.silenced || unit.flags.stunned) return 'silenced';
   if (ability.def.charges && ability.charges <= 0) return 'charges';
   if (ability.cooldown > 0) return 'cooldown';
-  if (unit.mana < abilityManaCost(ability)) return 'mana';
+  if (unit.mana < abilityManaCost(ability, unit)) return 'mana';
   return null;
 }
 
@@ -206,10 +211,17 @@ function releaseAbility(c) {
   if (c.target) projectile.targetId = c.target.id;
   else Object.assign(projectile, { toX: c.point.x, toY: c.point.y });
   c.sim.projectiles.push(projectile);
+  // Some upgrades fire more than one (Arcane Bolt with the shard).
+  for (const extra of def.extraTargets ? def.extraTargets(c) : []) {
+    c.sim.projectiles.push(Object.assign({}, projectile, {
+      targetId: extra.id,
+      onHit: (hitTarget) => def.hit(Object.assign({}, c, { target: hitTarget || extra })),
+    }));
+  }
 }
 
 function fireAbility(sim, unit, ability, target, point) {
-  unit.mana -= abilityManaCost(ability);
+  unit.mana -= abilityManaCost(ability, unit);
   ability.cooldown = abilityCooldown(ability);
   const charges = ability.def.charges;
   if (charges) {
