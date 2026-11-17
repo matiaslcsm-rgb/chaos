@@ -200,6 +200,7 @@ function startBreak(match) {
     const hero = player.game.hero;
     pushEvent(player.game.sim, { type: 'text', x: hero.x, y: hero.y, text: `Libros gratis: ${booksText(kinds)}` });
   }
+  for (const player of playersAlive(match)) offerNeutrals(player.game, match.round);
   if (duelRoundFor(match) && announceDuel(match)) match.timer = DUEL_PREP_TIME;
 }
 
@@ -217,10 +218,11 @@ function stepMatch(match, dt) {
   if (match.over) return;
   const human = humanPlayer(match);
   // The human's draft opens between rounds and the whole match waits for it, as in a solo game.
-  if (human && match.phase === 'prep' && human.game.phase !== 'lost' && !human.game.draft && draftsDue(human.game) > 0) {
+  if (human && match.phase === 'prep' && human.game.phase !== 'lost' && !human.game.draft && !human.game.neutralOffer && draftsDue(human.game) > 0) {
     openDraft(human.game);
   }
-  if (human && human.game.draft) return;
+  // Choosing a neutral item waits the same way.
+  if (human && (human.game.draft || human.game.neutralOffer)) return;
 
   for (const player of playersAlive(match)) {
     const game = player.game;

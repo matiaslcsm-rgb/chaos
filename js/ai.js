@@ -287,16 +287,50 @@ function aiUseItems(game) {
   const hp = hero.hp / hero.stats.maxHp;
   const near = enemiesAround(game, hero, 500).length;
   const nearest = nearestEnemy(game.sim, hero, Infinity);
-  hero.items.forEach((item, slot) => {
+  const fighting = nearest && inAttackRange(hero, nearest);
+  equippedItems(hero).forEach((item, slot) => {
     if (itemProblem(hero, item)) return;
     const use = {
       black_king_bar: hp < 0.5 && near >= 3,
       satanic: hp < 0.4 && near >= 1,
-      mask_of_madness: hp > 0.5 && nearest && inAttackRange(hero, nearest),
+      mask_of_madness: hp > 0.5 && fighting,
       phase_boots: nearest && distance(hero, nearest) > 500,
+      essence_ring: hp < 0.5 && near >= 1,
+      mana_draught: hero.mana < hero.stats.maxMana * 0.4,
+      pogo_stick: nearest && distance(hero, nearest) > 600,
+      idol_of_screeauk: hp < 0.6 && near >= 2,
+      flayers_bota: fighting,
+      fallen_sky: near >= 2 || (nearest && distance(hero, nearest) > 500 && distance(hero, nearest) < FALLEN_SKY_RANGE),
+      minotaur_horn: hp < 0.5 && near >= 1,
     }[item.key];
-    if (use) useItem(game.sim, hero, slot);
+    if (use) useItem(game.sim, hero, item.neutral ? NEUTRAL_SLOT : slot);
   });
+}
+
+// ---- Neutral items ----
+
+// What each neutral item is good for, with the same tags as the abilities.
+const AI_NEUTRAL_TAGS = {
+  chipped_vest: ['defense'], possessed_mask: ['attack'], occult_bracelet: ['magic'], weighted_dice: ['attack'],
+  essence_ring: ['defense'], defiant_shell: ['attack', 'defense'], mana_draught: ['magic'], pogo_stick: ['buff'],
+  cloak_of_flames: ['area'], stormcrafter: ['area', 'magic'], gunpowder_gauntlets: ['attack', 'area'], serrated_shiv: ['attack'],
+  giant_maul: ['attack'], idol_of_screeauk: ['defense'], flayers_bota: ['attack', 'buff'], rattlecage: ['defense', 'area'],
+  desolator_2: ['attack'], divine_regalia: ['attack', 'magic'], fallen_sky: ['stun', 'area'], minotaur_horn: ['defense'],
+};
+
+function aiPickNeutral(game, brain) {
+  const weights = AI_STYLE_WEIGHTS[brain.style];
+  const rng = game.sim.rng;
+  let best = null;
+  let bestScore = -Infinity;
+  for (const key of game.neutralOffer.options) {
+    const score = (AI_NEUTRAL_TAGS[key] || []).reduce((sum, tag) => sum + (weights[tag] || 0), 0) + rng();
+    if (score > bestScore) {
+      best = key;
+      bestScore = score;
+    }
+  }
+  return pickNeutral(game, best);
 }
 
 // One decision of the fight: walk to the wave, cast what is worth casting, use items.
@@ -352,6 +386,7 @@ function aiBet(match, player) {
 // Everything a computer player does, called every simulation step.
 function aiStep(game, brain, dt) {
   if (game.phase === 'lost') return;
+  if (game.neutralOffer) aiPickNeutral(game, brain);
   if (game.draft) aiPickDraft(game, brain);
   else if (shopOpen(game) && draftsDue(game) <= 0) aiUseBooks(game, brain);
   aiSpendPoints(game.hero, brain);

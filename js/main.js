@@ -2,7 +2,7 @@
 
 // Boot, input and the frame loop. The only file that knows about real time and the mouse.
 
-const GAME_VERSION = '0.10.0 · Etapa 4: libros';
+const GAME_VERSION = '0.11.0 · Etapa 4: libros e ítems neutrales';
 document.getElementById('game-version').textContent = `Versión ${GAME_VERSION}`;
 
 const canvas = document.getElementById('screen');
@@ -105,6 +105,12 @@ function onDraftClick(point) {
   const card = draftCards(canvas, game).find((c) => inRect(point, c));
   if (card) pickDraft(game, card.key);
   else if (inRect(point, draftSkipButton(canvas))) skipDraft(game);
+}
+
+function onNeutralOfferClick(point) {
+  const card = neutralCards(canvas, game).find((c) => inRect(point, c));
+  if (card) pickNeutral(game, card.key);
+  else if (inRect(point, draftSkipButton(canvas))) skipNeutral(game);
 }
 
 // ---- Abilities ----
@@ -251,7 +257,7 @@ function onShopClick(point, button) {
     if (button === 0) toggleShop();
     return true;
   }
-  const slot = inventorySlots(canvas).find((s) => inRect(point, s));
+  const slot = inventorySlots(canvas).concat(neutralSlot(canvas)).find((s) => inRect(point, s));
   if (!slot) return false;
   if (button === 0) tryUseItem(slot.slot);
   else if (button === 2) trySellItem(slot.slot);
@@ -320,6 +326,10 @@ canvas.addEventListener('mousedown', (event) => {
     if (event.button === 0) onDraftClick(point);
     return;
   }
+  if (game.neutralOffer) {
+    if (event.button === 0) onNeutralOfferClick(point);
+    return;
+  }
   if (onShopClick(point, event.button)) return;
   if (event.button === 0 && onTableClick(point)) return;
   if (event.button === 0 && onBetClick(point)) return;
@@ -350,7 +360,7 @@ canvas.addEventListener('mousedown', (event) => {
 });
 
 window.addEventListener('keydown', (event) => {
-  if (!game || endingText(game) || game.draft) return;
+  if (!game || endingText(game) || game.draft || game.neutralOffer) return;
   const key = event.key.toLowerCase();
   const index = abilityHotkeys(game.hero.abilities).indexOf(key);
   const levelling = event.shiftKey || event.ctrlKey;
@@ -366,6 +376,7 @@ window.addEventListener('keydown', (event) => {
   }
   if (levelling) return;
   if (ITEM_HOTKEYS.includes(key) && !event.repeat) tryUseItem(ITEM_HOTKEYS.indexOf(key));
+  if (key === NEUTRAL_HOTKEY && !event.repeat) tryUseItem(NEUTRAL_SLOT);
   if (key === 't' && !event.repeat) toggleShop();
   if (key === 'a') {
     view.attackMoveArmed = true;
@@ -446,7 +457,7 @@ function frame(now) {
     }
     ageView(elapsed);
     consumeEvents();
-    if (endingText(game) || game.draft) view.targeting = null;
+    if (endingText(game) || game.draft || game.neutralOffer) view.targeting = null;
     if (!shopOpen(game)) view.retraining = false;
     view.hoverEnemy = enemyAt(worldPoint(view.mouse));
     drawGame(ctx, canvas, game, view);

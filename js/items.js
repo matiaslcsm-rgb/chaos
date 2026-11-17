@@ -6,6 +6,7 @@
 const INVENTORY_SIZE = 6;
 const SELL_FRACTION = 0.5;
 const ITEM_HOTKEYS = ['z', 'x', 'c', 'v', 'b', 'n'];
+const NEUTRAL_SLOT = INVENTORY_SIZE;
 
 // Values of the Dota data that are plain stats, and the stat each one gives (see recomputeStats).
 const ITEM_STAT_KEYS = {
@@ -36,9 +37,15 @@ function isRanged(unit) {
   return unit.baseStats.projectileSpeed > 0;
 }
 
+// The six slots plus the neutral item, if any (js/neutrals.js).
+function equippedItems(unit) {
+  return unit.neutral ? unit.items.concat(unit.neutral) : unit.items;
+}
+
+// A neutral item's values are not plain stats (its "bonus_damage" can be a proc), so only its def gives stats.
 function itemStats(unit, item) {
   const stats = {};
-  for (const attrib of DB.items[item.key].attrib || []) {
+  for (const attrib of item.neutral ? [] : DB.items[item.key].attrib || []) {
     const stat = ITEM_STAT_KEYS[attrib.key];
     if (stat) stats[stat] = parseFloat(attrib.value);
   }
@@ -129,8 +136,9 @@ function itemProblem(unit, item) {
 }
 
 // The batch's active items are all instant and need no target, so they do not interrupt the hero.
+// slot: 0-5 for the inventory, NEUTRAL_SLOT for the neutral item.
 function useItem(sim, unit, slot) {
-  const item = unit.items[slot];
+  const item = slot === NEUTRAL_SLOT ? unit.neutral : unit.items[slot];
   if (!item) return 'empty';
   const problem = itemProblem(unit, item);
   if (problem) return problem;

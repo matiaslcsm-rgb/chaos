@@ -191,16 +191,24 @@ function shopCards(canvas) {
   }));
 }
 
-// The books you own, left of the inventory; only those you have.
+// The neutral item's own slot, left of the inventory's second row (G).
+function neutralSlot(canvas) {
+  const second = inventorySlots(canvas)[INVENTORY.columns];
+  return { slot: NEUTRAL_SLOT, key: NEUTRAL_HOTKEY, x: second.x - 12 - INVENTORY.size, y: second.y, width: INVENTORY.size, height: INVENTORY.size };
+}
+
+// The books you own, left of the neutral slot; only those you have.
+const BOOK_BUTTON = { width: 140, height: 30, gap: 6 };
+
 function bookButtons(canvas, hero) {
-  const left = inventorySlots(canvas)[0].x - 12 - 170;
+  const left = neutralSlot(canvas).x - 8 - BOOK_BUTTON.width;
   const books = bookStash(hero);
   return ['retrain', 'page'].filter((kind) => books[kind] > 0).map((kind, row) => ({
     kind,
     x: left,
-    y: canvas.height - INVENTORY.margin - 30 - row * 36,
-    width: 170,
-    height: 30,
+    y: canvas.height - INVENTORY.margin - BOOK_BUTTON.height - row * (BOOK_BUTTON.height + BOOK_BUTTON.gap),
+    width: BOOK_BUTTON.width,
+    height: BOOK_BUTTON.height,
   }));
 }
 
@@ -407,6 +415,72 @@ function abilityOwnerName(key) {
 
 function perLevel(value) {
   return [].concat(value).join('/');
+}
+
+// ---- Choosing a neutral item ----
+
+function neutralCards(canvas, game) {
+  const count = game.neutralOffer.options.length;
+  const rowWidth = count * DRAFT.width + (count - 1) * DRAFT.gap;
+  const left = (canvas.width - rowWidth) / 2;
+  return game.neutralOffer.options.map((key, index) => ({
+    key,
+    x: left + index * (DRAFT.width + DRAFT.gap),
+    y: 200,
+    width: DRAFT.width,
+    height: DRAFT.height + 20,
+  }));
+}
+
+function drawNeutralOffer(ctx, canvas, game, mouse) {
+  const offer = game.neutralOffer;
+  ctx.fillStyle = 'rgba(13, 15, 20, 0.88)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = NEUTRAL_COLOR;
+  ctx.font = `bold 30px ${FONT}`;
+  ctx.fillText(`Ítem neutral de nivel ${offer.tier}: elegí uno`, canvas.width / 2, 120);
+  ctx.fillStyle = '#8a93a6';
+  ctx.font = `14px ${FONT}`;
+  const current = game.hero.neutral;
+  ctx.fillText(current
+    ? `Reemplaza a tu ${DB.items[current.key].dname}, que se pierde.`
+    : `Va en su propio casillero (${NEUTRAL_HOTKEY.toUpperCase()}), al lado del inventario. No se vende.`, canvas.width / 2, 148);
+
+  for (const card of neutralCards(canvas, game)) {
+    const info = DB.items[card.key];
+    const def = NEUTRAL_DEFS[card.key];
+    const hover = inRect(mouse, card);
+    ctx.fillStyle = hover ? '#1f3335' : '#1b2030';
+    ctx.fillRect(card.x, card.y, card.width, card.height);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = hover ? NEUTRAL_COLOR : '#333a4c';
+    ctx.strokeRect(card.x, card.y, card.width, card.height);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#e8ecf4';
+    ctx.font = `bold 16px ${FONT}`;
+    ctx.fillText(info.dname, card.x + 12, card.y + 26);
+    ctx.font = `12px ${FONT}`;
+    ctx.fillStyle = def.active ? '#e8b04a' : '#8a93a6';
+    const kind = def.active ? `Activo (${NEUTRAL_HOTKEY.toUpperCase()})` : 'Pasivo';
+    const costs = [kind];
+    if (info.mc) costs.push(`Maná ${info.mc}`);
+    if (info.cd) costs.push(`Recarga ${info.cd} s`);
+    ctx.fillText(costs.join(' · '), card.x + 12, card.y + 46);
+    ctx.fillStyle = '#b8c0d0';
+    ctx.font = `13px ${FONT}`;
+    wrapText(ctx, def.text, card.width - 24).slice(0, 5).forEach((line, row) => {
+      ctx.fillText(line, card.x + 12, card.y + 70 + row * 17);
+    });
+  }
+
+  const button = draftSkipButton(canvas);
+  ctx.fillStyle = inRect(mouse, button) ? '#3a4154' : '#262c3a';
+  ctx.fillRect(button.x, button.y, button.width, button.height);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#d8dce6';
+  ctx.font = `15px ${FONT}`;
+  ctx.fillText('Cerrar: que me toque uno al azar', canvas.width / 2, button.y + 24);
 }
 
 // A draft pick, or a book: which ability goes, or the sixth one.
@@ -829,53 +903,66 @@ function drawInventory(ctx, canvas, game, view) {
   ctx.fillText(open ? (view.shop ? 'Cerrar tienda (T)' : 'Tienda (T)') : 'Tienda cerrada', button.x + button.width / 2, button.y + 19);
 
   let hovered = null;
-  for (const slot of inventorySlots(canvas)) {
-    const item = hero.items[slot.slot];
-    const { x, y, width, height } = slot;
-    ctx.fillStyle = item ? '#1b2030' : 'rgba(13, 15, 20, 0.7)';
-    ctx.fillRect(x, y, width, height);
-    if (item) {
-      if (inRect(view.mouse, slot)) hovered = slot;
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#d8dce6';
-      ctx.font = `10px ${FONT}`;
-      const lines = wrapText(ctx, DB.items[item.key].dname, width - 6).slice(0, 3);
-      lines.forEach((line, row) => {
-        ctx.fillText(line, x + width / 2, y + height / 2 + 8 + (row - (lines.length - 1) / 2) * 11);
-      });
-      if (item.cooldown > 0) {
-        ctx.fillStyle = 'rgba(8, 10, 14, 0.72)';
-        ctx.fillRect(x, y, width, height);
-        ctx.fillStyle = '#f4f6fa';
-        ctx.font = `bold 18px ${FONT}`;
-        ctx.fillText(item.cooldown >= 10 ? String(Math.ceil(item.cooldown)) : item.cooldown.toFixed(1), x + width / 2, y + height / 2 + 7);
-      }
-    }
-    const active = item && item.def.active;
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = active ? (itemProblem(hero, item) ? '#5a6274' : '#e8b04a') : '#333a4c';
-    ctx.strokeRect(x, y, width, height);
-    ctx.textAlign = 'left';
-    ctx.font = `bold 11px ${FONT}`;
-    ctx.fillStyle = active ? '#e8b04a' : '#5a6274';
-    ctx.fillText(slot.key.toUpperCase(), x + 4, y + 12);
+  for (const slot of inventorySlots(canvas).concat(neutralSlot(canvas))) {
+    const item = slot.slot === NEUTRAL_SLOT ? hero.neutral : hero.items[slot.slot];
+    if (item && inRect(view.mouse, slot)) hovered = slot;
+    drawItemSlot(ctx, hero, item, slot);
   }
   return hovered;
 }
 
+const NEUTRAL_COLOR = '#5fd0c8';
+
+function drawItemSlot(ctx, hero, item, slot) {
+  const { x, y, width, height } = slot;
+  const neutral = slot.slot === NEUTRAL_SLOT;
+  ctx.fillStyle = item ? '#1b2030' : 'rgba(13, 15, 20, 0.7)';
+  ctx.fillRect(x, y, width, height);
+  if (item) {
+    ctx.textAlign = 'center';
+    ctx.fillStyle = item.broken ? '#5a6274' : '#d8dce6';
+    ctx.font = `10px ${FONT}`;
+    const lines = wrapText(ctx, DB.items[item.key].dname, width - 6).slice(0, 3);
+    lines.forEach((line, row) => {
+      ctx.fillText(line, x + width / 2, y + height / 2 + 8 + (row - (lines.length - 1) / 2) * 11);
+    });
+    if (item.cooldown > 0) {
+      ctx.fillStyle = 'rgba(8, 10, 14, 0.72)';
+      ctx.fillRect(x, y, width, height);
+      ctx.fillStyle = '#f4f6fa';
+      ctx.font = `bold 18px ${FONT}`;
+      ctx.fillText(item.cooldown >= 10 ? String(Math.ceil(item.cooldown)) : item.cooldown.toFixed(1), x + width / 2, y + height / 2 + 7);
+    }
+  }
+  const active = item && item.def.active;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = active ? (itemProblem(hero, item) ? '#5a6274' : '#e8b04a') : neutral ? rgba(NEUTRAL_COLOR, item ? 0.8 : 0.35) : '#333a4c';
+  ctx.strokeRect(x, y, width, height);
+  ctx.textAlign = 'left';
+  ctx.font = `bold 11px ${FONT}`;
+  ctx.fillStyle = active ? '#e8b04a' : neutral ? NEUTRAL_COLOR : '#5a6274';
+  ctx.fillText(slot.key.toUpperCase(), x + 4, y + 12);
+  if (neutral && !item) {
+    ctx.textAlign = 'center';
+    ctx.font = `9px ${FONT}`;
+    ctx.fillText('neutral', x + width / 2, y + height / 2 + 8);
+  }
+}
+
 function drawItemTooltip(ctx, canvas, game, slot) {
-  const item = game.hero.items[slot.slot];
+  const item = slot.slot === NEUTRAL_SLOT ? game.hero.neutral : game.hero.items[slot.slot];
   const info = DB.items[item.key];
   const width = 320;
   ctx.font = `12px ${FONT}`;
-  const lines = wrapText(ctx, itemSummary(item.key), width - 24);
+  const lines = wrapText(ctx, item.neutral ? item.def.text : itemSummary(item.key), width - 24);
   const facts = [];
   if (item.def.active) {
     facts.push(`Se usa con ${slot.key.toUpperCase()} o con clic`);
     if (info.mc) facts.push(`Maná ${info.mc}`);
     if (info.cd) facts.push(`Recarga ${info.cd} s`);
   }
-  facts.push(shopOpen(game) ? `Clic derecho: vender por ${sellPrice(item.key)}` : 'Se vende entre rondas');
+  if (item.neutral) facts.push(item.broken ? 'Apagado: moriste con él' : `Neutral de nivel ${neutralTier(item.key)} · no se vende`);
+  else facts.push(shopOpen(game) ? `Clic derecho: vender por ${sellPrice(item.key)}` : 'Se vende entre rondas');
   const factLines = wrapText(ctx, facts.join(' · '), width - 24);
   const height = 38 + (lines.length + factLines.length) * 16 + 6;
   const x = canvas.width - INVENTORY.margin - width;
@@ -1005,8 +1092,8 @@ function drawBookButtons(ctx, canvas, game, view) {
     ctx.textAlign = 'center';
     ctx.fillStyle = active ? '#151922' : open ? '#e8ecf4' : '#5a6274';
     ctx.font = `bold 12px ${FONT}`;
-    const name = button.kind === 'page' ? 'Página rota' : 'Libro';
-    ctx.fillText(`${name} ×${books[button.kind]} · ${open ? 'usar' : 'entre rondas'}`, button.x + button.width / 2, button.y + 19);
+    const name = button.kind === 'page' ? 'página' : 'libro';
+    ctx.fillText(`${open ? `Usar ${name}` : name[0].toUpperCase() + name.slice(1)} ×${books[button.kind]}`, button.x + button.width / 2, button.y + 19, button.width - 8);
   }
 }
 
@@ -1066,7 +1153,7 @@ function drawHud(ctx, canvas, game, view) {
   if (game.match) {
     drawPlayerTable(ctx, canvas, game.match, view);
     if (view.spy !== null) drawSpyPanel(ctx, canvas, game.match, view);
-    if (!game.draft) drawDuelPanel(ctx, canvas, game.match, view);
+    if (!game.draft && !game.neutralOffer) drawDuelPanel(ctx, canvas, game.match, view);
   }
 
   const shopping = view.shop && shopOpen(game);
@@ -1079,7 +1166,7 @@ function drawHud(ctx, canvas, game, view) {
     'A + clic: avanzar atacando · S: frenar',
     'Q W E D F R: habilidades · Esc: cancelar',
     'Shift + tecla o clic en +: subir de nivel',
-    'Z X C V B N: ítems · T: tienda (entre rondas)',
+    'Z X C V B N: ítems · G: neutral · T: tienda',
   ];
   if (!shopping) {
     help.forEach((line, row) => {
@@ -1161,6 +1248,7 @@ function drawGame(ctx, canvas, game, view) {
   drawFloaters(ctx, view, scale);
   drawHud(ctx, canvas, game, view);
   if (game.draft) drawDraft(ctx, canvas, game, view.mouse);
+  else if (game.neutralOffer) drawNeutralOffer(ctx, canvas, game, view.mouse);
 
   const ending = endingText(game);
   if (ending) {

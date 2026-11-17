@@ -996,6 +996,7 @@ test('the shop and the inventory fit on screen without covering the rest', () =>
 function stepMatchPlaying(match) {
   const human = humanPlayer(match);
   if (human && human.game.draft) skipDraft(human.game);
+  if (human && human.game.neutralOffer) skipNeutral(human.game);
   stepMatch(match, TEST_STEP);
 }
 
@@ -1873,6 +1874,126 @@ test('computer: uses its books between rounds on the ability it wanted least', (
   aiStep(game, arena.brain, TEST_STEP);
   assert(!game.draft && !game.hero.abilities.some((ability) => ability.key === 'axe_counter_helix'), 'and picks another');
   assert(game.hero.books.retrain === 0, 'the book is spent');
+});
+
+// ---- Neutral items (user's decision of 2026-11-17) ----
+
+function giveNeutral(game, key) {
+  game.neutralOffer = { tier: neutralTier(key), options: [key] };
+  assert(pickNeutral(game, key), `could not take ${key}`);
+  return game.hero.neutral;
+}
+
+test('neutral items: 4 of each tier, each with its tier from the data and something to say', () => {
+  for (let tier = 1; tier <= 5; tier++) assert(neutralsOfTier(tier).length === 4, `tier ${tier}: ${neutralsOfTier(tier).length}`);
+  for (const key of Object.keys(NEUTRAL_DEFS)) {
+    assert(DB.items[key] && DB.items[key].tier >= 1, `${key} is a neutral of the data`);
+    assert(NEUTRAL_DEFS[key].text.length > 10, `${key} has no text`);
+  }
+});
+
+test('neutral items: after rounds 10 to 50 everyone still in chooses one of the next tier; a new one replaces the old', () => {
+  const match = createMatch(heroByName('Sven'), 81);
+  const human = humanPlayer(match);
+  match.players[3].game.phase = 'lost';
+  match.round = 9;
+  startBreak(match);
+  assert(!human.game.neutralOffer, 'nothing after round 9');
+  match.round = 10;
+  startBreak(match);
+  assert(human.game.neutralOffer && human.game.neutralOffer.tier === 1, 'tier 1 after round 10');
+  assert(human.game.neutralOffer.options.length === NEUTRAL_OPTIONS, 'three to choose from');
+  assert(!match.players[3].game.neutralOffer, 'not for whoever is out');
+  assert(!shopOpen(human.game), 'the shop waits while you choose');
+  const timer = match.timer;
+  stepMatch(match, TEST_STEP);
+  assert(match.timer === timer, 'the match waits for you');
+  const first = human.game.neutralOffer.options[0];
+  pickNeutral(human.game, first);
+  assert(human.game.hero.neutral.key === first && !human.game.neutralOffer, 'taken');
+  // The draft of the start comes first; then the computer players choose theirs.
+  runMatchUntil(match, () => match.players.filter((p) => p.game.phase !== 'lost').every((p) => p.game.hero.neutral), 1);
+  match.round = 50;
+  startBreak(match);
+  skipNeutral(human.game);
+  assert(neutralTier(human.game.hero.neutral.key) === 5, 'tier 5 after round 50, replacing the old one');
+  assert(human.game.hero.items.length === 0, 'it does not take an inventory slot');
+  assert(sellFromInventory(human.game, NEUTRAL_SLOT) === false, 'it cannot be sold');
+});
+
+test('neutral items: numbers and passives (Weighted Dice, Chipped Vest, Desolator 2, Divine Regalia)', () => {
+  const game = createGame(heroByName('Sven'), 82);
+  const max = game.hero.stats.damageMax;
+  giveNeutral(game, 'weighted_dice');
+  assertNear(game.hero.stats.damageMax, max + 6, 1e-9, 'damage max');
+  giveNeutral(game, 'chipped_vest');
+  assertNear(game.hero.stats.damageMax, max, 1e-9, 'the old one is gone');
+  const creep = addTestCreep(game.sim, game.hero.x + 60, game.hero.y, {});
+  landAttack(game.sim, creep, game.hero, { damage: 1 });
+  assert(creep.hp < creep.stats.maxHp, 'the vest hit back');
+  giveNeutral(game, 'desolator_2');
+  const armor = creep.stats.armor;
+  landAttack(game.sim, game.hero, creep, { damage: 1 });
+  assertNear(creep.stats.armor, armor - 13, 1e-9, 'armor down 13');
+  giveNeutral(game, 'divine_regalia');
+  assert(game.hero.stats.damageDealtPct === 20, 'damage up 20%');
+  game.phase = 'fight';
+  killHero(game);
+  assert(!game.hero.dead && game.hero.stats.damageDealtPct === AEGIS_ADVANTAGE.damageDealtPct, 'dying turns it off for good');
+});
+
+test('neutral items: actives work from their own slot with G (Essence Ring)', () => {
+  const game = createGame(heroByName('Sven'), 83);
+  const hero = giveNeutral(game, 'essence_ring') && game.hero;
+  const maxHp = hero.stats.maxHp;
+  assert(useItem(game.sim, hero, NEUTRAL_SLOT) === null, 'used');
+  assertNear(hero.stats.maxHp, maxHp + 240, 1e-9, '+240 max health');
+  assert(hero.neutral.cooldown === DB.items.essence_ring.cd, 'cooldown');
+  assert(useItem(game.sim, hero, NEUTRAL_SLOT) === 'cooldown', 'not twice');
+  runFor(game.sim, 10.1);
+  assertNear(hero.stats.maxHp, maxHp, 1e-9, 'gone after 10 s');
+});
+
+test('the neutral slot and the book buttons fit next to the inventory without covering the bar', () => {
+  const canvas = { width: 1280, height: 720 };
+  const overlap = (a, b) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+  const hero = addTestHero(createSim(1), 'Sniper', 1, 500, 500);
+  addAbility(hero, 'sven_warcry');
+  giveBook(hero, 'retrain');
+  giveBook(hero, 'page');
+  const bar = abilityBarSlots(canvas, hero).flatMap((slot) => [slot, slot.plus]);
+  const neutral = neutralSlot(canvas);
+  const books = bookButtons(canvas, hero);
+  assert(books.length === 2, 'both books show');
+  for (const box of [neutral].concat(books)) {
+    assert(box.x >= 0 && box.y >= 0 && box.x + box.width <= canvas.width && box.y + box.height <= canvas.height, 'on screen');
+    assert(!bar.some((other) => overlap(box, other)), 'clear of the ability bar');
+    assert(!inventorySlots(canvas).some((slot) => overlap(box, slot)), 'clear of the inventory');
+    assert(!overlap(box, heroPanelRect(canvas)), 'clear of the hero panel');
+  }
+  assert(!books.some((book) => overlap(book, neutral)) && !overlap(books[0], books[1]), 'clear of each other');
+});
+
+test('all 20 neutral items can be taken, used and fought with', () => {
+  for (const name of ['Sven', 'Sniper']) {
+    for (const key of Object.keys(NEUTRAL_DEFS)) {
+      try {
+        const game = createGame(heroByName(name), 84);
+        const hero = game.hero;
+        setHeroLevel(hero, 15);
+        hero.mana = hero.stats.maxMana;
+        giveNeutral(game, key);
+        addTestCreep(game.sim, hero.x + 150, hero.y, { maxHp: 3000 });
+        addTestCreep(game.sim, hero.x - 150, hero.y, { maxHp: 3000 });
+        if (NEUTRAL_DEFS[key].active) assert(useItem(game.sim, hero, NEUTRAL_SLOT) === null, 'could not use');
+        hero.acquireRange = HERO_ACQUIRE_RANGE;
+        runFor(game.sim, 8);
+        assert(Number.isFinite(hero.hp) && Number.isFinite(hero.stats.damageMin) && Number.isFinite(hero.x), 'a broken number');
+      } catch (error) {
+        throw new Error(`${key} on ${name}: ${error.message}`);
+      }
+    }
+  }
 });
 
 async function runTests() {

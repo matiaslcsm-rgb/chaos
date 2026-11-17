@@ -159,7 +159,7 @@ function bountyAlive(game) {
 
 // The shop opens between rounds, like in the mod.
 function shopOpen(game) {
-  return game.phase === 'prep' && !game.draft;
+  return game.phase === 'prep' && !game.draft && !game.neutralOffer;
 }
 
 function buyFromShop(game, key) {

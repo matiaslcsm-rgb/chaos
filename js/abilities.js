@@ -112,8 +112,8 @@ function canLevelAbility(hero, ability) {
 // a level, a toggle or the inventory changes.
 function refreshPassives(unit) {
   unit.mods = unit.mods.filter((mod) => !mod.passive);
-  unit.items.forEach((item, slot) => {
-    unit.mods.push({ id: `item:${slot}`, passive: true, sourceId: unit.id, duration: Infinity, stacks: 1, tickTimer: 0, stats: itemStats(unit, item) });
+  equippedItems(unit).forEach((item, slot) => {
+    unit.mods.push({ id: `item:${item.neutral ? 'neutral' : slot}`, passive: true, sourceId: unit.id, duration: Infinity, stacks: 1, tickTimer: 0, stats: itemStats(unit, item) });
   });
   for (const ability of unit.abilities) {
     if (ability.level > 0 && ability.def.stats) {

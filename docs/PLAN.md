@@ -286,7 +286,21 @@ Una partida completa, pero chica.
       Simplificaciones a revisar: no están Omniscient Book, Book of Summoner ni los tomos de atributo (no se
       encontró su precio); la IA no compra libros de reentrenamiento ni páginas; si cambiás una habilidad mejorada
       con Aghanim todavía no se pierde la mejora (el Aghanim no existe aún).
-- [ ] Ítems neutrales. Espera la decisión "Ítems neutrales: en qué rondas cae cada nivel".
+- [x] Ítems neutrales (`js/neutrals.js`) (2026-11-17):
+      - Al terminar las rondas 10, 20, 30 y 40, los que siguen en juego eligen uno entre 3 del nivel siguiente, y del
+        nivel 5 después de la ronda 50 (decisión del 2026-11-17). La partida espera mientras elegís; si cerrás, te
+        toca uno al azar.
+      - Va en su propio casillero, a la izquierda del inventario (tecla G). No se vende y el nuevo reemplaza al viejo.
+      - 20 de los 49 de Dota, 4 por nivel, los que se arman con las piezas que ya hay: Chipped Vest, Possessed Mask,
+        Occult Bracelet, Weighted Dice · Essence Ring, Defiant Shell, Mana Draught, Pogo Stick · Cloak of Flames,
+        Stormcrafter, Gunpowder Gauntlets, Serrated Shiv · Giant Maul, Idol of Screeauk, Flayer's Bota, Rattlecage ·
+        Desolator 2, Divine Regalia, Fallen Sky, Minotaur Horn.
+      - La IA elige según su estilo y usa los activos.
+      - 6 pruebas nuevas (109 en total). Banco de 6 partidas: todas terminaron solas, entre las rondas 60 y 66.
+      Simplificaciones a revisar: no están los "encantamientos" de Dota 7.38 (las mejoras de atributos que vienen con
+      cada neutral); Fallen Sky cae sobre el enemigo más cercano en vez de apuntarse; Minotaur Horn no limpia
+      estados; Weighted Dice solo suma el daño máximo (no tira dos veces); el mod limitaba a 3 por nivel en partidas
+      de 8 cuando los soltaban los creeps, y acá cada uno recibe el suyo.
 - [x] Marcas por perder duelos seguidos y ayudas al que va abajo (2026-11-17): las marcas están desde el
       2026-11-11 (D8, en "Final de partida") y las ayudas son los libros gratis de cada 10 rondas.
 - [ ] Aghanim para cualquier habilidad. Espera la decisión "Aghanim".

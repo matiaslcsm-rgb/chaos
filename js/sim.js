@@ -58,7 +58,8 @@ function recomputeStats(unit) {
     stats.hpRegen += (s.hpRegen || 0) * n;
     stats.manaRegen += (s.manaRegen || 0) * n;
     stats.damageMin += (s.damage || 0) * n;
-    stats.damageMax += (s.damage || 0) * n;
+    stats.damageMax += ((s.damage || 0) + (s.damageMax || 0)) * n;
+    stats.maxHp += (s.maxHp || 0) * n;
     damagePct += (s.damagePct || 0) * n;
     takenPct += (s.damageTakenPct || 0) * n;
     dealtPct += (s.damageDealtPct || 0) * n;
@@ -311,7 +312,7 @@ function runHooks(sim, unit, hook, ...args) {
   for (const ability of unit.abilities) {
     if (ability.level > 0 && ability.def[hook]) ability.def[hook](abilityContext(sim, unit, ability), ...args);
   }
-  for (const item of unit.items) {
+  for (const item of equippedItems(unit)) {
     if (item.def[hook]) item.def[hook](itemContext(sim, unit, item), ...args);
   }
 }
@@ -446,8 +447,11 @@ function stepUnit(sim, unit, dt) {
   unit.mana = Math.min(unit.stats.maxMana, unit.mana + unit.stats.manaRegen * dt);
   unit.attackCooldown = Math.max(0, unit.attackCooldown - dt);
   stepAbilityTimers(unit, dt);
-  for (const item of unit.items) item.cooldown = Math.max(0, item.cooldown - dt);
+  for (const item of equippedItems(unit)) item.cooldown = Math.max(0, item.cooldown - dt);
   stepMods(sim, unit, dt);
+  if (unit.dead) return;
+  // Effects that run all the time (some neutral items); only heroes carry them.
+  if (unit.kind === 'hero') runHooks(sim, unit, 'onStep', dt);
   if (unit.dead) return;
 
   if (unit.knock) {
